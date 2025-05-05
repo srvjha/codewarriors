@@ -6,7 +6,7 @@ import {
   validateLoginData,
   validateRegisterData,
   validateResetPassword,
-} from "../utils/user.validation";
+} from "../validators/user.validation";
 import { db } from "../db";
 import { ApiError } from "../utils/ApiError";
 import { uploadOnCloudinary } from "../utils/cloudinary";

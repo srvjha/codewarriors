@@ -15,9 +15,11 @@ app.get("/",(req,res)=>{
 })
 
 import authRoutes from "./routes/auth.route";
+import problemRoutes from "./routes/problem.route"
 import { errorHandler } from "./middleware/error.middleware";
 
 app.use("/api/v1/auth",authRoutes)
+app.use("/api/v1/problem",problemRoutes)
 app.use(errorHandler);
 app.listen(PORT, () => {
  console.log(`Server is running on port: ${PORT}`);
