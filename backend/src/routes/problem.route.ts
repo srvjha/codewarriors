@@ -7,8 +7,8 @@ const router = Router();
 
 router.post("/create",verifyUser,checkRole,createProblem)
 router.get("/all-problems",verifyUser,checkRole,getAllProblems)
-router.get("/:id",verifyUser,checkRole,getProblemById)
-router.put("/:id/update",verifyUser,checkRole,updateProblem)
-router.delete("/:id/delete",verifyUser,checkRole,deleteProblem)
+router.get("/:pid",verifyUser,checkRole,getProblemById)
+router.put("/:pid/update",verifyUser,checkRole,updateProblem)
+router.delete("/:pid/delete",verifyUser,checkRole,deleteProblem)
 router.get("/solved-problem",verifyUser,getAllProblemSolveByUser)
 export default router

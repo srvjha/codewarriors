@@ -39,13 +39,12 @@ type Judge0Submission = {
 
 
 export const submitBatch = async(submissions:Judge0Submission[])=>{
-    console.log("submissions: ",submissions)
-    console.log(`${process.env.JUDGE0_API_URL}`)
+    //console.log("submissions: ",submissions)
     const {data} = await axios.post(`${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,{
         submissions
     })
 
-    console.log("submit batch data: ",data)
+    //console.log("submit batch data: ",data)
 
     return data as Token[] // array of tokens;
 }
@@ -63,8 +62,8 @@ export const pollBatchResults = async(tokens:Token[])=>{
              }
          })
  
-         console.log("poll batch data: ",data)
-         console.log("poll batch data: ",data.status)
+         //console.log("poll batch data: ",data)
+
          const results = data.submissions as Statuses[];
  
          const isAllDone = results.every((result)=> result.status.id !== 1 && result.status.id !== 2)
