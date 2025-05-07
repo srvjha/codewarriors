@@ -15,7 +15,9 @@ type Judge0Submission = {
     source_code: string;
     language_id: number;
     stdin: string;
-    expected_output: string;
+    expected_output?: string;
+    base64_encoded?:boolean;
+    wait?:boolean
   };
   
   type Token = {
@@ -75,4 +77,14 @@ export const pollBatchResults = async(tokens:Token[])=>{
       throw new ApiError("Error while polling Judge0 submissions",500)
    }
 
+}
+
+export const getLanguageNameById = (languageId:number)=>{
+  const languages = {
+    71:"PYTHON",
+    62:"JAVA",
+    63:"JAVASCRIPT",
+    54:"C++ (GCC 9.2.0)"
+};
+    return languages[languageId as keyof typeof languages]
 }
