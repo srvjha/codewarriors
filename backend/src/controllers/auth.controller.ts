@@ -467,6 +467,29 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     );
 });
 
+const getProblemsSolvedByUser = asyncHandler(async(req,res)=>{
+  const userId = req.user.id  
+  const problems = await db.problem.findMany({
+    where:{
+      SolvedBy:{
+        some:{
+          userId
+        }
+      }
+    }, include:{
+      SolvedBy:{
+        where:{
+          userId
+        }
+      }
+    }
+  })
+
+  res.status(200).json(
+    new ApiResponse(200,problems,"Problem Fetched Successfully")
+  )
+})
+
 export {
   changeCurrentPassword,
   forgotPasswordRequest,
@@ -478,4 +501,5 @@ export {
   resendEmailVerification,
   resetForgottenPassword,
   verifyEmail,
+  getProblemsSolvedByUser
 };
