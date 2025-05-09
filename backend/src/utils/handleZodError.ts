@@ -1,5 +1,6 @@
 import { SafeParseReturnType } from "zod";
 import { ApiError } from "./ApiError";
+import { logger } from "../configs/logger";
 
  const handleZodError = <T>(
   result: SafeParseReturnType<unknown, T>
@@ -11,6 +12,7 @@ import { ApiError } from "./ApiError";
 
     if (missing) {
       if (result.error.issues[0].path.length) {
+         logger.warn(`Zod Validation Failed: ${result.error.issues[0].path}`);
         throw new ApiError(
           `Missing ${result.error.issues[0].path} field`,
           500

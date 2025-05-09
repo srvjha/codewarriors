@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { jsonSchema } from "./json.validation";
+import { Difficulty } from "../generated/prisma";
 
 const testcaseSchema = z.object({
   input: z.string(),
@@ -11,10 +12,12 @@ const testcaseSchema = z.object({
 const createProblemSchema = z.object({
   title: z.string().nonempty({ message: "Title is required" }),
   description: z.string().nonempty({ message: "Description is required" }),
-  difficulty: z.enum(["EASY", "MEDIUM", "HARD"], {
-    required_error: "Difficulty is required",
-    invalid_type_error: "Difficulty must be EASY, MEDIUM, or HARD",
-  }),
+  difficulty: z
+    .string()
+    .transform((val) => val.toUpperCase())
+    .refine((val): val is Difficulty => Object.values(Difficulty).includes(val as Difficulty), {
+      message: "Difficulty must be EASY, MEDIUM, or HARD",
+    }),
   tags: z
     .array(z.string())
     .nonempty({ message: "At least one tag is required" }),

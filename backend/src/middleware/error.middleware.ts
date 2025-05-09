@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ApiError } from "../utils/ApiError";
+import { logger } from "../configs/logger";
 
 
 const errorHandler = (
@@ -25,7 +26,9 @@ const errorHandler = (
     const errorMessage = err.message || "Internal Server Error";
     customError = new ApiError(errorMessage, statusCode);
   }
-
+    logger.error(
+    `${req.method} ${req.originalUrl} -> ${customError.message} [${customError.statusCode}]`
+  );
 
   res.status(customError.statusCode).json({
     success: customError.success,

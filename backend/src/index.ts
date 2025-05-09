@@ -1,5 +1,6 @@
 import { app } from "./app";
 import dotenv from "dotenv";
+import { logger } from "./configs/logger";
 
 
 dotenv.config({
@@ -13,5 +14,5 @@ app.get("/",(req,res)=>{
 })
 
 app.listen(PORT, () => {
- console.log(`Server is running on port: ${PORT}`);
+ logger.info(`Server is running on port: ${PORT}`);
 });

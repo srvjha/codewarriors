@@ -13,7 +13,7 @@ import {
 } from "../utils/judge0";
 import { ApiResponse } from "../utils/ApiResponse";
 import { validId } from "../helper/validId.helper";
-import { UserRole } from "../generated/prisma";
+import { Difficulty, UserRole } from "../generated/prisma";
 
 const createProblem = asyncHandler(async (req, res) => {
   const {
@@ -35,12 +35,22 @@ const createProblem = asyncHandler(async (req, res) => {
     throw new ApiError("You are not allowed to create a problem", 403);
   }
 
+  const existingProblem = await db.problem.findFirst({
+    where: {
+      title,
+    },
+  });
+
+  if (existingProblem) {
+    throw new ApiError("Problem already exists", 400);
+  }
+
   for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
     const languageId = getJudge0LanguageById(language);
     if (!languageId) {
       throw new ApiError(`Invalid ${language} language `, 400);
     }
-   
+
     const submissions = testcases.map(
       ({ input, output }: { input: string; output: string }) => {
         return {
@@ -52,9 +62,7 @@ const createProblem = asyncHandler(async (req, res) => {
       }
     );
 
-    const submissionResults = await submitBatch(submissions);
-    const tokens = submissionResults.map((res) => ({ token: res.token }));
-
+    const tokens = await submitBatch(submissions);
     const results = await pollBatchResults(tokens);
 
     for (let i = 0; i < results.length; i++) {
@@ -68,7 +76,7 @@ const createProblem = asyncHandler(async (req, res) => {
       data: {
         title,
         description,
-        difficulty,
+        difficulty:difficulty.toUpperCase() as Difficulty,
         tags,
         examples,
         constraints,
@@ -144,85 +152,82 @@ const updateProblem = asyncHandler(async (req, res) => {
     throw new ApiError("You are not allowed to create a problem", 403);
   }
 
+  const updatePayload: Partial<{
+    title: string;
+    description: string;
+    difficulty: "EASY" | "MEDIUM" | "HARD";
+    tags: string[];
+    hints: string;
+    constraints: string;
+    examples: any;
+    codeSnippets: any;
+    editorial: string;
+    referenceSolutions: any;
+    testcases: any;
+  }> = {};
 
-   const updatePayload: Partial<{
-      title: string;
-      description: string;
-      difficulty: "EASY" | "MEDIUM" | "HARD";
-      tags: string[];
-      hints: string;
-      constraints: string;
-      examples: any;
-      codeSnippets: any;
-      editorial: string;
-      referenceSolutions: any;
-      testcases: any;
-    }> = {};
+  if (title !== undefined) updatePayload.title = title;
+  if (description !== undefined) updatePayload.description = description;
+  if (difficulty !== undefined) updatePayload.difficulty = difficulty;
+  if (tags !== undefined) updatePayload.tags = tags;
+  if (hints !== undefined) updatePayload.hints = hints;
+  if (constraints !== undefined) updatePayload.constraints = constraints;
+  if (examples !== undefined) updatePayload.examples = examples;
+  if (codeSnippets !== undefined) updatePayload.codeSnippets = codeSnippets;
+  if (editorial !== undefined) updatePayload.editorial = editorial;
+  if (referenceSolutions !== undefined)
+    updatePayload.referenceSolutions = referenceSolutions;
+  if (testcases !== undefined) updatePayload.testcases = testcases;
 
-    if (title !== undefined) updatePayload.title = title;
-    if (description !== undefined) updatePayload.description = description;
-    if (difficulty !== undefined) updatePayload.difficulty = difficulty;
-    if (tags !== undefined) updatePayload.tags = tags;
-    if (hints !== undefined) updatePayload.hints = hints;
-    if (constraints !== undefined) updatePayload.constraints = constraints;
-    if (examples !== undefined) updatePayload.examples = examples;
-    if (codeSnippets !== undefined) updatePayload.codeSnippets = codeSnippets;
-    if (editorial !== undefined) updatePayload.editorial = editorial;
-    if (referenceSolutions !== undefined)
-      updatePayload.referenceSolutions = referenceSolutions;
-    if (testcases !== undefined) updatePayload.testcases = testcases;
+  if (Object.keys(updatePayload).length === 0) {
+    throw new ApiError("At least one field is required to update", 400);
+  }
+  console.log(updatePayload);
+  if (updatePayload.referenceSolutions) {
+    for (const [language, solutionCode] of Object.entries(
+      updatePayload.referenceSolutions
+    )) {
+      const languageId = getJudge0LanguageById(language);
+      if (!languageId) {
+        throw new ApiError(`Invalid ${language} language `, 400);
+      }
 
-    if (Object.keys(updatePayload).length === 0) {
-      throw new ApiError(
-        "At least one field is required to update",
-        400
+      const submissions = updatePayload.testcases.map(
+        ({ input, output }: { input: string; output: string }) => {
+          return {
+            source_code: solutionCode,
+            language_id: languageId,
+            stdin: input,
+            expected_output: output,
+          };
+        }
       );
-    }
-    console.log(updatePayload)
-   if(updatePayload.referenceSolutions){
-  for (const [language, solutionCode] of Object.entries(updatePayload.referenceSolutions)) {
-    const languageId = getJudge0LanguageById(language);
-    if (!languageId) {
-      throw new ApiError(`Invalid ${language} language `, 400);
-    }
 
-    const submissions = updatePayload.testcases.map(
-      ({ input, output }: { input: string; output: string }) => {
-        return {
-          source_code: solutionCode,
-          language_id: languageId,
-          stdin: input,
-          expected_output: output,
-        };
-      }
-    );
+      const submissionResults = await submitBatch(submissions);
+      const tokens = submissionResults.map((res) => ({ token: res.token }));
 
-    const submissionResults = await submitBatch(submissions);
-    const tokens = submissionResults.map((res) => ({ token: res.token }));
+      const results = await pollBatchResults(tokens);
 
-    const results = await pollBatchResults(tokens);
-
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i];
-      if (result.status.id !== 3) {
-        throw new ApiError(`Submission ${i + 1} failed`, 400);
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        if (result.status.id !== 3) {
+          throw new ApiError(`Submission ${i + 1} failed`, 400);
+        }
       }
     }
-  }  
-}
+  }
 
-    const newProblem = await db.problem.update({
-      where: { id: pid },
-      data: {
-       ...updatePayload,
-        userId: req.user.id,
-      },
-    });
+  const newProblem = await db.problem.update({
+    where: { id: pid },
+    data: {
+      ...updatePayload,
+      userId: req.user.id,
+    },
+  });
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, newProblem, "Problem updated successfully"));
-  
+  return res
+    .status(200)
+    .json(new ApiResponse(200, newProblem, "Problem updated successfully"));
 });
 
 const deleteProblem = asyncHandler(async (req, res) => {
