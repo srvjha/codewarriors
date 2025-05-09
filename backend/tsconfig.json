@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "strict": true,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
     "rootDir": "src",

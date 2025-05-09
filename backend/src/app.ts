@@ -2,6 +2,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { errorHandler } from "./middleware/error.middleware";
+import swaggerUi from "swagger-ui-express";
+import * as swaggerDocs from "./swagger-output.json"
 
 const app = express();
 
@@ -10,6 +12,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors());
 app.use(express.static("public"));
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 import healthRoutes from "./routes/healthCheck.route"
 import authRoutes from "./routes/auth.route";
