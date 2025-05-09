@@ -30,6 +30,7 @@ const getAllPlaylistDetails = asyncHandler(async (req, res) => {
 
 const getPlaylistDetails = asyncHandler(async (req, res) => {
   const { plid } = req.params;
+   validId(plid, "Playlist");
   const userId = req.user.id;
   const playlist = await db.playlist.findUnique({
     where: {
@@ -72,6 +73,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
 
 const deletePlaylist = asyncHandler(async (req, res) => {
   const { plid } = req.params;
+   validId(plid, "Playlist");
   const playlist = await db.playlist.delete({
     where: {
       id: plid,
@@ -84,6 +86,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 
 const addProblemToPlaylist = asyncHandler(async (req, res) => {
   const { plid } = req.params;
+   validId(plid, "Playlist");
   const { problemIds } = handleZodError(addProblemsValidation(req.body));
 
   problemIds.forEach((id) => validId(id, "Problem"));
@@ -122,6 +125,7 @@ const addProblemToPlaylist = asyncHandler(async (req, res) => {
 
 const removeProblemFromPlaylist = asyncHandler(async (req, res) => {
   const { plid } = req.params;
+  validId(plid, "Playlist");
   const { problemIds } = handleZodError(addProblemsValidation(req.body));
 
   problemIds.forEach((id) => validId(id, "Problem"));

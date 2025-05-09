@@ -1,4 +1,5 @@
 import { db } from "../db";
+import { validId } from "../helper/validId.helper";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asynHandler";
 
@@ -17,6 +18,7 @@ const getAllSubmission = asyncHandler(async (req, res) => {
 
 const getAllSubmissionForProblem = asyncHandler(async (req, res) => {
   const { pid } = req.params;
+   validId(pid, "Problem");
   const userId = req.user.id;
   const submissions = await db.submission.findMany({
     where: {
@@ -34,6 +36,7 @@ const getAllSubmissionForProblem = asyncHandler(async (req, res) => {
 
 const getAllTheSubmissionForProblem = asyncHandler(async (req, res) => {
   const { pid } = req.params;
+   validId(pid, "Problem");
   const submission = await db.submission.count({
     where: {
       problemId: pid,

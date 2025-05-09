@@ -1,3 +1,4 @@
+import { UserRole } from "../generated/prisma";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asynHandler";
 
@@ -7,7 +8,7 @@ export const checkRole = asyncHandler(async(req,res,next)=>{
     if(!role){
         throw new ApiError("Invalid role",400)
     }
-    if(role.toUpperCase() !== "ADMIN"){
+    if(role.toUpperCase() !== UserRole.ADMIN){
         throw new ApiError("You do not have permission to access this resource",403)
     }
     next();

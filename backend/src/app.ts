@@ -11,6 +11,7 @@ app.use(cookieParser());
 app.use(cors());
 app.use(express.static("public"));
 
+import healthRoutes from "./routes/healthCheck.route"
 import authRoutes from "./routes/auth.route";
 import problemRoutes from "./routes/problem.route"
 import executeCode from "./routes/executeCode.route"
@@ -18,11 +19,13 @@ import submissionRoutes from "./routes/submission.route"
 import playlistRoutes from "./routes/playlist.routes"
 
 
+
 app.use("/api/v1/auth",authRoutes)
 app.use("/api/v1/problem",problemRoutes)
 app.use("/api/v1/execute/code",executeCode);
 app.use("/api/v1/submission",submissionRoutes);
 app.use("/api/v1/playlist",playlistRoutes)
+app.use("/api/v1/health",healthRoutes)
 app.use(errorHandler);
 
 export { app };

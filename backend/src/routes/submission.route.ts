@@ -6,6 +6,6 @@ const router = Router();
 
 router.get("/all",verifyUser,getAllSubmission);
 router.get("/problem/:pid",verifyUser,getAllSubmissionForProblem);
-router.get("/count/:pid",verifyUser,getAllTheSubmissionForProblem)
+router.get("/count/problem/:pid",verifyUser,getAllTheSubmissionForProblem)
 
 export default router;

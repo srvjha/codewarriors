@@ -26,6 +26,7 @@ import {
 import { env } from "../utils/env";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { UserRole } from "../generated/prisma";
 
 const generateAccessAndRefreshToken = async (userId: string) => {
   try {
@@ -55,7 +56,7 @@ const generateAccessAndRefreshToken = async (userId: string) => {
 };
 
 const register = asyncHandler(async (req, res) => {
-  const { fullName, username, email, password, role } = handleZodError(
+  const { fullName, username, email, password } = handleZodError(
     validateRegisterData(req.body)
   );
 
@@ -85,7 +86,7 @@ const register = asyncHandler(async (req, res) => {
       username,
       fullName,
       password: hashedPassword,
-      role,
+      role:UserRole.USER,
       refreshToken: "",
       emailVerificationToken: hashedToken,
       emailVerificationExpiry: tokenExpiry,

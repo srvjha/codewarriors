@@ -8,7 +8,6 @@ const registerSchema = z.object({
     .max(20, { message: "Username must be at most 20 characters long" }),
 
   email: z.string().trim().email({ message: "Invalid email address" }),
-  role:z.enum(["USER","ADMIN"]),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters long" })
@@ -21,7 +20,6 @@ const registerSchema = z.object({
 
 const loginSchema = registerSchema.omit({
   fullName: true,
-  role:true,
   username: true,
 });
 
@@ -62,7 +60,7 @@ const validateRegisterData = (data: RegisterData) => {
 };
 
 const validateLoginData = (data: LoginData) => {
-  console.log("hii")
+ 
   return loginSchema.safeParse(data);
 };
 

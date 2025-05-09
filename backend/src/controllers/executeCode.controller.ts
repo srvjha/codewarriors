@@ -1,4 +1,5 @@
 import { db } from "../db";
+import { validId } from "../helper/validId.helper";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asynHandler";
 import { handleZodError } from "../utils/handleZodError";
@@ -16,6 +17,7 @@ const executeCode = asyncHandler(async (req, res) => {
   );
   const userId = req.user.id;
   const { pid } = req.params;
+   validId(pid, "Problem");
 
   // prepare each cases for judge0 batch submission
   const submissions = stdin.map((input) => ({
