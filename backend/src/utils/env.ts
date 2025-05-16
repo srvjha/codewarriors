@@ -7,6 +7,7 @@ const createEnv = (env: NodeJS.ProcessEnv) => {
   const envSchema = z.object({
     PORT: z.coerce.number(),
     DATABASE_URL: z.string().nonempty(),
+    RESEND_API_KEY:z.string().nonempty(),
 
     MAILTRAP_SMTP_HOST: z.string().nonempty(),
     MAILTRAP_SMTP_PORT: z.coerce.number(),

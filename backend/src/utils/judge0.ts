@@ -64,10 +64,10 @@ export const pollBatchResults = async(tokens:Token[])=>{
              }
          })
  
-         console.log("poll batch data: ",data)
+        //  console.log("poll batch data: ",data)
 
          const results = data.submissions as Statuses[];
-         console.log("results: ",results)
+        //  console.log("results: ",results)
  
          const isAllDone = results.every((result)=> result.status.id !== 1 && result.status.id !== 2)
          if(isAllDone) return results

@@ -71,6 +71,8 @@ model Problem {
   Submission        Submission[]
   SolvedBy          ProblemSolved[]
   ProblemInPlaylist ProblemInPlaylist[]
+
+  @@unique([title])
 }
 
 model Submission {

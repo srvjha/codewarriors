@@ -76,7 +76,7 @@ const createProblem = asyncHandler(async (req, res) => {
       data: {
         title,
         description,
-        difficulty:difficulty.toUpperCase() as Difficulty,
+        difficulty: difficulty.toUpperCase() as Difficulty,
         tags,
         examples,
         constraints,
@@ -95,7 +95,17 @@ const createProblem = asyncHandler(async (req, res) => {
 });
 
 const getAllProblems = asyncHandler(async (req, res) => {
-  const problems = await db.problem.findMany();
+  const problems = await db.problem.findMany({
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      difficulty: true,
+      tags: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
   if (!problems) {
     throw new ApiError("No problems found", 404);
   }
@@ -105,6 +115,7 @@ const getAllProblems = asyncHandler(async (req, res) => {
 });
 
 const getProblemById = asyncHandler(async (req, res) => {
+  console.log("by id yaha aaya hu");
   const { pid } = req.params;
   validId(pid, "Problem");
   const problem = await db.problem.findUnique({
@@ -130,6 +141,7 @@ const getProblemById = asyncHandler(async (req, res) => {
 });
 
 const updateProblem = asyncHandler(async (req, res) => {
+  console.log("update se yaha aaya hu");
   const { pid } = req.params;
   validId(pid, "Problem");
   const {
@@ -182,40 +194,55 @@ const updateProblem = asyncHandler(async (req, res) => {
   if (Object.keys(updatePayload).length === 0) {
     throw new ApiError("At least one field is required to update", 400);
   }
-  console.log(updatePayload);
+
   if (updatePayload.referenceSolutions) {
-    for (const [language, solutionCode] of Object.entries(
-      updatePayload.referenceSolutions
-    )) {
-      const languageId = getJudge0LanguageById(language);
-      if (!languageId) {
-        throw new ApiError(`Invalid ${language} language `, 400);
-      }
-
-      const submissions = updatePayload.testcases.map(
-        ({ input, output }: { input: string; output: string }) => {
-          return {
-            source_code: solutionCode,
-            language_id: languageId,
-            stdin: input,
-            expected_output: output,
-          };
-        }
+    if (!updatePayload.testcases) {
+      throw new ApiError(
+        "Testcases are required when reference solutions are provided",
+        400
       );
+    }
+  } else if (updatePayload.testcases) {
+    if (!updatePayload.referenceSolutions) {
+      throw new ApiError(
+        "Reference solutions are required when testcases are provided",
+        400
+      );
+    }
+  }
+  else if(updatePayload.referenceSolutions && updatePayload.testcases){
+  for (const [language, solutionCode] of Object.entries(
+    updatePayload.referenceSolutions
+  )) {
+    const languageId = getJudge0LanguageById(language);
+    if (!languageId) {
+      throw new ApiError(`Invalid ${language} language `, 400);
+    }
 
-      const submissionResults = await submitBatch(submissions);
-      const tokens = submissionResults.map((res) => ({ token: res.token }));
+    const submissions = updatePayload.testcases.map(
+      ({ input, output }: { input: string; output: string }) => {
+        return {
+          source_code: solutionCode,
+          language_id: languageId,
+          stdin: input,
+          expected_output: output,
+        };
+      }
+    );
 
-      const results = await pollBatchResults(tokens);
+    const submissionResults = await submitBatch(submissions);
+    const tokens = submissionResults.map((res) => ({ token: res.token }));
 
-      for (let i = 0; i < results.length; i++) {
-        const result = results[i];
-        if (result.status.id !== 3) {
-          throw new ApiError(`Submission ${i + 1} failed`, 400);
-        }
+    const results = await pollBatchResults(tokens);
+
+    for (let i = 0; i < results.length; i++) {
+      const result = results[i];
+      if (result.status.id !== 3) {
+        throw new ApiError(`Submission ${i + 1} failed`, 400);
       }
     }
   }
+}
 
   const newProblem = await db.problem.update({
     where: { id: pid },
@@ -231,6 +258,7 @@ const updateProblem = asyncHandler(async (req, res) => {
 });
 
 const deleteProblem = asyncHandler(async (req, res) => {
+  console.log("delete se  idhr aaya main");
   const { pid } = req.params;
   validId(pid, "Problem");
   const deletedProblem = await db.problem.deleteMany({ where: { id: pid } });
@@ -243,7 +271,29 @@ const deleteProblem = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Problem deleted successfully"));
 });
 
-const getAllProblemSolveByUser = asyncHandler(async (req, res) => {});
+const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const problems = await db.problem.findMany({
+    where: {
+      SolvedBy: {
+        some: {
+          userId,
+        },
+      },
+    },
+    include: {
+      SolvedBy: {
+        where: {
+          userId,
+        },
+      },
+    },
+  });
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, problems, "Problem Fetched Successfully"));
+});
 
 export {
   createProblem,
@@ -251,5 +301,5 @@ export {
   getProblemById,
   updateProblem,
   deleteProblem,
-  getAllProblemSolveByUser,
+  getAllProblemsSolvedByUser,
 };

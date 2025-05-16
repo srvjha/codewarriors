@@ -2,10 +2,10 @@ import { z } from "zod";
 import { jsonSchema } from "./json.validation";
 import { Difficulty } from "../generated/prisma";
 
-const testcaseSchema = z.object({
+export const testcaseSchema = z.array(z.object({
   input: z.string(),
   output: z.string(),
-});
+}));
 
 
 
@@ -25,7 +25,7 @@ const createProblemSchema = z.object({
   constraints: z.string().nonempty({ message: "Constraints are required" }),
   editorial:z.string().optional(),
   hints: z.string().optional(),
-  testcases:z.array(testcaseSchema),
+  testcases:testcaseSchema,
   codeSnippets: z.any(),
   referenceSolutions: jsonSchema,
 });
