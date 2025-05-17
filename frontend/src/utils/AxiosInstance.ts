@@ -1,0 +1,56 @@
+import axios from "axios";
+
+const API = axios.create({
+  baseURL: "http://localhost:3000/api/v1",
+  withCredentials: true, 
+});
+
+
+let isRefreshing = false;
+interface FailedRequestCallback {
+    (): void;
+}
+
+let failedRequestsQueue: FailedRequestCallback[] = [];
+
+
+API.interceptors.response.use(
+  (response) => response, 
+  async (error) => {
+    const originalRequest = error.config;
+    console.log("JWT Expiry Check Triggered");
+    console.log(error.response?.data?.error)
+
+   
+    if (error.response?.data?.error === "jwt expired" && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          failedRequestsQueue.push(() => resolve(API(originalRequest)));
+        });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        await axios.get("http://localhost:3000/api/v1/auth/refresh", {
+          withCredentials: true, 
+        });
+
+        failedRequestsQueue.forEach((callback) => callback());
+        failedRequestsQueue = [];
+
+        return API(originalRequest);
+      } catch (refreshError) {
+        failedRequestsQueue = [];
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
+export default API;

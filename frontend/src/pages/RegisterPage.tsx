@@ -9,15 +9,25 @@ import {
   CardTitle,
 } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Code, Brain, Trophy, Zap, ChevronRight, EyeOff, Eye } from "lucide-react";
-import { Link } from "react-router-dom";
+import {
+  Code,
+  Brain,
+  Trophy,
+  Zap,
+  ChevronRight,
+  EyeOff,
+  Eye,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { FormValues } from "@/utils/ZodResolver";
 import { resolver } from "@/utils/ZodResolver";
-import axios from "axios";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser } from "@/redux/slices/auth/authThunks";
+import type { AppDispatch, RootState } from "@/redux/store";
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -39,15 +49,18 @@ const featureItem = {
 };
 
 const RegisterPage = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const state = useSelector((state: RootState) => state);
+  console.log("State: ", state);
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm<FormValues>({ resolver });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(state.auth.isLoading);
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
 
   const onSubmit = handleSubmit(async (data: FormValues) => {
     const formData = new FormData();
@@ -60,33 +73,23 @@ const RegisterPage = () => {
       formData.append("avatar", data.avatar[0]);
     }
     console.log("formdata: ", formData);
-    await registerUser(data);
+    await registerUserFunction(data);
   });
 
-  const registerUser = async (userInfo: FormValues) => {
-    try {
-      const register = await axios.post(
-        "http://localhost:3000/api/v1/auth/register",
-        userInfo,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+  const registerUserFunction = async (userInfo: FormValues) => {
+    const result = await dispatch(registerUser(userInfo));
+    console.log("result: ", result);
 
-      if (register.data.success) {
-        ToastSuccess(register.data.message);
-        setIsLoading(false);
-        // empty the fields
+    if (registerUser.fulfilled.match(result)) {
+      setIsLoading(state.auth.isLoading);
+      ToastSuccess(result.payload);
+      setTimeout(() => {
         reset();
-      }
-      console.log("registered: ", register);
-    } catch (error: any) {
-      setTimeout(() => setIsLoading(false), 2000);
-      ToastError(`${error.response.data.error}`);
-
-      console.log("Error occured: ", error.response.data.error);
+        navigate("/");
+      }, 4000);
+    } else {
+      setTimeout(() => setIsLoading(state.auth.isLoading), 1000);
+      ToastError(`${result.payload}`);
     }
   };
 

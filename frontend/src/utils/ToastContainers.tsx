@@ -21,7 +21,7 @@ export const Toast = () => {
 export const ToastSuccess = (message:string) => {
   return toast.success(message, {
     position: "bottom-right",
-    autoClose: 5000,
+    autoClose: 2000,
     hideProgressBar: false,
     closeOnClick: false,
     pauseOnHover: true,

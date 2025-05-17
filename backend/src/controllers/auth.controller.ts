@@ -201,7 +201,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, cookieOption)
     .cookie("refreshToken", refreshToken, cookieOption)
     .status(200)
-    .json(new ApiResponse(200, null, "User logged in Successfully"));
+    .json(new ApiResponse(200, user, "User logged in Successfully"));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -323,7 +323,7 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken;
-
+  console.log("token: ",incomingRefreshToken)
   if (!incomingRefreshToken) {
     throw new ApiError("Unauthorized Request", 400);
   }
@@ -331,12 +331,13 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   let decodedToken: any;
   try {
     decodedToken = jwt.verify(incomingRefreshToken, env.REFRESH_TOKEN_SECRET);
+    console.log("decodedToken: ",decodedToken)
   } catch (error) {
     throw new ApiError("Invalid or expired refresh token", 400);
   }
 
   const user = await db.user.findUnique({
-    where: { id: decodedToken._id },
+    where: { id: decodedToken.id },
   });
 
   if (!user) {

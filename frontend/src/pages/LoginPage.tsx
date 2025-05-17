@@ -14,10 +14,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { LoginFormValues } from "@/utils/ZodResolver";
 import { LoginResolver } from "@/utils/ZodResolver";
-import axios from "axios";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "@/redux/store";
+import { LoginUser } from "@/redux/slices/auth/authThunks";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -40,44 +42,38 @@ const featureItem = {
 };
 
 const LoginPage = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const state = useSelector((state: RootState) => state);
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm<LoginFormValues>({ resolver: LoginResolver });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(state.auth.isLoading);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const onSubmit = handleSubmit(async (data: LoginFormValues) => {
     const formData = new FormData();
     formData.append("email", data.email);
     formData.append("password", data.password);
-    await LoginUser(data);
+    await LoginUserFunction(data);
   });
 
-  const LoginUser = async (userInfo: LoginFormValues) => {
-    try {
-      const login = await axios.post(
-        "http://localhost:3000/api/v1/auth/login",
-        userInfo,
-        {
-          withCredentials:true
-        }
-      );
+  const LoginUserFunction = async (userInfo: LoginFormValues) => {
+    const result = await dispatch(LoginUser(userInfo));
+    console.log("result: ", result);
 
-      if (login.data.success) {
-        ToastSuccess(login.data.message);
-        setIsLoading(false);
-        // empty the fields
+    if (LoginUser.fulfilled.match(result)) {
+      setIsLoading(state.auth.isLoading);
+      ToastSuccess(result.payload.message);
+      setTimeout(() => {
         reset();
-        navigate("/")
-      }
-    } catch (error: any) {
-      setTimeout(() => setIsLoading(false), 2000);
-      ToastError(`${error.response.data.error}`);
-
-      console.log("Error occured: ", error);
+        navigate("/");
+      }, 3000);
+    } else {
+      setTimeout(() => setIsLoading(state.auth.isLoading), 1000);
+      ToastError(`${result.payload}`);
     }
   };
   return (

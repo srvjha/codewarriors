@@ -16,7 +16,7 @@ router.get(
 router.get("/password/reset/:token", verifyUser, forgotPasswordRequest);
 router.get("/password/change", verifyUser, changeCurrentPassword);
 router.get("/me", verifyUser, getCurrentUser);
-router.get("/refresh", verifyUser, refreshAccessToken);
+router.get("/refresh",refreshAccessToken);
 router.get("/logout", verifyUser, logoutUser);
 
 
