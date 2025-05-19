@@ -43,36 +43,28 @@ const featureItem = {
 
 const LoginPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const state = useSelector((state: RootState) => state);
+  const {isLoading} = useSelector((state: RootState) => state.auth);
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm<LoginFormValues>({ resolver: LoginResolver });
-  const [isLoading, setIsLoading] = useState(state.auth.isLoading);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const onSubmit = handleSubmit(async (data: LoginFormValues) => {
-    const formData = new FormData();
-    formData.append("email", data.email);
-    formData.append("password", data.password);
     await LoginUserFunction(data);
   });
 
   const LoginUserFunction = async (userInfo: LoginFormValues) => {
     const result = await dispatch(LoginUser(userInfo));
-    console.log("result: ", result);
-
     if (LoginUser.fulfilled.match(result)) {
-      setIsLoading(state.auth.isLoading);
       ToastSuccess(result.payload.message);
       setTimeout(() => {
         reset();
         navigate("/");
       }, 3000);
     } else {
-      setTimeout(() => setIsLoading(state.auth.isLoading), 1000);
       ToastError(`${result.payload}`);
     }
   };
@@ -87,7 +79,7 @@ const LoginPage = () => {
         </div>
 
         <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative z-10">
-          {/* Left Content with Motion */}
+          {/* Left Content */}
           <motion.div
             className="text-center md:text-left space-y-8 px-2 md:px-8"
             variants={fadeUp}
@@ -96,7 +88,11 @@ const LoginPage = () => {
           >
             <div className="flex items-center justify-center md:justify-start space-x-2">
               <Code className="text-blue-500 w-8 h-8" />
-              <h2 className="text-xl font-bold text-blue-400">CodeWarrior</h2>
+              <Link to="/">
+                <h2 className="text-xl font-bold text-blue-400 cursor-pointer">
+                  CodeWarrior
+                </h2>
+              </Link>
             </div>
 
             <h1 className="text-5xl font-extrabold text-white leading-tight">
@@ -141,7 +137,7 @@ const LoginPage = () => {
             </motion.ul>
           </motion.div>
 
-          {/* Right Card with Motion */}
+          {/* Right Card */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -234,7 +230,7 @@ const LoginPage = () => {
                     </div>
                     <Button
                       className="w-full text-base bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white py-6 flex items-center justify-center"
-                      onClick={() => setIsLoading(true)}
+                      disabled={isLoading}
                     >
                       {isLoading ? (
                         <BeatLoader />

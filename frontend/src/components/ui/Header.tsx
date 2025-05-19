@@ -12,11 +12,28 @@ import { LogoutUser } from "@/redux/slices/auth/authThunks";
 import { ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ClipLoader } from "react-spinners";
 
 export const Header = () => {
 
       const dispatch = useDispatch<AppDispatch>()
-     const user = useSelector((state: RootState) => state.auth.userData); 
+     const {userData,isAuthenticated} = useSelector((state: RootState) => state.auth); 
+     console.log("user header: ",userData);
+     console.log("is authe: ",isAuthenticated)
+     if (!userData && isAuthenticated) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <ClipLoader size={50} color="#4F46E5" />
+      </div>
+    );
+  }
       const logout = async () => {
          
            const result = await dispatch(LogoutUser())
@@ -30,12 +47,13 @@ export const Header = () => {
   return (
      <nav className="text-white flex flex-row justify-between px-4 md:px-8 py-4 h-16 border-b border-neutral-800 sticky top-0 z-50  bg-opacity-90 backdrop-blur-sm">
           <div className="flex flex-row gap-5 items-center">
+            <Link to="/">
             <img
-              src="codewarriorblue.png"
-              alt="Code Warrior"
-             
+              src="/codewarriorblue.png"
+              alt="Code Warrior"             
               className="h-6 w-auto"
             />
+            </Link>
             <div className="hidden md:flex space-x-6">
               <Link
                 to="/problemset"
@@ -61,14 +79,14 @@ export const Header = () => {
             {/* <Link to="/about" className="hover:text-blue-400 transition-colors">
               About
             </Link> */}
-            {user ? (
+            {userData ? (
               // <img src={user?.avatar} alt="User Avatar" className="h-12 w-12 rounded-full" />
               <DropdownMenu>
                 <DropdownMenuTrigger className="cursor-pointer">
                   <Avatar className=" h-10 w-10 ">
-                    <AvatarImage src={user.avatar} />
-                    <AvatarFallback>
-                      {user?.fullName.split("")[0]}
+                    <AvatarImage src={userData.avatar} />
+                    <AvatarFallback className="text-black font-semibold text-xl">
+                      {userData?.fullName.split("")[0]}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>

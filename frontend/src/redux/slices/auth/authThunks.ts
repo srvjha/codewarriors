@@ -1,18 +1,21 @@
 import API from "@/utils/AxiosInstance";
-import type { FormValues, LoginFormValues } from "@/utils/ZodResolver";
+import type { LoginFormValues } from "@/utils/ZodResolver";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { UserData } from "./authTypes";
 
 export const registerUser = createAsyncThunk(
   "auth/register",
-  async (userData: FormValues,{rejectWithValue}) => {
+  async (userData: FormData,{rejectWithValue}) => {
     try {
       const response = await API.post("/auth/register", userData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      return response.data.message
+       return {
+        data:response.data.data,
+        message:response.data.message
+      }
     } catch (error:any) {
         return rejectWithValue(error.response.data.error)
     }

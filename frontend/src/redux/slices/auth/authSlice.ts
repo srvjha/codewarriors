@@ -27,10 +27,12 @@ export const authSlice = createSlice({
     builder.addCase(registerUser.fulfilled, (state, action) => {
       state.isLoading = false;
       state.isAuthenticated = true;
-      state.userData = action.payload;
+      state.userData = action.payload.data;
+      state.message = action.payload.message;
     });
     builder.addCase(registerUser.rejected, (state, action) => {
       state.isError = true;
+      state.isLoading = false;
       console.log("error aaya hai bhai: ", action.payload);
     });
 
@@ -45,10 +47,9 @@ export const authSlice = createSlice({
       state.userData = action.payload.data;
       state.message = action.payload.message;
     });
-    builder.addCase(LoginUser.rejected, (state, action) => {
+    builder.addCase(LoginUser.rejected, (state,_) => {
       state.isLoading = false;
       state.isError = true;
-      console.log("error aaya hai bhai login: ", action.payload);
     });
 
     // logout
@@ -78,8 +79,10 @@ export const authSlice = createSlice({
     });
 
     builder.addCase(fetchCurrentUser.rejected, (state, _) => {
+      console.log("i m here")
     state.isLoading = false;
     state.isError = true;
+    state.isAuthenticated = false;
    
 });
 

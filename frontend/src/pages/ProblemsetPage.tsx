@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Search, Filter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 type Problem = {
   id: string;
@@ -113,26 +114,29 @@ const ProblemsetPage = () => {
               key={problem.id}
               className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
             >
-              <div className="text-white font-medium flex flex-col">
-                <span>
-                  {index + 1}. {problem.title}
-                </span>
-               
-                <span className="text-sm text-gray-400">
-                  {problem.description.length > 80
-                    ? problem.description.slice(0, 80) + "..."
-                    : problem.description}
-                </span>
-              </div>
-              <div className="flex items-center gap-4">
-                <span
-                  className={`text-sm font-semibold ${
-                    difficultyColor[problem.difficulty]
-                  }`}
-                >
-                  {problem.difficulty}
-                </span>
-              </div>
+              <Link to={`/problem/${problem.id}`}>
+                <div className="text-white font-medium flex flex-col">
+                  <span>
+                    {index + 1}. {problem.title}
+                  </span>
+
+                  <span className="text-sm text-gray-400">
+                    {problem.description.length > 80
+                      ? problem.description.slice(0, 80) + "..."
+                      : problem.description}
+                  </span>
+                </div>
+                </Link>
+                <div className="flex items-center gap-4">
+                  <span
+                    className={`text-sm font-semibold ${
+                      difficultyColor[problem.difficulty]
+                    }`}
+                  >
+                    {problem.difficulty}
+                  </span>
+                </div>
+              
             </Card>
           ))
         )}

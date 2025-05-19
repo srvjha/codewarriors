@@ -50,20 +50,18 @@ const featureItem = {
 
 const RegisterPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const state = useSelector((state: RootState) => state);
-  console.log("State: ", state);
+  const {isLoading} = useSelector((state: RootState) => state.auth);
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
   } = useForm<FormValues>({ resolver });
-  const [isLoading, setIsLoading] = useState(state.auth.isLoading);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const onSubmit = handleSubmit(async (data: FormValues) => {
-    const formData = new FormData();
+   const formData = new FormData();
     formData.append("username", data.username);
     formData.append("fullName", data.fullName);
     formData.append("email", data.email);
@@ -72,23 +70,18 @@ const RegisterPage = () => {
     if (data.avatar && data.avatar?.[0]) {
       formData.append("avatar", data.avatar[0]);
     }
-    console.log("formdata: ", formData);
-    await registerUserFunction(data);
+    await registerUserFunction(formData);
   });
 
-  const registerUserFunction = async (userInfo: FormValues) => {
+  const registerUserFunction = async (userInfo: FormData) => {
     const result = await dispatch(registerUser(userInfo));
-    console.log("result: ", result);
-
     if (registerUser.fulfilled.match(result)) {
-      setIsLoading(state.auth.isLoading);
-      ToastSuccess(result.payload);
+      ToastSuccess(result.payload.message);
       setTimeout(() => {
         reset();
         navigate("/");
       }, 4000);
     } else {
-      setTimeout(() => setIsLoading(state.auth.isLoading), 1000);
       ToastError(`${result.payload}`);
     }
   };
@@ -285,7 +278,7 @@ const RegisterPage = () => {
                     <Button
                       type="submit"
                       className="w-full text-base bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-500 hover:to-blue-400  text-white py-6 flex items-center justify-center"
-                      onClick={() => setIsLoading(true)}
+                      disabled={isLoading}
                     >
                       {isLoading ? (
                         <BeatLoader />

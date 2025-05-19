@@ -8,7 +8,7 @@ export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { userData, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
-
+   console.log("isAuth: ",isAuthenticated)
   if (!userData) {
     return (
       <div

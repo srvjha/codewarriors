@@ -323,7 +323,6 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken;
-  console.log("token: ",incomingRefreshToken)
   if (!incomingRefreshToken) {
     throw new ApiError("Unauthorized Request", 400);
   }
@@ -331,7 +330,6 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   let decodedToken: any;
   try {
     decodedToken = jwt.verify(incomingRefreshToken, env.REFRESH_TOKEN_SECRET);
-    console.log("decodedToken: ",decodedToken)
   } catch (error) {
     throw new ApiError("Invalid or expired refresh token", 400);
   }
@@ -345,6 +343,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 
   if (incomingRefreshToken !== user.refreshToken) {
+    console.log("in: ",incomingRefreshToken);
+    console.log("user token: ",user.refreshToken)
     throw new ApiError("Refresh Token Expired", 400);
   }
   const options = {

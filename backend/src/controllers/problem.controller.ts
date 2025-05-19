@@ -115,20 +115,10 @@ const getAllProblems = asyncHandler(async (req, res) => {
 });
 
 const getProblemById = asyncHandler(async (req, res) => {
-  console.log("by id yaha aaya hu");
   const { pid } = req.params;
   validId(pid, "Problem");
   const problem = await db.problem.findUnique({
-    where: { id: pid },
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      difficulty: true,
-      tags: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    where: { id: pid }
   });
 
   if (!problem) {
