@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asynHandler";
 import { handleZodError } from "../utils/handleZodError";
 import {
+  getJudge0LanguageById,
   getLanguageNameById,
   pollBatchResults,
   submitBatch,
@@ -24,16 +25,18 @@ type refsolutions = {
 const executeCode = asyncHandler(async (req, res) => {
   let {
     source_code,
-    language_id,
+    language,
     stdin = [],
   } = handleZodError(executeCodeSchemaValidation(req.body));
+  console.log("source_code: ", source_code);
+  console.log("language: ", language);
   const userId = req.user.id;
   const { pid, type } = req.params;
   validId(pid, "Problem");
   if (type !== ExecutionTypeEnum.RUN && type !== ExecutionTypeEnum.SUBMIT) {
     return new ApiError("Invalid execution type", 400);
   }
-
+  const language_id = getJudge0LanguageById(language);
   const inputs = await db.problem.findUnique({
     where: { id: pid },
     select: {
@@ -86,7 +89,7 @@ const executeCode = asyncHandler(async (req, res) => {
   const tokens = submitResponse.map((res) => ({ token: res.token }));
 
   const results = await pollBatchResults(tokens);
-  // console.log("results: ",results);
+  // console.log("results : ",results);
 
   let allPassedCases = true;
   const detailedResults = results.map((result, index) => {

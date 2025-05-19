@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const executeCodeSchema = z.object({
   source_code: z.string().nonempty("source code is required"),
-  language_id: z.number(),
+  language: z.string().nonempty("language id is required"),
   stdin: z.array(z.string()).optional(),
 });
 
