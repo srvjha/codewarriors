@@ -28,3 +28,25 @@ export interface Problem {
   createdAt: string;
   updatedAt: string;
 }
+
+
+ export type TestCaseResultType = {
+    testCase: number | string;
+    passed: boolean;
+    time: string;
+    memory: string;
+    [key: string]: any;
+  };
+
+ export  type ResultType = {
+    status: string;
+    stderr?: string;
+    [key: string]: any;
+  };
+
+ export const ExecutionStatus = {
+  RUN: "RUN",
+  SUBMIT: "SUBMIT",
+} as const;
+
+export type ExecutionStatus = keyof typeof ExecutionStatus;

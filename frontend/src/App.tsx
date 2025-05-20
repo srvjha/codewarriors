@@ -14,14 +14,13 @@ import ProblemPage from "./pages/ProblemPage";
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
+  const excludedPaths = ["/login", "/register"];
 
   useEffect(() => {
-    const excludedPaths = ["/login","/register"];
     if (!excludedPaths.includes(location.pathname)) {
-      console.log("fetch user call");
       dispatch(fetchCurrentUser());
     }
-  }, [location.pathname]); 
+  }, [location.pathname]);
 
   return (
     <Routes>
@@ -35,19 +34,16 @@ const App = () => {
             </PrivateRoute>
           }
         />
-         <Route
+        <Route
           path="/problem/:problemId"
           element={
             <PrivateRoute>
-            <ProblemPage/>
+              <ProblemPage />
             </PrivateRoute>
           }
         />
       </Route>
 
-     
-     
-      
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
     </Routes>

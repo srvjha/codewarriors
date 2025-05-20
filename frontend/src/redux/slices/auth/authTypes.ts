@@ -11,4 +11,5 @@ export interface AuthState {
   isLoading: boolean;
   isError:boolean;
   message?:string;
+  hasFetchedUser: boolean;
 }

@@ -12,7 +12,8 @@ let initialState: AuthState = {
   isLoading: false,
   userData: null,
   isError: false,
-  message:""
+  message:"",
+  hasFetchedUser: false,
 };
 
 export const authSlice = createSlice({
@@ -71,10 +72,10 @@ export const authSlice = createSlice({
 });
 
     builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
-      console.log("fullfill");
       state.isLoading = false;
       state.isAuthenticated = true;
       state.userData = action.payload;
+      state.hasFetchedUser = true;
      
     });
 
@@ -82,6 +83,7 @@ export const authSlice = createSlice({
     state.isLoading = false;
     state.isError = true;
     state.isAuthenticated = false;
+    state.hasFetchedUser = true;
     
 });
 
