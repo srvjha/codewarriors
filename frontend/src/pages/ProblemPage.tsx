@@ -171,9 +171,9 @@ const ProblemPage = () => {
         );
 
         if (res.data.success) {
-          console.log("Code executed successfully:", res.data.data);
+          ;
           setResults(res.data.data);
-        setActiveResultTab("result");
+          setActiveResultTab("result");
         }
       } catch (error: any) {
         console.error("Error executing code:", error);
@@ -562,7 +562,7 @@ const ProblemPage = () => {
       <div className="h-full overflow-y-auto px-4 py-3 bg-[#212121]">
         {/* Test case tabs */}
         <div className="flex items-center space-x-2 mb-3 sticky top-0 bg-[#212121] z-10 pb-2">
-          {testCases.map((_, index) => (
+          {testCases.slice(0,3).map((_, index) => (
             <button
               key={index}
               className={`h-8 px-3 text-sm font-medium rounded-md ${
@@ -637,7 +637,7 @@ const ProblemPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {results.TestCaseResult?.map((result: TestCaseResultType, index: number) => (
+                  {results.TestCaseResult?.slice(0,3).map((result: TestCaseResultType, index: number) => (
                     <tr key={index} className="border-t border-gray-700">
                       <td className="py-2 px-3 text-gray-300">Case {result.testCase}</td>
                       <td className="py-2 px-3">

@@ -79,11 +79,10 @@ export const authSlice = createSlice({
     });
 
     builder.addCase(fetchCurrentUser.rejected, (state, _) => {
-      console.log("i m here")
     state.isLoading = false;
     state.isError = true;
     state.isAuthenticated = false;
-   
+    
 });
 
   },

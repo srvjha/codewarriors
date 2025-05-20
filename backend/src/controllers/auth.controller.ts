@@ -109,9 +109,20 @@ const register = asyncHandler(async (req, res) => {
     ...userInfo
   } = user;
 
+   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user.id as string
+  );
+  const cookieOption = {
+    httpOnly: true,
+    secure: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  };
+
 
   res
     .status(200)
+    .cookie("accessToken", accessToken, cookieOption)
+    .cookie("refreshToken", refreshToken, cookieOption)
     .json(
       new ApiResponse(
         200,
@@ -150,18 +161,9 @@ const verifyEmail = asyncHandler(async (req, res) => {
     },
   });
 
-  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
-    user.id as string
-  );
-  const cookieOption = {
-    httpOnly: true,
-    secure: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  };
+ 
 
   res
-    .cookie("accessToken", accessToken, cookieOption)
-    .cookie("refreshToken", refreshToken, cookieOption)
     .status(200)
     .json(new ApiResponse(200, null, "Email verified successfully"));
 });
@@ -455,6 +457,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
       username: true,
       email: true,
       avatar: true,
+      isEmailVerified: true,
     },
   });
 

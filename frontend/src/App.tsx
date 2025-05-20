@@ -16,7 +16,7 @@ const App = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const excludedPaths = ["/login","register"];
+    const excludedPaths = ["/login","/register"];
     if (!excludedPaths.includes(location.pathname)) {
       console.log("fetch user call");
       dispatch(fetchCurrentUser());

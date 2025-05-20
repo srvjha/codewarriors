@@ -30,6 +30,7 @@
     "framer-motion": "^12.10.5",
     "lucide-react": "^0.509.0",
     "monaco-editor": "^0.52.2",
+    "randomcolor": "^0.6.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.3",
@@ -45,6 +46,7 @@
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@types/node": "^22.15.18",
+    "@types/randomcolor": "^0.5.9",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@types/react-syntax-highlighter": "^15.5.13",

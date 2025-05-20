@@ -5,11 +5,13 @@ import { Navigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 
 export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const { userData, isAuthenticated } = useSelector(
+  const {  isAuthenticated,isError } = useSelector(
     (state: RootState) => state.auth
   );
-   console.log("isAuth: ",isAuthenticated)
-  if (!userData) {
+  console.log("Private route Auth: ", isAuthenticated);
+  console.log("Private route Error: ", isError);
+   
+  if (!isAuthenticated && !isError) {
     return (
       <div
         style={{

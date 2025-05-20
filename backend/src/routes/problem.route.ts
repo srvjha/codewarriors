@@ -6,8 +6,8 @@ import { createProblem, deleteProblem, getAllProblems,  getAllProblemsSolvedByUs
 const router = Router();
 
 router.post("/create",verifyUser,checkRole,createProblem)
-router.get("/all-problems",verifyUser,checkRole,getAllProblems)
-router.get("/:pid",verifyUser,checkRole,getProblemById)
+router.get("/all-problems",getAllProblems)
+router.get("/:pid",getProblemById)
 router.put("/:pid/update",verifyUser,checkRole,updateProblem)
 router.delete("/:pid/delete",verifyUser,checkRole,deleteProblem)
 router.get("/solved/all-problems",verifyUser,getAllProblemsSolvedByUser)

@@ -61,7 +61,6 @@ export const fetchCurrentUser = createAsyncThunk<UserData>(
       const response = await API.get("/auth/me",{
         withCredentials:true
       });
-      console.log("called api")
       return response.data.data
     } catch (error:any) {
       return rejectWithValue(error.response.data.error)

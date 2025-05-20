@@ -13,11 +13,13 @@ import { ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { LogOut, Settings, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClipLoader } from "react-spinners";
+import  randomColor from 'randomcolor';
 
 export const Header = () => {
-
+      
       const dispatch = useDispatch<AppDispatch>()
      const {userData,isAuthenticated} = useSelector((state: RootState) => state.auth); 
+     const randomColorCode = randomColor()
      console.log("user header: ",userData);
      console.log("is authe: ",isAuthenticated)
      if (!userData && isAuthenticated) {
@@ -85,8 +87,11 @@ export const Header = () => {
                 <DropdownMenuTrigger className="cursor-pointer">
                   <Avatar className=" h-10 w-10 ">
                     <AvatarImage src={userData.avatar} />
-                    <AvatarFallback className="text-black font-semibold text-xl">
-                      {userData?.fullName.split("")[0]}
+                    <AvatarFallback 
+                    className="text-black font-semibold text-xl"
+                    style={{ backgroundColor: randomColorCode }} 
+                    >
+                      {userData?.fullName.split("")[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
