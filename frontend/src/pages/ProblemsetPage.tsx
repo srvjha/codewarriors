@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 type Problem = {
   id: string;
@@ -25,6 +27,7 @@ const difficultyColor: Record<Problem["difficulty"], string> = {
 const ProblemsetPage = () => {
   const [problems, setProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
+  const {userData} = useSelector((state:RootState)=>state.auth)
 
   useEffect(() => {
     const fetchProblems = async () => {
@@ -71,7 +74,9 @@ const ProblemsetPage = () => {
             Curated problems across categories for interviews and challenges.
           </p>
         </div>
-        <Button variant="primary">Create Problem</Button>
+       {userData &&userData.role === "ADMIN" && 
+       (<Link to="/create/problem"> <Button variant="primary">Create Problem <CirclePlus className="ml-2" /></Button></Link>)
+       }
       </div>
 
       {/* Tags */}

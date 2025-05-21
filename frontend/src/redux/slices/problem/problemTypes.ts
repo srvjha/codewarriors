@@ -45,8 +45,8 @@ export interface Problem {
   };
 
  export const ExecutionStatus = {
-  RUN: "RUN",
-  SUBMIT: "SUBMIT",
+  RUN: "run",
+  SUBMIT: "submit",
 } as const;
 
 export type ExecutionStatus = keyof typeof ExecutionStatus;

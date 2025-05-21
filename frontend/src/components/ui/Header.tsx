@@ -21,6 +21,7 @@ export const Header = () => {
     (state: RootState) => state.auth
   );
   const randomColorCode = randomColor();
+  console.log("userData", userData);
 
   if (!userData && isAuthenticated) {
     return (
@@ -45,77 +46,99 @@ export const Header = () => {
     }
   };
   return (
-    <nav className="text-white flex flex-row justify-between px-4 md:px-8 py-4 h-16 border-b border-neutral-800 sticky top-0 z-50  bg-opacity-90 backdrop-blur-sm">
-      <div className="flex flex-row gap-5 items-center">
-        <Link to="/">
-          <img
-            src="/codewarriorblue.png"
-            alt="Code Warrior"
-            className="h-6 w-auto"
-          />
-        </Link>
-        <div className="hidden md:flex space-x-6">
-          <Link
-            to="/problemset"
-            className="hover:text-blue-400 transition-colors"
-          >
-            Problems
+    <>
+      <nav className="text-white flex flex-row justify-between px-4 md:px-8 py-4 h-14 border-b border-neutral-800 sticky top-0 z-50  bg-opacity-90 backdrop-blur-sm">
+        <div className="flex flex-row gap-5 items-center">
+          <Link to="/">
+            <img
+              src="/codewarriorblue.png"
+              alt="Code Warrior"
+              className="h-6 w-auto"
+            />
           </Link>
-          <Link
-            to="/leaderboard"
-            className="hover:text-blue-400 transition-colors"
-          >
-            Leaderboard
-          </Link>
-          <Link to="/discuss" className="hover:text-blue-400 transition-colors">
-            Discuss
-          </Link>
-        </div>
-      </div>
-      <div className="flex flex-row items-center gap-5 mr-2">
-        {/* <Link to="/about" className="hover:text-blue-400 transition-colors">
-              About
-            </Link> */}
-        {userData ? (
-          // <img src={user?.avatar} alt="User Avatar" className="h-12 w-12 rounded-full" />
-          <DropdownMenu>
-            <DropdownMenuTrigger className="cursor-pointer">
-              <Avatar className=" h-10 w-10 ">
-                <AvatarImage src={userData.avatar} />
-                <AvatarFallback
-                  className="text-black font-semibold text-xl"
-                  style={{ backgroundColor: randomColorCode }}
-                >
-                  {userData?.fullName.split("")[0].toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>
-                <User />
-                <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
-                <LogOut />
-                <div onClick={() => logout()}>Logout</div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Link to="/login">
-            <Button
-              variant="outline"
-              className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-gray-900"
+          <div className="hidden md:flex space-x-6">
+            <Link
+              to="/problemset"
+              className="hover:text-blue-400 transition-colors"
             >
-              Sign In
-            </Button>
+              Problems
+            </Link>
+
+            <Link
+              to="/discuss"
+              className="hover:text-blue-400 transition-colors"
+            >
+              Discuss
+            </Link>
+            <Link
+              to="/pricing"
+              className="hover:text-blue-400 transition-colors"
+            >
+              Pricing
+            </Link>
+          </div>
+        </div>
+        <div className="flex flex-row items-center gap-5 mr-2">
+          <Link to="/about" className="hover:text-blue-400 transition-colors">
+            About
           </Link>
-        )}
+          {userData?.role === "ADMIN" && (
+            <Link
+              to="/admin/dashboard"
+              className="hover:text-blue-400 transition-colors"
+            >
+              Dashboard
+            </Link>
+          )}
+
+          {userData ? (
+            // <img src={user?.avatar} alt="User Avatar" className="h-12 w-12 rounded-full" />
+            <DropdownMenu>
+              <DropdownMenuTrigger className="cursor-pointer">
+                <Avatar className=" h-10 w-10 ">
+                  <AvatarImage src={userData.avatar} />
+                  <AvatarFallback
+                    className="text-black font-semibold text-xl"
+                    style={{ backgroundColor: randomColorCode }}
+                  >
+                    {userData?.fullName.split("")[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>
+                  <User />
+                  <Link to="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings />
+                  <Link to="/settings">Settings</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem variant="destructive">
+                  <LogOut />
+                  <div onClick={() => logout()}>Logout</div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login">
+              <Button
+                variant="outline"
+                className="text-blue-400 border-blue-400 hover:bg-blue-400 hover:text-gray-900"
+              >
+                Sign In
+              </Button>
+            </Link>
+          )}
+        </div>
+      </nav>
+    {isAuthenticated && !userData?.isEmailVerified && (
+       <div className="w-full bg-gradient-to-r from-cyan-900 via-blue-700 to-cyan-900 text-white text-center text-sm py-1.5 shadow-sm">
+        📩 We’ve sent a verification email. Please verify your email to
+        continue.
       </div>
-    </nav>
+     )}
+     
+    </>
   );
 };

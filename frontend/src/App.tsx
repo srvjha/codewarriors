@@ -10,6 +10,12 @@ import { fetchCurrentUser } from "./redux/slices/auth/authThunks";
 import { useEffect } from "react";
 import Layout from "./Layout";
 import ProblemPage from "./pages/ProblemPage";
+import PricingPage from "./pages/PricingPage";
+import Dashboard from "./pages/Dashboard";
+import About from "./pages/About";
+import DiscussPage from "./pages/DiscussPage";
+import ProfilePage from "./pages/ProfilePage";
+import CreateProblem from "./pages/CreateProblem";
 
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -42,10 +48,65 @@ const App = () => {
             </PrivateRoute>
           }
         />
+         <Route
+          path="/admin/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard/>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/about"
+          element={
+            <PrivateRoute>
+              <About/>
+            </PrivateRoute>
+          }
+        />
+
+         <Route
+          path="/discuss"
+          element={
+            <PrivateRoute>
+              <DiscussPage/>
+            </PrivateRoute>
+          }
+        />
+
+         <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage/>
+            </PrivateRoute>
+          }
+        />
+
+         <Route
+          path="/create/problem"
+          element={
+            <PrivateRoute>
+              <CreateProblem/>
+            </PrivateRoute>
+          }
+        />
+
+        
+       
       </Route>
 
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+       <Route
+          path="/pricing"
+          element={
+           
+              <PricingPage/>
+           
+          }
+        />
     </Routes>
   );
 };

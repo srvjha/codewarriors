@@ -1,20 +1,22 @@
 import { motion } from "framer-motion";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
-export default function FancyCodeEditor() {
-  const codeLines = [
-    "function findMissingNumber(nums) {",
-    "  const n = nums.length;",
-    "  const expectedSum = (n * (n + 1)) / 2;",
-    "  const actualSum = nums.reduce((sum, num) => sum + num, 0);",
-    "  const missing = expectedSum - actualSum;",
-    "  console.log(`Expected: ${expectedSum}, Actual: ${actualSum}`);",
-    "  return missing;",
-    "}",
-    "",
-    "const numbers = [0, 1, 2, 4, 5];",
-    "const result = findMissingNumber(numbers);",
-    "console.log('Missing Number:', result);"
-  ];
+export default function CodeEditor() {
+  const code = `
+function findMissingNumber(nums) {
+  const n = nums.length;
+  const expectedSum = (n * (n + 1)) / 2;
+  const actualSum = nums.reduce((sum, num) => sum + num, 0);
+  const missing = expectedSum - actualSum;
+  console.log(\`Expected: \${expectedSum}, Actual: \${actualSum}\`);
+  return missing;
+}
+
+const numbers = [0, 1, 2, 4, 5];
+const result = findMissingNumber(numbers);
+console.log('Missing Number:', result);
+`.trim();
 
   return (
     <motion.div
@@ -23,8 +25,7 @@ export default function FancyCodeEditor() {
       transition={{ duration: 0.6 }}
       className="w-full max-w-4xl mx-auto mt-10"
     >
-      <div className="relative rounded-2xl overflow-hidden  bg-[#0d0d0d] shadow-lg shadow-[#088bd7]">
-        
+      <div className="relative rounded-2xl overflow-hidden bg-[#0d0d0d] shadow-lg shadow-[#088bd7]">
         {/* Top bar */}
         <div className="px-4 py-2 flex items-center justify-between bg-[#1a1a1a]">
           <div className="flex items-center space-x-2">
@@ -37,18 +38,26 @@ export default function FancyCodeEditor() {
           </div>
         </div>
 
-        {/* Code block */}
-        <div className="p-6 font-mono text-sm text-gray-100 overflow-x-auto">
-          <pre className="flex flex-col">
-            {codeLines.map((line, i) => (
-              <div key={i} className="flex">
-                <span className="w-8 text-right text-gray-500 mr-4 select-none">
-                  {i + 1}
-                </span>
-                <code className="whitespace-pre-wrap">{line}</code>
-              </div>
-            ))}
-          </pre>
+        {/* Code block with syntax highlighting */}
+        <div className="p-6 text-sm text-gray-100 overflow-x-auto">
+          <SyntaxHighlighter
+            language="javascript"
+            style={oneDark}
+            showLineNumbers
+            customStyle={{
+              background: "transparent",
+              padding: 0,
+              margin: 0,
+              fontSize: "0.875rem",
+            }}
+            codeTagProps={{
+              style: {
+                fontFamily: 'Menlo, Monaco, Consolas, "Courier New", monospace',
+              },
+            }}
+          >
+            {code}
+          </SyntaxHighlighter>
         </div>
       </div>
     </motion.div>

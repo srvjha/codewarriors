@@ -2,7 +2,8 @@
 @import "tw-animate-css";
 
 body{
-  background-color: #0f0f0f
+  background-color: #111010;
+  color:aliceblue
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -133,3 +134,20 @@ body{
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
 }
+
+
+@keyframes float {
+  0% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.08;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.1);
+    opacity: 0.15;
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.08;
+  }
+}
+

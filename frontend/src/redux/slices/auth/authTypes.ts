@@ -3,6 +3,8 @@ export type UserData = {
   username: string;
   email: string;
   avatar?: string;
+  role: string;
+  isEmailVerified: boolean;
 };
 
 export interface AuthState {
