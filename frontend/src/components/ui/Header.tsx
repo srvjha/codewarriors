@@ -51,7 +51,7 @@ export const Header = () => {
         <div className="flex flex-row gap-5 items-center">
           <Link to="/">
             <img
-              src="/codewarriorblue.png"
+              src="/codewarrior_logo.png"
               alt="Code Warrior"
               className="h-6 w-auto"
             />

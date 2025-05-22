@@ -8,7 +8,7 @@ export const Footer = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
             <div>
               <img
-                src="codewarriorblue.png"
+                src="/codewarrior_logo.png"
                 alt="Code Warrior"
                 width="170"
                 className="h-8 w-auto mb-4"

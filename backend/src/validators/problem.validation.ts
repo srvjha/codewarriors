@@ -21,11 +21,15 @@ const createProblemSchema = z.object({
   tags: z
     .array(z.string())
     .nonempty({ message: "At least one tag is required" }),
-  examples: z.any(), // will refine this with a stricter structure
+  examples: z.array(z.object({
+    input: z.string(),
+    output: z.string(),
+    explanation: z.string().optional(),
+  })), // will refine this with a stricter structure
   constraints: z.string().nonempty({ message: "Constraints are required" }),
   editorial:z.string().optional(),
   hints: z.string().optional(),
-  testcases:testcaseSchema,
+  testcases:testcaseSchema.nonempty({ message: "At least one test case is required" }),
   codeSnippets: z.any(),
   referenceSolutions: jsonSchema,
 });

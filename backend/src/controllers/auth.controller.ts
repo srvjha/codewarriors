@@ -11,8 +11,8 @@ import { db } from "../db";
 import { ApiError } from "../utils/ApiError";
 import { uploadOnCloudinary } from "../utils/cloudinary";
 import {
-  emailVerificationMailgenContent,
-  forgotPasswordMailgenContent,
+  emailVerificationContent,
+  forgotPasswordContent,
   sendEmail,
 } from "../utils/sendMail";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -99,7 +99,7 @@ const register = asyncHandler(async (req, res) => {
   await sendEmail(
     user.email,
     "Verify Email",
-    emailVerificationMailgenContent(user.username, verificationUrl)
+    emailVerificationContent(user.username, verificationUrl)
   );
 
   const {
@@ -181,9 +181,6 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError("User not found", 400);
   }
 
-  if (!user.isEmailVerified) {
-    throw new ApiError("User is not verified", 400);
-  }
 
   const verifyPassword = await isPasswordCorrect(password, user.password);
 
@@ -264,7 +261,7 @@ const resendEmailVerification = asyncHandler(async (req, res) => {
   await sendEmail(
     user.email,
     "Verify Email",
-    emailVerificationMailgenContent(user.username, verificationUrl)
+    emailVerificationContent(user.username, verificationUrl)
   );
   
   
@@ -309,7 +306,7 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
   await sendEmail(
     user.email,
     "Verify Email",
-    forgotPasswordMailgenContent(user.username, verificationUrl)
+    forgotPasswordContent(user.username, verificationUrl)
   );
 
   res
@@ -458,6 +455,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
       email: true,
       avatar: true,
       isEmailVerified: true,
+      role:true
     },
   });
 

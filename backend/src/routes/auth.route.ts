@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { changeCurrentPassword, forgotPasswordRequest, getCurrentUser, loginUser, logoutUser, refreshAccessToken, register, resetForgottenPassword, verifyEmail } from "../controllers/auth.controller";
+import { changeCurrentPassword, forgotPasswordRequest, getCurrentUser, loginUser, logoutUser, refreshAccessToken, register, resendEmailVerification, resetForgottenPassword, verifyEmail } from "../controllers/auth.controller";
 import { upload } from "../middleware/multer.middleware";
 import { verifyUser } from "../middleware/auth.middleware";
 
@@ -7,6 +7,7 @@ const router = Router();
 
 router.post("/register",upload.single("avatar"),register);
 router.get("/verify/email/:token",verifyEmail)
+router.post("/resend/verify/email",verifyUser,resendEmailVerification);
 router.post("/login", loginUser);
 router.get(
   "/password/reset",

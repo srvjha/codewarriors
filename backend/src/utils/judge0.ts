@@ -1,5 +1,7 @@
 import axios from "axios"
 import { ApiError } from "./ApiError";
+import { env } from "./env";
+import { headers } from "../helper/judge0.helper";
 export const getJudge0LanguageById = (language: string) => {
     const languages = {
         "PYTHON": 71,
@@ -41,13 +43,10 @@ type Judge0Submission = {
 
 
 export const submitBatch = async(submissions:Judge0Submission[])=>{
-    //console.log("submissions: ",submissions)
-    const {data} = await axios.post(`${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,{
-        submissions
-    })
-
-    //console.log("submit batch data: ",data)
-
+    const {data} = await axios.post(`${env.JUDGE0_API_URL}/submissions/batch`,
+      {submissions},
+      
+    )
     return data as Token[] // array of tokens;
 }
 
@@ -57,18 +56,15 @@ export const pollBatchResults = async(tokens:Token[])=>{
    try {
      while(true){
        
-         const {data} = await axios.get(`${process.env.JUDGE0_API_URL}/submissions/batch`,{
+         const {data} = await axios.get(`${env.JUDGE0_API_URL}/submissions/batch`,{
              params:{
                 tokens: tokens.map(t => t.token).join(","),
                  base64_encoded:false
              }
          })
  
-        //  console.log("poll batch data: ",data)
 
          const results = data.submissions as Statuses[];
-        //  console.log("results: ",results)
- 
          const isAllDone = results.every((result)=> result.status.id !== 1 && result.status.id !== 2)
          if(isAllDone) return results
          await sleep(1000)

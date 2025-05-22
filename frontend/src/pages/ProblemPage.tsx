@@ -7,7 +7,6 @@ import {
   FlaskConical,
   History,
   Lightbulb,
-  MessageSquare,
   RotateCw,
   Scan,
   XCircle,
@@ -18,6 +17,9 @@ import {
   XOctagon,
   CheckCircle,
   Clock,
+  Timer,
+  Cpu,
+  X,
 } from "lucide-react";
 
 import axios from "axios";
@@ -39,7 +41,11 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { DifficultyBadge } from "@/components/ui/DifficultyBadge";
 import { Tag } from "@/components/ui/Tag";
-import { formatRuntime, StatusIndicator } from "@/helper/Problem.helper";
+import {  StatusIndicator } from "@/helper/Problem.helper";
+import { ClipLoader } from "react-spinners";
+import type { SubmissionType } from "@/redux/slices/submit/SubmissionTypes";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 const ProblemPage = () => {
   const params = useParams();
@@ -47,7 +53,7 @@ const ProblemPage = () => {
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedLang, setSelectedLang] = useState<
-    "JAVASCRIPT" | "PYTHON" | "C++"
+    "JAVASCRIPT" | "PYTHON" | "JAVA" | "CPP"
   >("JAVASCRIPT");
   const [activeTab, setActiveTab] = useState<string>("description");
   const [activeTestCase, setActiveTestCase] = useState<number>(1);
@@ -56,8 +62,11 @@ const ProblemPage = () => {
   >([]);
   const [codeSnippet, setCodeSnippet] = useState("");
   const [isRunning, setIsRunning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [results, setResults] = useState<ResultType | null>(null);
   const [activeResultTab, setActiveResultTab] = useState("testcase");
+  const [submissions, setSubmissions] = useState<SubmissionType[]>([]);
+  const { userData } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -112,10 +121,46 @@ const ProblemPage = () => {
     );
   }
 
-  const selectedExample =
-    problem.examples[selectedLang] || Object.values(problem.examples)[0];
+  const selectedExample = problem.examples;
 
-  const handleRunCode = async () => {
+  const handleSubmitCode = async () => {
+    setIsSubmitting(true);
+    let payload = {
+      source_code: codeSnippet,
+      language: selectedLang,
+    };
+    try {
+      const res = await axios.post(
+        `http://localhost:3000/api/v1/execute/code/${problemId}/${ExecutionStatus.SUBMIT}`,
+        JSON.stringify(payload),
+        {
+          withCredentials: true,
+
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (res.data.success) {
+        console.log("Execution result:", res.data.data);
+        setResults(res.data.data);
+        setActiveTab("submit");
+      }
+    } catch (error: any) {
+      console.error("Error executing code:", error);
+      setResults({
+        status: "Error",
+        stderr: error.message || "An error occurred during execution",
+      });
+      setActiveResultTab("submit");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+   const handleRunCode = async () => {
+    console.log("hello ji from run")
     setIsRunning(true);
     let payload = {
       source_code: codeSnippet,
@@ -135,6 +180,7 @@ const ProblemPage = () => {
       );
 
       if (res.data.success) {
+       
         setResults(res.data.data);
         setActiveResultTab("result");
       }
@@ -144,7 +190,6 @@ const ProblemPage = () => {
         status: "Error",
         stderr: error.message || "An error occurred during execution",
       });
-      setActiveResultTab("result");
     } finally {
       setIsRunning(false);
     }
@@ -152,6 +197,25 @@ const ProblemPage = () => {
 
   const handleCodeUpdate = (newCode: string) => {
     setCodeSnippet(newCode);
+  };
+
+  const getSubmissions = async () => {
+    try {
+      setActiveTab("submissions");
+      const res = await axios.get(
+        `http://localhost:3000/api/v1/submission/problem/${problemId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log("submissions", res);
+
+      if (res.data.success) {
+        setSubmissions(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+    }
   };
 
   return (
@@ -212,22 +276,32 @@ const ProblemPage = () => {
                   ? "bg-[#3e3e3e] text-white"
                   : "text-gray-400 hover:bg-[#3e3e3e] hover:text-white"
               }`}
-              onClick={() => setActiveTab("submissions")}
+              onClick={getSubmissions}
             >
               <History size={16} className="mr-1.5" />
               Submissions
             </button>
-            <button
-              className={`flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                activeTab === "discussion"
-                  ? "bg-[#3e3e3e] text-white"
-                  : "text-gray-400 hover:bg-[#3e3e3e] hover:text-white"
-              }`}
-              onClick={() => setActiveTab("discussion")}
-            >
-              <MessageSquare size={16} className="mr-1.5" />
-              Discussion
-            </button>
+            {results && (
+              <div className="flex items-center ">
+                <button
+                  className="flex items-center px-1 py-1.5 text-sm font-medium rounded-md transition-colors  text-white "
+                  onClick={() => setActiveTab("submit")}
+                >
+                  <History size={16} className="mr-1" />
+                  {results?.status}
+                </button>
+                <button
+                  onClick={() => {
+                    setResults(null);
+                    setActiveTab("description");
+                  }} 
+                  className="text-gray-400  transition-colors "
+                  title="Cancel"
+                >
+                  <X size={12} />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Content Area */}
@@ -261,37 +335,40 @@ const ProblemPage = () => {
                 </div>
 
                 {/* Examples */}
-                {selectedExample && (
-                  <div className="mb-6">
-                    <h3 className="text-gray-200 font-medium mb-2">Example:</h3>
-                    <div className="bg-[#2d2d2d] p-3 rounded-md mb-3">
-                      <div className="mb-2">
-                        <span className="text-gray-50 font-medium">
-                          Input:{" "}
-                        </span>
-                        <code className="text-gray-400 font-mono">
-                          {selectedExample.input}
-                        </code>
-                      </div>
-                      <div className="mb-2">
-                        <span className="text-gray-50 font-medium">
-                          Output:{" "}
-                        </span>
-                        <code className="text-gray-400 font-mono">
-                          {selectedExample.output}
-                        </code>
-                      </div>
-                      <div>
-                        <span className="text-gray-50 font-medium">
-                          Explanation:{" "}
-                        </span>
-                        <span className="text-gray-400">
-                          {selectedExample.explanation}
-                        </span>
+                {selectedExample &&
+                  selectedExample.map((example, index) => (
+                    <div className="mb-6" key={index + 1}>
+                      <h3 className="text-gray-200 font-medium mb-2">
+                        Example {index + 1}:
+                      </h3>
+                      <div className="bg-[#2d2d2d] p-3 rounded-md mb-3">
+                        <div className="mb-2">
+                          <span className="text-gray-50 font-medium">
+                            Input:{" "}
+                          </span>
+                          <code className="text-gray-400 font-mono">
+                            {example.input}
+                          </code>
+                        </div>
+                        <div className="mb-2">
+                          <span className="text-gray-50 font-medium">
+                            Output:{" "}
+                          </span>
+                          <code className="text-gray-400 font-mono">
+                            {example.output}
+                          </code>
+                        </div>
+                        <div>
+                          <span className="text-gray-50 font-medium">
+                            Explanation:{" "}
+                          </span>
+                          <span className="text-gray-400">
+                            {example.explanation}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  ))}
               </div>
             )}
 
@@ -340,6 +417,7 @@ const ProblemPage = () => {
             {activeTab === "solution" && (
               <div className="flex flex-col  h-full text-gray-400">
                 <pre className="bg-transparent p-4 rounded-md overflow-x-auto">
+                  <p className="text-cyan-100">{selectedLang}:</p>
                   <SyntaxHighlighter
                     language="javascript"
                     style={oneDark}
@@ -358,20 +436,137 @@ const ProblemPage = () => {
               </div>
             )}
 
-            {activeTab === "submissions" && (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                <History size={48} className="mb-4 opacity-50" />
-                <p>No submissions yet.</p>
-              </div>
-            )}
+            {activeTab === "submissions" &&
+              (submissions.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                  <History size={48} className="mb-4 opacity-50" />
+                  <p>No submissions yet.</p>
+                </div>
+              ) : (
+                <div className="">
+                  <table className="min-w-full text-left text-sm text-gray-300 border-none">
+                    <thead className=" text-gray-400 uppercase text-xs">
+                      <tr>
+                        <th className="px-4 py-3">Language</th>
+                        <th className="px-4 py-3">Status</th>
+                        <th className="px-4 py-3">Time</th>
+                        <th className="px-4 py-3">Memory</th>
+                        <th className="px-4 py-3">Submitted At</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {submissions.map((sub: any, index: number) => (
+                        <tr key={index} className={`border-t border-gray-700 `}>
+                          <td className="px-4 py-3 font-mono">
+                            {sub.language}
+                          </td>
+                          <td className="px-4 py-3 flex items-center gap-2">
+                            {sub.status === "Accepted" ? (
+                              <CheckCircle className="text-green-400 w-4 h-4" />
+                            ) : (
+                              <XCircle className="text-red-400 w-4 h-4" />
+                            )}
+                            {sub.status}
+                          </td>
+                          <td className="px-4 py-3">{sub.time || "--"}</td>
+                          <td className="px-4 py-3">{sub.memory || "--"}</td>
+                          <td className="px-4 py-3 text-sm text-gray-400">
+                            {new Date(sub.createdAt).toLocaleString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ))}
 
-            {activeTab === "discussion" && (
-              <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                <MessageSquare size={48} className="mb-4 opacity-50" />
-                <p>Join the discussion about this problem.</p>
-                <button className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
-                  Add Comment
-                </button>
+            {activeTab === "submit" && results && (
+              <div className=" text-white min-h-screen py-10 px-4 flex justify-center -mt-8 ">
+                <div className="w-full max-w-4xl space-y-8">
+                  {/* Header */}
+                  <div className="flex justify-between items-start sm:items-center flex-col sm:flex-row">
+                    <div className="flex flex-col gap-2 text-sm">
+                      {/* Status */}
+                      <div className="flex items-center gap-1  font-semibold text-base">
+                        {results.status === "Accepted" ? (
+                          <CheckCircle size={18} className="text-green-500" />
+                        ) : (
+                          <XCircle size={18} className="text-red-500" />
+                        )}
+                        <span
+                          className={`${
+                            results.status === "Accepted"
+                              ? "text-green-500"
+                              : "text-red-500"
+                          }`}
+                        >
+                          {results.status}
+                        </span>
+                        <span className="text-gray-400 font-normal text-sm ml-1">
+                          ({results?.TestCaseResult.length} testcases passed)
+                        </span>
+                      </div>
+
+                      {/* User Info */}
+                      <div className="flex items-center gap-2 text-gray-400">
+                        <img
+                          src={userData?.avatar}
+                          alt="avatar"
+                          className="w-6 h-6 rounded-full object-cover border border-gray-700"
+                        />
+                        <span className="text-white font-medium">
+                          {userData?.fullName}
+                        </span>
+                        <span className="text-gray-500">
+                          submitted at{" "}
+                          {new Date(results?.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Runtime & Memory */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6  p-4 rounded-lg">
+                    <div className="bg-gradient-to-br from-[#232323] to-[#1A1A1A] p-4 rounded-lg shadow space-y-2">
+                      <div className="text-sm text-gray-400">Runtime</div>
+                      <div className="text-xl font-bold text-green-400 flex items-center gap-2">
+                        <Timer size={18} />
+                        {results?.time}
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-br from-[#232323] to-[#1A1A1A]  p-4 rounded-lg shadow space-y-2">
+                      <div className="text-sm text-gray-400">Memory</div>
+                      <div className="text-xl font-bold text-cyan-400 flex items-center gap-2">
+                        <Cpu size={18} />
+                        {results?.memory}
+                      </div>
+                    </div>
+                  </div>
+
+                 
+
+                  {/* Code */}
+                  <div className=" p-4 rounded-lg bg-gradient-to-br from-[#232323] to-[#1A1A1A] ">
+                    <div className="text-sm text-gray-400 mb-2">
+                      Code ({results?.language})
+                    </div>
+
+                    <SyntaxHighlighter
+                      language="javascript"
+                      style={oneDark}
+                      wrapLines={true}
+                      wrapLongLines={true}
+                      customStyle={{
+                        borderRadius: "0.5rem",
+                        padding: "1rem",
+
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {results?.sourceCode}
+                    </SyntaxHighlighter>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -405,11 +600,13 @@ const ProblemPage = () => {
                   <ChevronDown size={18} className="ml-1 mt-[3px]" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="px-3 py-1 mt-2 text-gray-200 bg-[#3f3b3b] rounded-md shadow-md">
-                  {["JAVASCRIPT", "PYTHON", "C++"].map((lang) => (
+                  {["JAVASCRIPT", "PYTHON", "JAVA", "CPP"].map((lang) => (
                     <DropdownMenuItem
                       key={lang}
                       onSelect={() =>
-                        setSelectedLang(lang as "JAVASCRIPT" | "PYTHON" | "C++")
+                        setSelectedLang(
+                          lang as "JAVASCRIPT" | "PYTHON" | "JAVA" | "CPP"
+                        )
                       }
                       className="cursor-pointer hover:bg-[#555] px-2 py-1 rounded"
                     >
@@ -446,14 +643,22 @@ const ProblemPage = () => {
 
             {/* Action Buttons */}
             <div className="flex justify-end p-1 mr-1">
-              <Button
-                className="bg-[#343131] h-8 hover:bg-[#464242] cursor-pointer text-white  rounded-md mr-2 text-sm font-semibold"
-                onClick={handleRunCode}
+              <Button className="bg-[#343131] h-8 hover:bg-[#464242] cursor-pointer text-white  rounded-md mr-2 text-sm font-semibold"
+              onClick={handleRunCode}
               >
-                {isRunning ? "Running..." : "Run"}
+                {isRunning ? 
+                  <ClipLoader size={18} color={"#fff"} />
+                : "Run"}
               </Button>
-              <Button className="bg-green-500 h-8 hover:bg-green-700 cursor-pointer text-white rounded-md text-sm font-semibold">
-                Submit
+              <Button
+                className="bg-green-500 h-8 hover:bg-green-700 cursor-pointer text-white rounded-md text-sm font-semibold"
+                onClick={handleSubmitCode}
+              >
+                {isSubmitting ? (
+                  <ClipLoader size={18} color={"#fff"} />
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </div>
           </div>
@@ -556,7 +761,7 @@ const ProblemPage = () => {
                         className="animate-spin text-blue-500 mb-3"
                         size={24}
                       />
-                      <p className="text-pink-700">Running code...</p>
+                      <p className="text-green-500">Running code...</p>
                     </div>
                   ) : results ? (
                     <div className="space-y-4 ">
@@ -566,16 +771,16 @@ const ProblemPage = () => {
                         <div className="flex items-center text-gray-300 text-sm">
                           <Clock size={16} className="mr-1" />
                           Runtime:{" "}
-                          {formatRuntime(
-                            results.TestCaseResult?.[0]?.time || "0 ms"
-                          )}
+                          {
+                            results.time
+                          }
                         </div>
                       </div>
 
                       {/* Test case results */}
-                      <div className="border border-gray-700 rounded-md overflow-hidden">
+                      <div className=" rounded-md overflow-hidden">
                         <table className="w-full text-sm">
-                          <thead className="bg-gray-800">
+                          <thead className="">
                             <tr>
                               <th className="py-2 px-3 text-left text-gray-300">
                                 Test Case
@@ -592,17 +797,17 @@ const ProblemPage = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {results.TestCaseResult?.slice(0, 3).map(
+                            {results.testCases?.slice(0, 3).map(
                               (result: TestCaseResultType, index: number) => (
                                 <tr
                                   key={index}
                                   className="border-t border-gray-700"
                                 >
                                   <td className="py-2 px-3 text-gray-300">
-                                    Case {result.testCase}
+                                    Case {result.testCases}
                                   </td>
                                   <td className="py-2 px-3">
-                                    {result.passed ? (
+                                    {result.passedTestCases ? (
                                       <span className="text-green-500 flex items-center">
                                         <CheckCircle
                                           size={14}
@@ -618,7 +823,7 @@ const ProblemPage = () => {
                                     )}
                                   </td>
                                   <td className="py-2 px-3 text-gray-300">
-                                    {formatRuntime(result.time)}
+                                    {result.time}
                                   </td>
                                   <td className="py-2 px-3 text-gray-300">
                                     {result.memory}
@@ -636,7 +841,8 @@ const ProblemPage = () => {
                           Output:
                         </h3>
                         <div className="bg-[#363535] px-3 py-2 rounded-md text-white text-sm font-mono whitespace-pre">
-                          {results.stdout || "No output"}
+                          {JSON.parse(results.stdout)||
+                            "No output"}
                         </div>
                       </div>
 

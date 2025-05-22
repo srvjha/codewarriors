@@ -1,4 +1,5 @@
 import { db } from "../db";
+import { getAverage } from "../helper/executeCode.helper";
 import { validId } from "../helper/validId.helper";
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -28,8 +29,6 @@ const executeCode = asyncHandler(async (req, res) => {
     language,
     stdin = [],
   } = handleZodError(executeCodeSchemaValidation(req.body));
-  console.log("source_code: ", source_code);
-  console.log("language: ", language);
   const userId = req.user.id;
   const { pid, type } = req.params;
   validId(pid, "Problem");
@@ -49,12 +48,12 @@ const executeCode = asyncHandler(async (req, res) => {
   if (!safeTestCases.success) {
     throw new ApiError("Invalid test cases", 400);
   }
-  const ts =
+  const executionResults =
     type === ExecutionTypeEnum.RUN
       ? safeTestCases.data.slice(0, 3)
       : safeTestCases.data;
-  const standardDbInput = ts.map((testcase) => testcase.input);
-  const standardDbOutput = ts.map((testcase) => testcase.output);
+  const standardDbInput = executionResults.map((testcase) => testcase.input);
+  const standardDbOutput = executionResults.map((testcase) => testcase.output);
   let getExpectedOutput;
   if (type === ExecutionTypeEnum.RUN && stdin && stdin.length > 0) {
     getExpectedOutput = await handleCustomInput(
@@ -119,31 +118,55 @@ const executeCode = asyncHandler(async (req, res) => {
 
     // console.log(`Passed: ${passedTestCases}`)
   });
+  console.log("Detailed Results: ", detailedResults);
+  const averageMemory = getAverage(detailedResults.map((r) => r.memory));
+  const averageTime = getAverage(detailedResults.map((r) => r.time));
+
+  let submissionData = {
+    userId,
+    problemId: pid,
+    sourceCode: source_code,
+    language: getLanguageNameById(language_id),
+    stdin: stdin.join("\n"),
+    stdout: JSON.stringify(detailedResults.map((result) => result.stdout)),
+    stderr: detailedResults.some((result) => result.stderr)
+      ? JSON.stringify(detailedResults.some((result) => result.stderr))
+      : null,
+    compileOutput: detailedResults.some((result) => result.compileOutput)
+      ? JSON.stringify(detailedResults.some((result) => result.compileOutput))
+      : null,
+    status: allPassedCases ? "Accepted" : "Wrong Answer",
+    memory: averageMemory ? `${averageMemory} KB` : null,
+    time: averageTime ? `${averageTime}s` : null,
+  };
+  console.log("type: ", type);
+  console.log("Submission Data: ", {
+        ...submissionData,
+        testCases: detailedResults,
+      });
+  console.log(
+    "type === ExecutionTypeEnum.RUN: ",
+    type === ExecutionTypeEnum.RUN
+  );
+  if (type === ExecutionTypeEnum.RUN) {
+    console.log("hello");
+     return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          ...submissionData,
+          testCases: detailedResults,
+        },
+        "Code executed successfully"
+      )
+    );
+  }
 
   // console.log("Detailed Results: ",detailedResults);
   const submission = await db.submission.create({
-    data: {
-      userId,
-      problemId: pid,
-      sourceCode: source_code,
-      language: getLanguageNameById(language_id),
-      stdin: stdin.join("\n"),
-      stdout: JSON.stringify(detailedResults.map((result) => result.stdout)),
-      stderr: detailedResults.some((result) => result.stderr)
-        ? JSON.stringify(detailedResults.some((result) => result.stderr))
-        : null,
-      compileOutput: detailedResults.some((result) => result.compileOutput)
-        ? JSON.stringify(detailedResults.some((result) => result.stderr))
-        : null,
-      status: allPassedCases ? "Accepted" : "Wrong Answer",
-      memory: detailedResults.some((result) => result.memory)
-        ? JSON.stringify(detailedResults.some((result) => result.stderr))
-        : null,
-      time: detailedResults.some((result) => result.time)
-        ? JSON.stringify(detailedResults.some((result) => result.stderr))
-        : null,
-    },
+    data: submissionData,
   });
+  console.log("Submission: ", submission);
 
   // if all passed true mark problem solved to true;
 

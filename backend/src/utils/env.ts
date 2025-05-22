@@ -27,6 +27,8 @@ const createEnv = (env: NodeJS.ProcessEnv) => {
     CLOUDINARY_CLOUD_NAME: z.string().nonempty(),
     CLOUDINARY_API_KEY: z.string().nonempty(),
     CLOUDINARY_API_SECRET: z.string().nonempty(),
+
+    JUDGE0_API_URL: z.string().nonempty()
   });
 
   const validationResult = envSchema.safeParse(env);

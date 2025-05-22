@@ -1,99 +1,49 @@
-import Mailgen from "mailgen";
-import nodemailer from "nodemailer";
+ import { Resend } from "resend";
 import { env } from "./env";
 
+const resend = new Resend(env.RESEND_API_KEY);
 
 const sendEmail = async (
   email: string,
   subject: string,
-  content: Mailgen.Content,
+  htmlContent: string
 ) => {
-  const mailGenerator = new Mailgen({
-    theme: "default",
-    product: {
-      name: "CodeWarrior",
-      link: "https://codewarrior.app",
-    },
-  });
-
-  const emailTextual = mailGenerator.generatePlaintext(content);
-  const emailHtml = mailGenerator.generate(content);
-
-  const transporter = nodemailer.createTransport({
-    host: env.MAILTRAP_SMTP_HOST,
-    port: env.MAILTRAP_SMTP_PORT,
-    auth: {
-      user: env.MAILTRAP_SMTP_USER,
-      pass: env.MAILTRAP_SMTP_PASS,
-    },
-  });
-
-  const mail = {
-    from: "mail.taskmanager@example.com",
-    to: email,
-    subject: subject,
-    text: emailTextual,
-    html: emailHtml,
-  };
-
   try {
-    await transporter.sendMail(mail);
+    await resend.emails.send({
+      from: "CodeWarrior <noreply@uignite.in>", 
+      to: "srvtj629@gmail.com",
+      subject: subject,
+      html: htmlContent,
+    });
   } catch (error: any) {
-    console.log(
-      "Email service failed silently. Make sure you have provided your MAILTRAP credentials in the .env file",
-    );
+    console.log("Email service failed. Check your RESEND credentials and setup.");
     console.log("Error: ", error);
   }
 };
 
-const emailVerificationMailgenContent = (
-  username: string,
-  verificationUrl: string,
-) => {
-  return {
-    body: {
-      name: username,
-      intro: "Welcome to our app! We're very excited to have you on board.",
-      action: {
-        instructions:
-          "To verify your email please click on the following button:",
-        button: {
-          color: "#22BC66", // Optional action button color
-          text: "Verify your email",
-          link: verificationUrl,
-        },
-      },
-      outro:
-        "Need help, or have questions? Just reply to this email, we'd love to help.",
-    },
-  };
+const emailVerificationContent = (username: string, verificationUrl: string) => {
+  return `
+    <h2>Welcome, ${username}!</h2>
+    <p>We're very excited to have you on board.</p>
+    <p>To verify your email please click the button below:</p>
+    <a href="${verificationUrl}" style="padding: 10px 15px; background-color: #22BC66; color: white; text-decoration: none; border-radius: 5px;">Verify your email</a>
+    <p>If you have any questions, just reply to this email—we'd love to help.</p>
+  `;
 };
 
-const forgotPasswordMailgenContent = (
-  username: string,
-  passwordResetUrl: string,
-) => {
-  return {
-    body: {
-      name: username,
-      intro: "We got a request to reset the password of our account",
-      action: {
-        instructions:
-          "To reset your password click on the following button or link:",
-        button: {
-          color: "#22BC66", // Optional action button color
-          text: "Reset password",
-          link: passwordResetUrl,
-        },
-      },
-      outro:
-        "Need help, or have questions? Just reply to this email, we'd love to help.",
-    },
-  };
+const forgotPasswordContent = (username: string, passwordResetUrl: string) => {
+  return `
+    <h2>Hello, ${username}</h2>
+    <p>We received a request to reset your password.</p>
+    <p>Click the button below to reset it:</p>
+    <a href="${passwordResetUrl}" style="padding: 10px 15px; background-color: #22BC66; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
+    <p>If you didn't request this, feel free to ignore it.</p>
+    <p>Need help? Just reply to this email.</p>
+  `;
 };
 
 export {
-  emailVerificationMailgenContent,
-  forgotPasswordMailgenContent,
+  emailVerificationContent,
+  forgotPasswordContent,
   sendEmail,
 };

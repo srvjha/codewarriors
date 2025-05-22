@@ -2,16 +2,14 @@ export interface Problem {
   id: string;
   title: string;
   description: string;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  difficulty: "EASY" | "MEDIUM" | "HARD";
   tags: string[];
   userId: string;
   examples: {
-    [key: string]: {
-      input: string;
-      output: string;
-      explanation: string;
-    };
-  };
+    input: string;
+    output: string;
+    explanation?: string;
+  }[];
   constraints: string;
   hints: string | null;
   editorial: string | null;
@@ -29,22 +27,21 @@ export interface Problem {
   updatedAt: string;
 }
 
+export type TestCaseResultType = {
+  testCase: number | string;
+  passed: boolean;
+  time: string;
+  memory: string;
+  [key: string]: any;
+};
 
- export type TestCaseResultType = {
-    testCase: number | string;
-    passed: boolean;
-    time: string;
-    memory: string;
-    [key: string]: any;
-  };
+export type ResultType = {
+  status: string;
+  stderr?: string;
+  [key: string]: any;
+};
 
- export  type ResultType = {
-    status: string;
-    stderr?: string;
-    [key: string]: any;
-  };
-
- export const ExecutionStatus = {
+export const ExecutionStatus = {
   RUN: "run",
   SUBMIT: "submit",
 } as const;
