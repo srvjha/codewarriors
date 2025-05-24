@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Search, Filter, CirclePlus } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { debounce } from "@/utils/debounce";
 
 type Problem = {
   id: string;
@@ -25,9 +26,10 @@ const difficultyColor: Record<Problem["difficulty"], string> = {
 };
 
 const ProblemsetPage = () => {
-  const [problems, setProblems] = useState<Problem[]>([]);
+  const [allProblems, setAllProblems] = useState<Problem[]>([]);
+  const [filteredProblems, setFilteredProblems] = useState<Problem[]>([]);
   const [loading, setLoading] = useState(true);
-  const {userData} = useSelector((state:RootState)=>state.auth)
+  const { userData } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     const fetchProblems = async () => {
@@ -38,7 +40,8 @@ const ProblemsetPage = () => {
             withCredentials: true,
           }
         );
-        setProblems(res.data.data);
+        setAllProblems(res.data.data);
+        setFilteredProblems(res.data.data);
       } catch (err) {
         console.error("Failed to fetch problems:", err);
       } finally {
@@ -50,17 +53,39 @@ const ProblemsetPage = () => {
 
   // Count tags
   const tagCounts: Record<string, number> = {};
-  problems.forEach((problem) => {
+  allProblems.forEach((problem) => {
     problem.tags.forEach((tag) => {
       tagCounts[tag] = (tagCounts[tag] || 0) + 1;
     });
   });
 
-  const totalCount = problems.length;
+  const totalCount = allProblems.length;
   const topicList = [
     { label: "All Topics", count: totalCount },
     ...Object.entries(tagCounts).map(([tag, count]) => ({ label: tag, count })),
   ];
+
+  // debounce searh functionality
+  const searchRef =
+    useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
+
+  useEffect(() => {
+    searchRef.current = debounce(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        const query = event.target.value.toLowerCase();
+        const filteredProblems = allProblems.filter((problem) =>
+          problem.title.toLowerCase().match(new RegExp(query, "i"))
+        );
+        setFilteredProblems(filteredProblems);
+      },
+      2000
+    );
+  }, [allProblems]);
+  const handleProblemSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (searchRef.current) {
+      searchRef.current(event);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
@@ -74,9 +99,14 @@ const ProblemsetPage = () => {
             Curated problems across categories for interviews and challenges.
           </p>
         </div>
-       {userData &&userData.role === "ADMIN" && 
-       (<Link to="/create/problem"> <Button variant="primary">Create Problem <CirclePlus className="ml-2" /></Button></Link>)
-       }
+        {userData && userData.role === "ADMIN" && (
+          <Link to="/create/problem">
+            {" "}
+            <Button variant="primary">
+              Create Problem <CirclePlus className="ml-2" />
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Tags */}
@@ -99,11 +129,12 @@ const ProblemsetPage = () => {
           <Input
             placeholder="Search questions"
             className="pl-8 bg-zinc-900 text-white border-zinc-700"
+            onChange={handleProblemSearch}
           />
         </div>
         <Button
           variant="outline"
-          className="bg-zinc-800 text-white border-zinc-700"
+          className="bg-zinc-800 text-white border-zinc-900"
         >
           <Filter className="mr-2" size={16} /> Filter
         </Button>
@@ -113,8 +144,10 @@ const ProblemsetPage = () => {
       <div className="space-y-2">
         {loading ? (
           <p className="text-gray-400">Loading problems...</p>
+        ) : filteredProblems.length === 0 ? (
+          <p className="text-gray-400">No problems found.</p>
         ) : (
-          problems.map((problem, index) => (
+          filteredProblems.map((problem, index) => (
             <Card
               key={problem.id}
               className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
@@ -131,17 +164,16 @@ const ProblemsetPage = () => {
                       : problem.description}
                   </span>
                 </div>
-                </Link>
-                <div className="flex items-center gap-4">
-                  <span
-                    className={`text-sm font-semibold ${
-                      difficultyColor[problem.difficulty]
-                    }`}
-                  >
-                    {problem.difficulty}
-                  </span>
-                </div>
-              
+              </Link>
+              <div className="flex items-center gap-4">
+                <span
+                  className={`text-sm font-semibold ${
+                    difficultyColor[problem.difficulty]
+                  }`}
+                >
+                  {problem.difficulty}
+                </span>
+              </div>
             </Card>
           ))
         )}

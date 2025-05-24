@@ -16,6 +16,7 @@ import About from "./pages/About";
 import DiscussPage from "./pages/DiscussPage";
 import ProfilePage from "./pages/ProfilePage";
 import CreateProblem from "./pages/CreateProblem";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -48,11 +49,11 @@ const App = () => {
             </PrivateRoute>
           }
         />
-         <Route
+        <Route
           path="/admin/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard/>
+              <Dashboard />
             </PrivateRoute>
           }
         />
@@ -61,52 +62,46 @@ const App = () => {
           path="/about"
           element={
             <PrivateRoute>
-              <About/>
+              <About />
             </PrivateRoute>
           }
         />
 
-         <Route
+        <Route
           path="/discuss"
           element={
             <PrivateRoute>
-              <DiscussPage/>
+              <DiscussPage />
             </PrivateRoute>
           }
         />
 
-         <Route
+        <Route
           path="/profile"
           element={
             <PrivateRoute>
-              <ProfilePage/>
+              <ProfilePage />
             </PrivateRoute>
           }
         />
 
-         <Route
+        <Route
           path="/create/problem"
           element={
             <PrivateRoute>
-              <CreateProblem/>
+              <CreateProblem />
             </PrivateRoute>
           }
         />
 
-        
-       
       </Route>
+
+      
 
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-       <Route
-          path="/pricing"
-          element={
-           
-              <PricingPage/>
-           
-          }
-        />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/verify/:token" element={<VerifyEmail />} />
     </Routes>
   );
 };

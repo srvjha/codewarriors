@@ -11,9 +11,31 @@ const getAllSubmission = asyncHandler(async (req, res) => {
     },
   });
 
+  const getProblemDetails = submissions.map(async (submission) => {
+    const problem = await db.problem.findUnique({
+      where: {
+        id: submission.problemId,
+      },
+      select:{
+        id: true,
+        title: true,        
+        difficulty: true,
+        tags: true,
+      }
+    });   
+
+    const { problemId, ...restSubmission } = submission;
+
+    return {
+      ...restSubmission,
+      problem,
+    };
+  });
+  const resolvedSubmissions = await Promise.all(getProblemDetails);
+
   res
     .status(200)
-    .json(new ApiResponse(200, submissions, "All Submissions Fetched Succesfully"));
+    .json(new ApiResponse(200, resolvedSubmissions, "All Submissions Fetched Succesfully"));
 });
 
 const getAllSubmissionForProblem = asyncHandler(async (req, res) => {

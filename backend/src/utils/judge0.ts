@@ -46,6 +46,7 @@ export const submitBatch = async(submissions:Judge0Submission[])=>{
     const {data} = await axios.post(`${env.JUDGE0_API_URL}/submissions/batch`,
       {submissions},
       
+      
     )
     return data as Token[] // array of tokens;
 }
@@ -60,7 +61,8 @@ export const pollBatchResults = async(tokens:Token[])=>{
              params:{
                 tokens: tokens.map(t => t.token).join(","),
                  base64_encoded:false
-             }
+             },
+            
          })
  
 

@@ -5,6 +5,7 @@ export type UserData = {
   avatar?: string;
   role: string;
   isEmailVerified: boolean;
+  dailyProblemStreak:number
 };
 
 export interface AuthState {

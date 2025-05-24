@@ -10,17 +10,16 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/redux/store";
 import { LogoutUser } from "@/redux/slices/auth/authThunks";
 import { ToastError, ToastSuccess } from "@/utils/ToastContainers";
-import { LogOut, Settings, User } from "lucide-react";
+import { List, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClipLoader } from "react-spinners";
-import randomColor from "randomcolor";
+import { TbFlame, TbFlameFilled } from "react-icons/tb";
 
 export const Header = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { userData, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
-  const randomColorCode = randomColor();
   console.log("userData", userData);
 
   if (!userData && isAuthenticated) {
@@ -78,14 +77,36 @@ export const Header = () => {
             </Link>
           </div>
         </div>
-        <div className="flex flex-row items-center gap-5 mr-2">
+        <div className="flex flex-row items-center gap-5 mr-3">
+          {userData && userData?.dailyProblemStreak > 0 ? (
+             <div className="flex gap-1">
+            
+              <TbFlameFilled 
+              className="text-blue-500 mt-1" 
+              size={18} 
+               data-tip="daily streak" />
+              <span>{userData?.dailyProblemStreak}</span>
+          </div>
+         
+          ):(
+             <div className="flex gap-1">
+            
+              <TbFlame 
+              className="text-white mt-1" 
+              size={18} 
+               data-tip="daily streak" />
+              <span>{userData?.dailyProblemStreak}</span>
+          </div>
+         
+          )}
+         
           <Link to="/about" className="hover:text-blue-400 transition-colors">
             About
           </Link>
           {userData?.role === "ADMIN" && (
             <Link
               to="/admin/dashboard"
-              className="hover:text-blue-400 transition-colors"
+              className="bg-cyan-800 border border-cyan-700 text-sm px-2.5 hover:bg-cyan-700 hover:border-cyan-900 rounded-lg py-1.5 transition-colors"
             >
               Dashboard
             </Link>
@@ -98,8 +119,7 @@ export const Header = () => {
                 <Avatar className=" h-10 w-10 ">
                   <AvatarImage src={userData.avatar} />
                   <AvatarFallback
-                    className="text-black font-semibold text-xl"
-                    style={{ backgroundColor: randomColorCode }}
+                    className="text-black font-semibold text-xl bg-white"
                   >
                     {userData?.fullName.split("")[0].toUpperCase()}
                   </AvatarFallback>
@@ -108,15 +128,15 @@ export const Header = () => {
               <DropdownMenuContent>
                 <DropdownMenuItem>
                   <User />
-                  <Link to="/profile">Profile</Link>
+                  <Link to="/profile" className="cursor-pointer">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Settings />
-                  <Link to="/settings">Settings</Link>
+                  <List />
+                  <Link to="/settings" className="cursor-pointer">My List</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem variant="destructive">
                   <LogOut />
-                  <div onClick={() => logout()}>Logout</div>
+                  <div onClick={() => logout()} className="cursor-pointer">Logout</div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

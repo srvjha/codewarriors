@@ -204,6 +204,8 @@ const executeCode = asyncHandler(async (req, res) => {
     data: testCaseResult,
   });
 
+  
+
   const submissionWithTestCase = await db.submission.findUnique({
     where: {
       id: submission.id,
@@ -212,6 +214,40 @@ const executeCode = asyncHandler(async (req, res) => {
       TestCaseResult: true,
     },
   });
+
+  // now if dailystreak is not updated for the current date then update the daily streak only
+
+  const currentDaySubmission = await db.submission.findFirst({
+    where: {
+      userId,
+      status: "Accepted",
+      createdAt: {
+        gte: new Date(new Date().setHours(0, 0, 0, 0)),
+        lte: new Date(new Date().setHours(23, 59, 59, 999)),
+      },
+    },
+  })
+
+  const currentStreak = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      isStreakMaintained: true,
+    },
+  });
+
+ console.log("currentStreak: ", currentStreak);
+
+ if (currentDaySubmission && !currentStreak?.isStreakMaintained) {
+    await db.user.update({
+      where: { id: userId },
+      data: {
+        dailyProblemStreak: {
+          increment: 1,
+        },
+        isStreakMaintained: true,
+      },
+    });
+  }
 
   res
     .status(200)

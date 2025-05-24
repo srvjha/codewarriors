@@ -41,7 +41,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { DifficultyBadge } from "@/components/ui/DifficultyBadge";
 import { Tag } from "@/components/ui/Tag";
-import {  StatusIndicator } from "@/helper/Problem.helper";
+import { StatusIndicator } from "@/helper/Problem.helper";
 import { ClipLoader } from "react-spinners";
 import type { SubmissionType } from "@/redux/slices/submit/SubmissionTypes";
 import { useSelector } from "react-redux";
@@ -67,6 +67,7 @@ const ProblemPage = () => {
   const [activeResultTab, setActiveResultTab] = useState("testcase");
   const [submissions, setSubmissions] = useState<SubmissionType[]>([]);
   const { userData } = useSelector((state: RootState) => state.auth);
+  const [executionType, setExecutionType] = useState<ExecutionStatus>();
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -125,6 +126,7 @@ const ProblemPage = () => {
 
   const handleSubmitCode = async () => {
     setIsSubmitting(true);
+    setExecutionType("SUBMIT");
     let payload = {
       source_code: codeSnippet,
       language: selectedLang,
@@ -159,9 +161,9 @@ const ProblemPage = () => {
     }
   };
 
-   const handleRunCode = async () => {
-    console.log("hello ji from run")
+  const handleRunCode = async () => {
     setIsRunning(true);
+    setExecutionType("RUN");
     let payload = {
       source_code: codeSnippet,
       language: selectedLang,
@@ -180,7 +182,6 @@ const ProblemPage = () => {
       );
 
       if (res.data.success) {
-       
         setResults(res.data.data);
         setActiveResultTab("result");
       }
@@ -208,10 +209,13 @@ const ProblemPage = () => {
           withCredentials: true,
         }
       );
-      console.log("submissions", res);
 
       if (res.data.success) {
-        setSubmissions(res.data.data);
+        const resData = res.data.data.sort(
+          (a: { createdAt: string }, b: { createdAt: string }) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setSubmissions(resData);
       }
     } catch (error) {
       console.error("Error fetching submissions:", error);
@@ -281,7 +285,7 @@ const ProblemPage = () => {
               <History size={16} className="mr-1.5" />
               Submissions
             </button>
-            {results && (
+            {results && executionType === "SUBMIT" && (
               <div className="flex items-center ">
                 <button
                   className="flex items-center px-1 py-1.5 text-sm font-medium rounded-md transition-colors  text-white "
@@ -294,7 +298,7 @@ const ProblemPage = () => {
                   onClick={() => {
                     setResults(null);
                     setActiveTab("description");
-                  }} 
+                  }}
                   className="text-gray-400  transition-colors "
                   title="Cancel"
                 >
@@ -503,7 +507,11 @@ const ProblemPage = () => {
                           {results.status}
                         </span>
                         <span className="text-gray-400 font-normal text-sm ml-1">
-                          ({results?.TestCaseResult.length} testcases passed)
+                          {results.status === "Accepted"
+                            ? `${
+                                results?.TestCaseResult?.length || 0
+                              } testcases passed`
+                            : "0 testcases passed"}
                         </span>
                       </div>
 
@@ -542,8 +550,6 @@ const ProblemPage = () => {
                       </div>
                     </div>
                   </div>
-
-                 
 
                   {/* Code */}
                   <div className=" p-4 rounded-lg bg-gradient-to-br from-[#232323] to-[#1A1A1A] ">
@@ -643,12 +649,11 @@ const ProblemPage = () => {
 
             {/* Action Buttons */}
             <div className="flex justify-end p-1 mr-1">
-              <Button className="bg-[#343131] h-8 hover:bg-[#464242] cursor-pointer text-white  rounded-md mr-2 text-sm font-semibold"
-              onClick={handleRunCode}
+              <Button
+                className="bg-[#343131] h-8 hover:bg-[#464242] cursor-pointer text-white  rounded-md mr-2 text-sm font-semibold"
+                onClick={handleRunCode}
               >
-                {isRunning ? 
-                  <ClipLoader size={18} color={"#fff"} />
-                : "Run"}
+                {isRunning ? <ClipLoader size={18} color={"#fff"} /> : "Run"}
               </Button>
               <Button
                 className="bg-green-500 h-8 hover:bg-green-700 cursor-pointer text-white rounded-md text-sm font-semibold"
@@ -770,17 +775,14 @@ const ProblemPage = () => {
                         <StatusIndicator status={results.status} />
                         <div className="flex items-center text-gray-300 text-sm">
                           <Clock size={16} className="mr-1" />
-                          Runtime:{" "}
-                          {
-                            results.time
-                          }
+                          Runtime: {results.time}
                         </div>
                       </div>
 
                       {/* Test case results */}
                       <div className=" rounded-md overflow-hidden">
                         <table className="w-full text-sm">
-                          <thead className="">
+                          <thead>
                             <tr>
                               <th className="py-2 px-3 text-left text-gray-300">
                                 Test Case
@@ -797,40 +799,45 @@ const ProblemPage = () => {
                             </tr>
                           </thead>
                           <tbody>
-                            {results.testCases?.slice(0, 3).map(
-                              (result: TestCaseResultType, index: number) => (
-                                <tr
-                                  key={index}
-                                  className="border-t border-gray-700"
-                                >
-                                  <td className="py-2 px-3 text-gray-300">
-                                    Case {result.testCases}
-                                  </td>
-                                  <td className="py-2 px-3">
-                                    {result.passedTestCases ? (
-                                      <span className="text-green-500 flex items-center">
-                                        <CheckCircle
-                                          size={14}
-                                          className="mr-1"
-                                        />
-                                        Accepted
-                                      </span>
-                                    ) : (
-                                      <span className="text-red-500 flex items-center">
-                                        <XOctagon size={14} className="mr-1" />
-                                        Wrong Answer
-                                      </span>
-                                    )}
-                                  </td>
-                                  <td className="py-2 px-3 text-gray-300">
-                                    {result.time}
-                                  </td>
-                                  <td className="py-2 px-3 text-gray-300">
-                                    {result.memory}
-                                  </td>
-                                </tr>
-                              )
-                            )}
+                            {results.testCases
+                              ?.slice(0, 3)
+                              .map(
+                                (result: TestCaseResultType, index: number) => (
+                                  <tr
+                                    key={index}
+                                    className="border-t border-gray-700"
+                                  >
+                                    <td className="py-2 px-3 text-gray-300">
+                                      Case {result.testCases}
+                                    </td>
+                                    <td className="py-2 px-3">
+                                      {result.passedTestCases ? (
+                                        <span className="text-green-500 flex items-center">
+                                          <CheckCircle
+                                            size={14}
+                                            className="mr-1"
+                                          />
+                                          Accepted
+                                        </span>
+                                      ) : (
+                                        <span className="text-red-500 flex items-center">
+                                          <XOctagon
+                                            size={14}
+                                            className="mr-1"
+                                          />
+                                          Wrong Answer
+                                        </span>
+                                      )}
+                                    </td>
+                                    <td className="py-2 px-3 text-gray-300">
+                                      {result.time}
+                                    </td>
+                                    <td className="py-2 px-3 text-gray-300">
+                                      {result.memory}
+                                    </td>
+                                  </tr>
+                                )
+                              )}
                           </tbody>
                         </table>
                       </div>
@@ -841,8 +848,7 @@ const ProblemPage = () => {
                           Output:
                         </h3>
                         <div className="bg-[#363535] px-3 py-2 rounded-md text-white text-sm font-mono whitespace-pre">
-                          {JSON.parse(results.stdout)||
-                            "No output"}
+                          {JSON.parse(results.stdout) || "No output"}
                         </div>
                       </div>
 

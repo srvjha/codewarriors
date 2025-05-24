@@ -11,8 +11,8 @@ import { db } from "../db";
 import { ApiError } from "../utils/ApiError";
 import { uploadOnCloudinary } from "../utils/cloudinary";
 import {
-  emailVerificationContent,
-  forgotPasswordContent,
+  emailVerificationMailgenContent,
+  forgotPasswordMailgenContent,
   sendEmail,
 } from "../utils/sendMail";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -27,6 +27,7 @@ import { env } from "../utils/env";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { UserRole } from "../generated/prisma";
+import { sanitizeUser } from "../utils/sanitizeUser";
 
 const generateAccessAndRefreshToken = async (userId: string) => {
   try {
@@ -93,13 +94,13 @@ const register = asyncHandler(async (req, res) => {
       avatar: avatarURL,
     },
   });
-
-  const verificationUrl = `${env.BASE_URI}/api/v1/auth/verify/email/${unHashedToken}`;
+ console.log("Base uri: ",env.BASE_URI)
+  const verificationUrl = `${env.BASE_URI}/verify/${unHashedToken}`;
 
   await sendEmail(
     user.email,
     "Verify Email",
-    emailVerificationContent(user.username, verificationUrl)
+    emailVerificationMailgenContent(user.username, verificationUrl)
   );
 
   const {
@@ -180,8 +181,6 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError("User not found", 400);
   }
-
-
   const verifyPassword = await isPasswordCorrect(password, user.password);
 
   if (!verifyPassword) {
@@ -200,7 +199,7 @@ const loginUser = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, cookieOption)
     .cookie("refreshToken", refreshToken, cookieOption)
     .status(200)
-    .json(new ApiResponse(200, user, "User logged in Successfully"));
+    .json(new ApiResponse(200, sanitizeUser(user), "User logged in Successfully"));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -256,12 +255,12 @@ const resendEmailVerification = asyncHandler(async (req, res) => {
     },
   });
 
-  const verificationUrl = `${env.BASE_URI}/api/v1/auth/verify/email/${unHashedToken}`;
+  const verificationUrl = `${env.BASE_URI}/verify/${unHashedToken}`;
 
   await sendEmail(
     user.email,
     "Verify Email",
-    emailVerificationContent(user.username, verificationUrl)
+    emailVerificationMailgenContent(user.username, verificationUrl)
   );
   
   
@@ -306,7 +305,7 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
   await sendEmail(
     user.email,
     "Verify Email",
-    forgotPasswordContent(user.username, verificationUrl)
+    forgotPasswordMailgenContent(user.username, verificationUrl)
   );
 
   res
@@ -455,7 +454,8 @@ const getCurrentUser = asyncHandler(async (req, res) => {
       email: true,
       avatar: true,
       isEmailVerified: true,
-      role:true
+      role:true,
+      dailyProblemStreak:true
     },
   });
 
@@ -469,6 +469,9 @@ const getCurrentUser = asyncHandler(async (req, res) => {
       new ApiResponse(200, userInfo, "Current User Data Fetched Successfully!")
     );
 });
+
+
+
 
 
 
