@@ -79,27 +79,25 @@ export const Header = () => {
         </div>
         <div className="flex flex-row items-center gap-5 mr-3">
           {userData && userData?.dailyProblemStreak > 0 ? (
-             <div className="flex gap-1">
-            
-              <TbFlameFilled 
-              className="text-blue-500 mt-1" 
-              size={18} 
-               data-tip="daily streak" />
+            <div className="flex gap-1">
+              <TbFlameFilled
+                className="text-blue-500 mt-1"
+                size={18}
+                data-tip="daily streak"
+              />
               <span>{userData?.dailyProblemStreak}</span>
-          </div>
-         
-          ):(
-             <div className="flex gap-1">
-            
-              <TbFlame 
-              className="text-white mt-1" 
-              size={18} 
-               data-tip="daily streak" />
+            </div>
+          ) : (
+            <div className="flex gap-1">
+              <TbFlame
+                className="text-white mt-1"
+                size={18}
+                data-tip="daily streak"
+              />
               <span>{userData?.dailyProblemStreak}</span>
-          </div>
-         
+            </div>
           )}
-         
+
           <Link to="/about" className="hover:text-blue-400 transition-colors">
             About
           </Link>
@@ -118,25 +116,31 @@ export const Header = () => {
               <DropdownMenuTrigger className="cursor-pointer">
                 <Avatar className=" h-10 w-10 ">
                   <AvatarImage src={userData.avatar} />
-                  <AvatarFallback
-                    className="text-black font-semibold text-xl bg-white"
-                  >
+                  <AvatarFallback className="text-black font-semibold text-xl bg-white">
                     {userData?.fullName.split("")[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <User />
-                  <Link to="/profile" className="cursor-pointer">Profile</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+              <DropdownMenuContent className="bg-black text-white border-none shadow-sm shadow-gray-800">
+                <Link to="/profile">
+                  <DropdownMenuItem className="cursor-pointer"> 
+                    <User />
+                    Profile
+                  </DropdownMenuItem>
+                </Link>
+                 <Link to="/settings">
+                <DropdownMenuItem className="cursor-pointer">
                   <List />
-                  <Link to="/settings" className="cursor-pointer">My List</Link>
+                 
+                    My List
+                  
                 </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem variant="destructive">
                   <LogOut />
-                  <div onClick={() => logout()} className="cursor-pointer">Logout</div>
+                  <div onClick={() => logout()} className="cursor-pointer">
+                    Logout
+                  </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -152,13 +156,12 @@ export const Header = () => {
           )}
         </div>
       </nav>
-    {isAuthenticated && !userData?.isEmailVerified && (
-       <div className="w-full bg-gradient-to-r from-cyan-900 via-blue-700 to-cyan-900 text-white text-center text-sm py-1.5 shadow-sm">
-        📩 We’ve sent a verification email. Please verify your email to
-        continue.
-      </div>
-     )}
-     
+      {isAuthenticated && !userData?.isEmailVerified && (
+        <div className="w-full bg-gradient-to-r from-cyan-900 via-blue-700 to-cyan-900 text-white text-center text-sm py-1.5 shadow-sm">
+          📩 We’ve sent a verification email. Please verify your email to
+          continue.
+        </div>
+      )}
     </>
   );
 };

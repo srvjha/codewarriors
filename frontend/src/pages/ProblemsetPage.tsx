@@ -4,11 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
-import { Search, Filter, CirclePlus } from "lucide-react";
+import { Search, Filter, CirclePlus, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { debounce } from "@/utils/debounce";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { Spinner } from "@/components/ui/Spinner";
 
 type Problem = {
   id: string;
@@ -16,7 +18,7 @@ type Problem = {
   description: string;
   difficulty: "EASY" | "MEDIUM" | "HARD";
   tags: string[];
-  successRate?: number; // Optional if your backend sends this
+  isSolved: boolean;
 };
 
 const difficultyColor: Record<Problem["difficulty"], string> = {
@@ -28,20 +30,25 @@ const difficultyColor: Record<Problem["difficulty"], string> = {
 const ProblemsetPage = () => {
   const [allProblems, setAllProblems] = useState<Problem[]>([]);
   const [filteredProblems, setFilteredProblems] = useState<Problem[]>([]);
+  const [visibleProblems, setVisibleProblems] = useState<Problem[]>([]);
+  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
   const { userData } = useSelector((state: RootState) => state.auth);
+  const problemsPerPage = 10;
 
   useEffect(() => {
     const fetchProblems = async () => {
       try {
         const res = await axios.get(
           "http://localhost:3000/api/v1/problem/all-problems",
-          {
-            withCredentials: true,
-          }
+          { withCredentials: true }
         );
-        setAllProblems(res.data.data);
-        setFilteredProblems(res.data.data);
+        const data: Problem[] = res.data.data;
+
+        setAllProblems(data);
+        setFilteredProblems(data);
+        setVisibleProblems(data.slice(0, problemsPerPage));
+        setHasMore(data.length > problemsPerPage);
       } catch (err) {
         console.error("Failed to fetch problems:", err);
       } finally {
@@ -51,7 +58,48 @@ const ProblemsetPage = () => {
     fetchProblems();
   }, []);
 
-  // Count tags
+  const fetchSolvedStatus = async (problems: Problem[]) => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/api/v1/problem/solved/all-problems",
+        { withCredentials: true }
+      );
+
+      const solvedIds = response.data.data;
+
+      return problems.map((problem) => ({
+        ...problem,
+        isSolved: solvedIds.some((solved: Problem) => solved.id === problem.id),
+      }));
+    } catch (error) {
+      console.error("Failed to fetch solved problems:", error);
+      return problems.map((p) => ({ ...p, isSolved: false }));
+    }
+  };
+
+  const fetchMoreData = async () => {
+    if (visibleProblems.length >= filteredProblems.length) {
+      setHasMore(false);
+      return;
+    }
+
+    const nextProblems = filteredProblems.slice(
+      visibleProblems.length,
+      visibleProblems.length + problemsPerPage
+    );
+
+    const updatedNext = await fetchSolvedStatus(nextProblems);
+    setVisibleProblems((prev) => [...prev, ...updatedNext]);
+  };
+
+  useEffect(() => {
+    const initializeSolvedStatus = async () => {
+      const updated = await fetchSolvedStatus(filteredProblems.slice(0, problemsPerPage));
+      setVisibleProblems(updated);
+    };
+    initializeSolvedStatus();
+  }, [filteredProblems]);
+
   const tagCounts: Record<string, number> = {};
   allProblems.forEach((problem) => {
     problem.tags.forEach((tag) => {
@@ -65,22 +113,20 @@ const ProblemsetPage = () => {
     ...Object.entries(tagCounts).map(([tag, count]) => ({ label: tag, count })),
   ];
 
-  // debounce searh functionality
-  const searchRef =
-    useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
+  const searchRef = useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
 
   useEffect(() => {
-    searchRef.current = debounce(
-      (event: React.ChangeEvent<HTMLInputElement>) => {
-        const query = event.target.value.toLowerCase();
-        const filteredProblems = allProblems.filter((problem) =>
-          problem.title.toLowerCase().match(new RegExp(query, "i"))
-        );
-        setFilteredProblems(filteredProblems);
-      },
-      2000
-    );
+    searchRef.current = debounce((event: React.ChangeEvent<HTMLInputElement>) => {
+      const query = event.target.value.toLowerCase();
+      const filtered = allProblems.filter((problem) =>
+        problem.title.toLowerCase().includes(query)
+      );
+      setFilteredProblems(filtered);
+      setVisibleProblems([]);
+      setHasMore(filtered.length > problemsPerPage);
+    }, 1000);
   }, [allProblems]);
+
   const handleProblemSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (searchRef.current) {
       searchRef.current(event);
@@ -92,16 +138,13 @@ const ProblemsetPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">
-            Interview Problem Set
-          </h1>
+          <h1 className="text-2xl font-bold text-white">Interview Problem Set</h1>
           <p className="text-gray-400 text-sm mt-1">
             Curated problems across categories for interviews and challenges.
           </p>
         </div>
-        {userData && userData.role === "ADMIN" && (
+        {userData?.role === "ADMIN" && (
           <Link to="/create/problem">
-            {" "}
             <Button variant="primary">
               Create Problem <CirclePlus className="ml-2" />
             </Button>
@@ -116,8 +159,7 @@ const ProblemsetPage = () => {
             key={topic.label}
             className="text-sm px-3 py-1 bg-zinc-800 text-white hover:bg-zinc-700"
           >
-            {topic.label}{" "}
-            <span className="ml-1 text-gray-400">({topic.count})</span>
+            {topic.label} <span className="ml-1 text-gray-400">({topic.count})</span>
           </Badge>
         ))}
       </div>
@@ -132,52 +174,69 @@ const ProblemsetPage = () => {
             onChange={handleProblemSearch}
           />
         </div>
-        <Button
-          variant="outline"
-          className="bg-zinc-800 text-white border-zinc-900"
-        >
+        <Button variant="outline" className="bg-zinc-800 text-white border-zinc-900">
           <Filter className="mr-2" size={16} /> Filter
         </Button>
       </div>
 
-      {/* Problem List */}
-      <div className="space-y-2">
-        {loading ? (
-          <p className="text-gray-400">Loading problems...</p>
-        ) : filteredProblems.length === 0 ? (
-          <p className="text-gray-400">No problems found.</p>
-        ) : (
-          filteredProblems.map((problem, index) => (
-            <Card
-              key={problem.id}
-              className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
-            >
-              <Link to={`/problem/${problem.id}`}>
-                <div className="text-white font-medium flex flex-col">
-                  <span>
-                    {index + 1}. {problem.title}
-                  </span>
-
-                  <span className="text-sm text-gray-400">
-                    {problem.description.length > 80
-                      ? problem.description.slice(0, 80) + "..."
-                      : problem.description}
+      {/* Infinite Scroll */}
+      {loading ? (
+        <p className="text-gray-400">Loading problems...</p>
+      ) : visibleProblems.length === 0 ? (
+        <p className="text-gray-400">No problems found.</p>
+      ) : (
+        <InfiniteScroll
+          dataLength={visibleProblems.length}
+          next={fetchMoreData}
+          hasMore={hasMore}
+          loader={<h4 className="text-white text-center"><Spinner className="mt-6"/></h4>}
+          endMessage={
+            <p className="mt-6 text-center text-lg font-semibold text-zinc-200">
+              Yay! You have seen it all
+            </p>
+          }
+        >
+          <div className="space-y-2">
+            {visibleProblems.map((problem, index) => (
+              <Card
+                key={problem.id}
+                className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
+              >
+                <Link to={`/problem/${problem.id}`}>
+                  <div className="flex flex-row">
+                    {problem.isSolved ? (
+                      <CheckCircle className="mt-2 mr-3 text-green-500" />
+                    ) : (
+                      <div className="mr-9"></div>
+                    )}
+                    <div className="text-white font-medium flex flex-col">
+                      <span className="problemtitle">
+                        {index + 1}. {problem.title}
+                      </span>
+                      <span className="text-sm text-gray-400">
+                        {problem.description.length > 80
+                          ? problem.description.slice(0, 80) + "..."
+                          : problem.description}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+                <div className="flex items-center gap-4 px-1 py-1 mr-4">
+                  <span
+                    className={`text-sm font-semibold ${difficultyColor[problem.difficulty]}`}
+                  >
+                    {problem.difficulty.length > 4
+                      ? `${problem.difficulty.slice(0, 3)}.`
+                      : problem.difficulty}
                   </span>
                 </div>
-              </Link>
-              <div className="flex items-center gap-4">
-                <span
-                  className={`text-sm font-semibold ${
-                    difficultyColor[problem.difficulty]
-                  }`}
-                >
-                  {problem.difficulty}
-                </span>
-              </div>
-            </Card>
-          ))
-        )}
-      </div>
+              </Card>
+            ))}
+          </div>
+        </InfiniteScroll>
+
+        
+      )}
     </div>
   );
 };

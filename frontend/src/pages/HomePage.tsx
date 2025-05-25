@@ -1,14 +1,12 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { Toast } from "@/utils/ToastContainers";
 import CodeEditor from "@/components/ui/CodeEditor";
 
 const HomePage = () => {
   return (
-    <>
-      <Toast />
       <div className="flex flex-col min-h-screen ">
+         <div className="glow-grid-bg mt-12" />
         <div className="text-white px-6 py-12 md:py-24 min-h-screen">
           <div className="max-w-3xl mx-auto flex flex-col items-center gap-12 -mt-6 text-center">
             <motion.div
@@ -135,7 +133,6 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-    </>
   );
 };
 

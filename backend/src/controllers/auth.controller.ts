@@ -470,6 +470,29 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     );
 });
 
+const allUsers = asyncHandler(async(req,res)=>{
+  const getUsers = await db.user.findMany({
+    select:{
+      id:true,
+      fullName:true,
+      username:true,
+      avatar:true,
+      email:true,
+      isEmailVerified:true,
+      isStreakMaintained:true,
+      lastSubmissionDate:true,
+      dailyProblemStreak:true
+    }
+  })
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      getUsers,
+      "All users fetched successfully"
+    )
+  )
+})
+
 
 
 
@@ -485,5 +508,6 @@ export {
   register,
   resendEmailVerification,
   resetForgottenPassword,
-  verifyEmail
+  verifyEmail,
+  allUsers
 };

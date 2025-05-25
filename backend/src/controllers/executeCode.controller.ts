@@ -141,16 +141,16 @@ const executeCode = asyncHandler(async (req, res) => {
   };
   console.log("type: ", type);
   console.log("Submission Data: ", {
-        ...submissionData,
-        testCases: detailedResults,
-      });
+    ...submissionData,
+    testCases: detailedResults,
+  });
   console.log(
     "type === ExecutionTypeEnum.RUN: ",
     type === ExecutionTypeEnum.RUN
   );
   if (type === ExecutionTypeEnum.RUN) {
     console.log("hello");
-     return res.status(200).json(
+    return res.status(200).json(
       new ApiResponse(
         200,
         {
@@ -204,8 +204,6 @@ const executeCode = asyncHandler(async (req, res) => {
     data: testCaseResult,
   });
 
-  
-
   const submissionWithTestCase = await db.submission.findUnique({
     where: {
       id: submission.id,
@@ -214,9 +212,42 @@ const executeCode = asyncHandler(async (req, res) => {
       TestCaseResult: true,
     },
   });
+ 
 
-  // now if dailystreak is not updated for the current date then update the daily streak only
+  //handling daily streak feat
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); //  midnight
 
+  //  user streak info
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      dailyProblemStreak: true,
+      isStreakMaintained: true,
+      lastSubmissionDate: true,
+    },
+  });
+
+  const lastSubmissionDate = user?.lastSubmissionDate
+    ? new Date(user.lastSubmissionDate)
+    : null;
+
+  if (lastSubmissionDate) lastSubmissionDate.setHours(0, 0, 0, 0);
+
+  const isNewDay =
+    !lastSubmissionDate || lastSubmissionDate.getTime() !== today.getTime();
+
+  //  If it's a new day, reset isStreakMaintained to false
+  if (isNewDay && user?.isStreakMaintained) {
+    await db.user.update({
+      where: { id: userId },
+      data: {
+        isStreakMaintained: false,
+      },
+    });
+  }
+
+  // checking if user submitted today
   const currentDaySubmission = await db.submission.findFirst({
     where: {
       userId,
@@ -226,25 +257,18 @@ const executeCode = asyncHandler(async (req, res) => {
         lte: new Date(new Date().setHours(23, 59, 59, 999)),
       },
     },
-  })
-
-  const currentStreak = await db.user.findUnique({
-    where: { id: userId },
-    select: {
-      isStreakMaintained: true,
-    },
   });
 
- console.log("currentStreak: ", currentStreak);
+  //  If user submitted and streak isn't already marked for today, update
+  if (currentDaySubmission && !user?.isStreakMaintained) {
+    const currentStreak = user?.dailyProblemStreak || 0;
 
- if (currentDaySubmission && !currentStreak?.isStreakMaintained) {
     await db.user.update({
       where: { id: userId },
       data: {
-        dailyProblemStreak: {
-          increment: 1,
-        },
+        dailyProblemStreak: currentStreak === 0 ? 1 : { increment: 1 },
         isStreakMaintained: true,
+        lastSubmissionDate: new Date(), // Update for tomorrow's check
       },
     });
   }

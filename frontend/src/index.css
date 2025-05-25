@@ -169,3 +169,14 @@ body{
   font-size: 10px !important;
 }
 
+
+.glow-grid-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, rgba(63, 96, 148, 0.08) 1px, transparent 2px),
+    linear-gradient(to bottom, rgba(60, 88, 131, 0.08) 1px, transparent 2px);
+  background-size: 60px 60px;
+}
+

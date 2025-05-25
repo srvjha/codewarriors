@@ -1,7 +1,7 @@
 import {Router} from "express";
 import { verifyUser } from "../middleware/auth.middleware";
 import { checkRole } from "../middleware/permission.middleware";
-import { createProblem, deleteProblem, getAllProblems,  getAllProblemsSolvedByUser,  getProblemById, updateProblem } from "../controllers/problem.controller";
+import { createProblem, deleteProblem, getAllProblems,  getAllProblemsSolvedByUser,  getProblemById, isProblemSolved, updateProblem } from "../controllers/problem.controller";
 
 const router = Router();
 
@@ -11,4 +11,5 @@ router.get("/:pid",getProblemById)
 router.put("/:pid/update",verifyUser,checkRole,updateProblem)
 router.delete("/:pid/delete",verifyUser,checkRole,deleteProblem)
 router.get("/solved/all-problems",verifyUser,getAllProblemsSolvedByUser)
+router.get("/:pid/status",verifyUser,isProblemSolved)
 export default router

@@ -64,6 +64,7 @@ const createProblem = asyncHandler(async (req, res) => {
 
     const tokens = await submitBatch(submissions);
     const results = await pollBatchResults(tokens);
+    console.log("Results: ",results)
 
     for (let i = 0; i < results.length; i++) {
       const result = results[i];
@@ -109,6 +110,7 @@ const getAllProblems = asyncHandler(async (req, res) => {
   if (!problems) {
     throw new ApiError("No problems found", 404);
   }
+
   return res
     .status(200)
     .json(new ApiResponse(200, problems, "Problems retrieved successfully"));
@@ -285,6 +287,35 @@ const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, problems, "Problem Fetched Successfully"));
 });
 
+const isProblemSolved = asyncHandler(async(req,res)=>{
+  const userId = req.user.id;
+  const {pid} = req.params;
+ 
+
+  validId(pid,"Problem");
+  let problemSolved = false
+
+  const foundProblem = await db.problemSolved.findFirst({
+    where:{
+      userId:userId,
+      problemId:pid
+    }
+  })
+
+  if(foundProblem){
+    problemSolved = true;
+  }
+  
+  return res.status(200).json(
+    new ApiResponse(
+
+      200,
+      problemSolved,
+      "Problem Status Found Successfully"
+    )
+  )
+})
+
 export {
   createProblem,
   getAllProblems,
@@ -292,4 +323,5 @@ export {
   updateProblem,
   deleteProblem,
   getAllProblemsSolvedByUser,
+  isProblemSolved
 };

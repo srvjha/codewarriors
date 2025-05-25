@@ -49,7 +49,7 @@ const ContributionCalendar = () => {
   console.log("startDate: ",startDate)
 
   return (
-    <div className="p-4  rounded shadow w-[1000px] h-[100px]">
+    <div className="p-4  rounded shadow w-[990px] h-[100px]">
       <h2 className="text-xl font-bold mb-8 text-center">Your Submission Activity</h2>
       <CalendarHeatmap
         startDate={startDate}

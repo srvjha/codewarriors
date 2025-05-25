@@ -39,8 +39,9 @@ model User {
   forgotPasswordExpiry    DateTime?
   emailVerificationToken  String?
   emailVerificationExpiry DateTime?
-  dailyProblemStreak      Int?      @default(0)
-  isStreakMaintained      Boolean?  @default(false)
+  dailyProblemStreak      Int       @default(0)
+  isStreakMaintained      Boolean   @default(false)
+  lastSubmissionDate      DateTime?
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
 

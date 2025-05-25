@@ -46,6 +46,7 @@ import { ClipLoader } from "react-spinners";
 import type { SubmissionType } from "@/redux/slices/submit/SubmissionTypes";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import tags from '../../companyTags.json'
 
 const ProblemPage = () => {
   const params = useParams();
@@ -222,6 +223,22 @@ const ProblemPage = () => {
     }
   };
 
+  const getCompanyTags = (title: string) => {
+    const tagObj = tags.find((tag) => tag.problem === title);
+    if (!tagObj || !tagObj.companies || tagObj.companies.length === 0) return null;
+    return (
+      <div className="flex flex-wrap gap-2 mb-2">
+        {tagObj.companies.map((company: string, idx: number) => (
+          <div className="flex  px-2 py-1 text-[12px] rounded-lg" key={idx}>
+            <img src = {`https://logo.clearbit.com/${company.toLowerCase()}.com`} alt="companylogo" className="w-4 h-4 rounded-lg" />
+             <div className="ml-1">{company}</div>
+          </div>
+         
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className=" text-white -mt-2 ">
       {/* Main Content */}
@@ -319,6 +336,10 @@ const ProblemPage = () => {
                   {problem.tags.map((tag, index) => (
                     <Tag key={index} name={tag} />
                   ))}
+                </div>
+
+                <div>
+                  {getCompanyTags(problem.title)}
                 </div>
 
                 {/* Problem Description */}

@@ -1,5 +1,6 @@
 import {cn} from '@/lib/utils';
-import {useEffect, useState, FC} from 'react';
+import {useEffect, useState,} from 'react';
+import type { FC } from 'react';
 
 type SpinnerProps = {
   className?: string;
@@ -25,9 +26,9 @@ const Spinner: FC<SpinnerProps> = ({
       <div
         className={cn('flex space-x-2 justify-center items-center', className)}
       >
-        <div className="h-3 w-3 dark:bg-light-primary bg-dark-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
-        <div className="h-3 w-3 dark:bg-light-primary bg-dark-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
-        <div className="h-3 w-3 dark:bg-light-primary bg-dark-primary rounded-full animate-bounce" />
+        <div className="h-3 w-3 bg-zinc-100 rounded-full animate-bounce [animation-delay:-0.3s]" />
+        <div className="h-3 w-3 bg-zinc-100  rounded-full animate-bounce [animation-delay:-0.15s]" />
+        <div className="h-3 w-3 bg-zinc-100 rounded-full animate-bounce" />
       </div>
     );
   }

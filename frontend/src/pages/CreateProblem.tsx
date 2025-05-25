@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Minus,
 } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,14 +46,22 @@ const CreateProblemForm = () => {
     resolver: CreateProblemResolver,
   });
 
-  const { fields: testCaseFields, append: appendTestCase } = useFieldArray({
+  const {
+    fields: testCaseFields,
+    append: appendTestCase,
+    remove: removeTestCase,
+  } = useFieldArray({
     control,
     name: "testcases",
   });
 
   const navigate = useNavigate();
 
-  const { fields: examplesFields, append: appendExample } = useFieldArray({
+  const {
+    fields: examplesFields,
+    append: appendExample,
+    remove: removeExample,
+  } = useFieldArray({
     control,
     name: "examples",
   });
@@ -68,8 +77,6 @@ const CreateProblemForm = () => {
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0);
     }
-
-    console.log("Form Data:", data);
 
     try {
       const response = await axios.post(
@@ -201,6 +208,12 @@ const CreateProblemForm = () => {
                 key={field.id}
                 className="bg-zinc-900 p-4 rounded-xl border border-zinc-700 space-y-2"
               >
+                <div className=" flex justify-end">
+                  <Minus
+                    className="bg-gray-800 rounded-md p-1 cursor-pointer hover:bg-gray-700"
+                    onClick={() => removeExample(1)}
+                  />
+                </div>
                 <Textarea
                   {...register(`examples.${index}.input`)}
                   placeholder="Input"
@@ -241,6 +254,12 @@ const CreateProblemForm = () => {
                 key={field.id}
                 className="bg-zinc-900 p-4 rounded-xl border border-zinc-700 space-y-2"
               >
+                <div className=" flex justify-end">
+                  <Minus
+                    className="bg-gray-800 rounded-md p-1 cursor-pointer hover:bg-gray-700"
+                    onClick={() => removeTestCase(1)}
+                  />
+                </div>
                 <Textarea
                   {...register(`testcases.${index}.input`)}
                   placeholder="Input"
