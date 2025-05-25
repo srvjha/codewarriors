@@ -13,7 +13,7 @@ import {
 } from "../utils/judge0";
 import { ApiResponse } from "../utils/ApiResponse";
 import { validId } from "../helper/validId.helper";
-import { Difficulty, UserRole } from "../generated/prisma";
+import { Difficulty, UserRole } from "@prisma/client";
 
 const createProblem = asyncHandler(async (req, res) => {
   const {

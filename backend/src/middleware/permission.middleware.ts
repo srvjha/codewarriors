@@ -1,4 +1,4 @@
-import { UserRole } from "../generated/prisma";
+import { UserRole } from "@prisma/client";
 import { ApiError } from "../utils/ApiError";
 import { asyncHandler } from "../utils/asynHandler";
 

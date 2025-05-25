@@ -1,4 +1,4 @@
-import { User } from "../generated/prisma";
+import { User } from "@prisma/client";
 
 type SafeUser = Omit<
   User,

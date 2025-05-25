@@ -26,7 +26,7 @@ import {
 import { env } from "../utils/env";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
-import { UserRole } from "../generated/prisma";
+import { UserRole } from "@prisma/client";
 import { sanitizeUser } from "../utils/sanitizeUser";
 
 const generateAccessAndRefreshToken = async (userId: string) => {

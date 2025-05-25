@@ -1,4 +1,4 @@
-import { PrismaClient, User } from "../generated/prisma";
+import { PrismaClient, User } from "@prisma/client";
 
 export type CustomUser = Pick<
   User,

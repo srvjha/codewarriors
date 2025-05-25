@@ -1,4 +1,5 @@
 import { db } from "../db";
+import { Submission } from "@prisma/client";
 import { validId } from "../helper/validId.helper";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asynHandler";
@@ -11,7 +12,7 @@ const getAllSubmission = asyncHandler(async (req, res) => {
     },
   });
 
-  const getProblemDetails = submissions.map(async (submission) => {
+  const getProblemDetails = submissions.map(async (submission:Submission) => {
     const problem = await db.problem.findUnique({
       where: {
         id: submission.problemId,

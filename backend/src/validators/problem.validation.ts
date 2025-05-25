@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { jsonSchema } from "./json.validation";
-import { Difficulty } from "../generated/prisma";
+import { Difficulty } from "@prisma/client";
 
 export const testcaseSchema = z.array(z.object({
   input: z.string(),
