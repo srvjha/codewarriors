@@ -20,7 +20,7 @@ export const Header = () => {
   const { userData, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
-  console.log("userData", userData);
+ 
 
   if (!userData && isAuthenticated) {
     return (
@@ -128,7 +128,7 @@ export const Header = () => {
                     Profile
                   </DropdownMenuItem>
                 </Link>
-                 <Link to="/settings">
+                 <Link to="/my-list">
                 <DropdownMenuItem className="cursor-pointer">
                   <List />
                  

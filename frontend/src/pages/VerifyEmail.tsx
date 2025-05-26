@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/button";
 import { Mail } from "lucide-react";
+import API from "@/utils/AxiosInstance";
 
 const VerifyEmail = () => {
   const { token } = useParams();
@@ -13,8 +13,8 @@ const VerifyEmail = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:3000/api/v1/auth/verify/email/${token}`)
+    API
+      .get(`/auth/verify/email/${token}`)
       .then((res) => {
         console.log(res);
         setMessage("✅ Email Verified Successfully!");

@@ -11,8 +11,8 @@ import { db } from "../db";
 import { ApiError } from "../utils/ApiError";
 import { uploadOnCloudinary } from "../utils/cloudinary";
 import {
-  emailVerificationMailgenContent,
-  forgotPasswordMailgenContent,
+  emailVerificationContent,
+  forgotPasswordContent,
   sendEmail,
 } from "../utils/sendMail";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -100,7 +100,7 @@ const register = asyncHandler(async (req, res) => {
   await sendEmail(
     user.email,
     "Verify Email",
-    emailVerificationMailgenContent(user.username, verificationUrl)
+    emailVerificationContent(user.username, verificationUrl)
   );
 
   const {
@@ -260,7 +260,7 @@ const resendEmailVerification = asyncHandler(async (req, res) => {
   await sendEmail(
     user.email,
     "Verify Email",
-    emailVerificationMailgenContent(user.username, verificationUrl)
+    emailVerificationContent(user.username, verificationUrl)
   );
   
   
@@ -305,7 +305,7 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
   await sendEmail(
     user.email,
     "Verify Email",
-    forgotPasswordMailgenContent(user.username, verificationUrl)
+    forgotPasswordContent(user.username, verificationUrl)
   );
 
   res

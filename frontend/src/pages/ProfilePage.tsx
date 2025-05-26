@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import axios from "axios";
 import ContributionCalendar from "@/components/ContributionGraph";
 import type { RootState } from "@/redux/store";
+import { Button } from "@/components/ui/button";
+import API from "@/utils/AxiosInstance";
 
 type Submission = {
   id: string;
@@ -29,7 +30,7 @@ const ProfilePage = () => {
   useEffect(()=>{
  const fetchSubmissions = async () => {
   try {
-    const res = await axios.get("http://localhost:3000/api/v1/submission/all", {
+    const res = await API.get("/submission/all", {
       withCredentials: true,
     });
 
@@ -62,7 +63,8 @@ fetchSubmissions();
     <div className="flex flex-col items-center min-h-screen  p-4">
       <div className="w-full max-w-5xl  p-6 rounded-lg shadow-lg shadow-neutral-800 ">
         {/* User Info */}
-        <div className="flex items-center gap-4 mb-6 border-b border-b-gray-700 pb-4">
+        <div className="flex items-center gap-4 justify-between mb-6 border-b border-b-gray-700 pb-4">
+          <div className="flex items-center gap-4">
           <img
             src={avatar}
             alt={`${username} avatar`}
@@ -73,6 +75,8 @@ fetchSubmissions();
             <p className="text-gray-500">{email}</p>
             <p className="text-sm text-gray-400">@{username}</p>
           </div>
+          </div>
+          <Button>Change Password</Button>
         </div>
 
         {/* Contribution Graph */}

@@ -22,7 +22,7 @@ import {
   X,
 } from "lucide-react";
 
-import axios from "axios";
+
 import {
   ExecutionStatus,
   type Problem,
@@ -40,13 +40,13 @@ import { Button } from "@/components/ui/button";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { DifficultyBadge } from "@/components/ui/DifficultyBadge";
-import { Tag } from "@/components/ui/Tag";
 import { StatusIndicator } from "@/helper/Problem.helper";
 import { ClipLoader } from "react-spinners";
 import type { SubmissionType } from "@/redux/slices/submit/SubmissionTypes";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import tags from '../../companyTags.json'
+import API from "@/utils/AxiosInstance";
 
 const ProblemPage = () => {
   const params = useParams();
@@ -73,8 +73,8 @@ const ProblemPage = () => {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:3000/api/v1/problem/${problemId}`,
+        const res = await API.get(
+          `/problem/${problemId}`,
           {
             withCredentials: true,
           }
@@ -133,8 +133,8 @@ const ProblemPage = () => {
       language: selectedLang,
     };
     try {
-      const res = await axios.post(
-        `http://localhost:3000/api/v1/execute/code/${problemId}/${ExecutionStatus.SUBMIT}`,
+      const res = await API.post(
+        `/execute/code/${problemId}/${ExecutionStatus.SUBMIT}`,
         JSON.stringify(payload),
         {
           withCredentials: true,
@@ -170,8 +170,8 @@ const ProblemPage = () => {
       language: selectedLang,
     };
     try {
-      const res = await axios.post(
-        `http://localhost:3000/api/v1/execute/code/${problemId}/${ExecutionStatus.RUN}`,
+      const res = await API.post(
+        `/execute/code/${problemId}/${ExecutionStatus.RUN}`,
         JSON.stringify(payload),
         {
           withCredentials: true,
@@ -204,8 +204,8 @@ const ProblemPage = () => {
   const getSubmissions = async () => {
     try {
       setActiveTab("submissions");
-      const res = await axios.get(
-        `http://localhost:3000/api/v1/submission/problem/${problemId}`,
+      const res = await API.get(
+        `/submission/problem/${problemId}`,
         {
           withCredentials: true,
         }
@@ -229,7 +229,7 @@ const ProblemPage = () => {
     return (
       <div className="flex flex-wrap gap-2 mb-2">
         {tagObj.companies.map((company: string, idx: number) => (
-          <div className="flex  px-2 py-1 text-[12px] rounded-lg" key={idx}>
+          <div className="flex bg-zinc-900  px-2 py-1 text-[12px] rounded-lg" key={idx}>
             <img src = {`https://logo.clearbit.com/${company.toLowerCase()}.com`} alt="companylogo" className="w-4 h-4 rounded-lg" />
              <div className="ml-1">{company}</div>
           </div>
@@ -334,7 +334,7 @@ const ProblemPage = () => {
                 <div className="flex items-center gap-3 mb-4 mt-2">
                   <DifficultyBadge difficulty={problem.difficulty} />
                   {problem.tags.map((tag, index) => (
-                    <Tag key={index} name={tag} />
+                    <span key={index} className="bg-zinc-900 text-gray-300 px-2 py-1 text-xs rounded-md mr-2">  {tag} </span>
                   ))}
                 </div>
 

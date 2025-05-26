@@ -85,31 +85,44 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 });
 
 const addProblemToPlaylist = asyncHandler(async (req, res) => {
-  const { plid } = req.params;
-   validId(plid, "Playlist");
-  const { problemIds } = handleZodError(addProblemsValidation(req.body));
+  const { plid, pid } = req.params;
+  validId(plid, "Playlist");
+  validId(pid, "Problem");
 
-  problemIds.forEach((id) => validId(id, "Problem"));
-
-  const existingProblems = await db.problem.findMany({
+  const existingProblems = await db.problem.findFirst({
     where: {
-      id: { in: problemIds },
+      id: pid,
     },
     select: { id: true },
   });
 
-  const validIds = new Set(existingProblems.map((p) => p.id));
-  const invalidIds = problemIds.filter((id: string) => !validIds.has(id));
-
-  if (invalidIds.length > 0) {
-    throw new ApiError(`Invalid problem IDs: ${invalidIds.join(", ")}`, 400);
+  if (!existingProblems) {
+    throw new ApiError("Problem not found", 404);
   }
+  const existingPlaylist = await db.playlist.findFirst({
+    where: {
+      id: plid,
+    },
+    select: { id: true },
+  });
 
-  const addProblems = await db.problemInPlaylist.createMany({
-    data: problemIds.map((problemId: string) => ({
+  if (!existingPlaylist) {
+    throw new ApiError("Playlist not found", 404);
+  }
+  const existingProblemInPlaylist = await db.problemInPlaylist.findFirst({
+    where: {
       playListId: plid,
-      problemId,
-    })),
+      problemId: pid,
+    },
+  });
+  if (existingProblemInPlaylist) {
+    throw new ApiError("Problem already exists in the playlist", 400);
+  }
+  const addProblems = await db.problemInPlaylist.create({
+    data: {
+      playListId: plid,
+      problemId: pid,
+    },
   });
 
   res
@@ -124,29 +137,25 @@ const addProblemToPlaylist = asyncHandler(async (req, res) => {
 });
 
 const removeProblemFromPlaylist = asyncHandler(async (req, res) => {
-  const { plid } = req.params;
+  const { plid, pid } = req.params;
   validId(plid, "Playlist");
-  const { problemIds } = handleZodError(addProblemsValidation(req.body));
-
-  problemIds.forEach((id) => validId(id, "Problem"));
+  validId(pid, "Problem");
 
   const existingProblems = await db.problem.findMany({
     where: {
-      id: { in: problemIds },
+      id: pid ,
     },
     select: { id: true },
   });
 
-  const validIds = new Set(existingProblems.map((p) => p.id));
-  const invalidIds = problemIds.filter((id: string) => !validIds.has(id));
-
-  if (invalidIds.length > 0) {
-    throw new ApiError(`Invalid problem IDs: ${invalidIds.join(", ")}`, 400);
+ 
+  if (existingProblems.length === 0) {
+    throw new ApiError("Problem not found", 404);
   }
   const deleteProblem = await db.problemInPlaylist.deleteMany({
     where: {
       playListId: plid,
-      problemId: { in: problemIds },
+      problemId: pid,
     },
   });
   if (deleteProblem.count === 0) {

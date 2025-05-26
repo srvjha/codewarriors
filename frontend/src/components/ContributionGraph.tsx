@@ -3,8 +3,8 @@ import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
-import axios from "axios";
 import type { SubmissionType } from "@/redux/slices/submit/SubmissionTypes";
+import API from "@/utils/AxiosInstance";
 
 type Calendar = {
     date:string,
@@ -17,7 +17,7 @@ const ContributionCalendar = () => {
   useEffect(() => {
     const fetchSubmissions = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/v1/submission/all", {
+        const res = await API.get("/submission/all", {
           withCredentials: true,
         });
 

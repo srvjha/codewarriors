@@ -118,7 +118,7 @@ const executeCode = asyncHandler(async (req, res) => {
 
     // console.log(`Passed: ${passedTestCases}`)
   });
-  console.log("Detailed Results: ", detailedResults);
+  // console.log("Detailed Results: ", detailedResults);
   const averageMemory = getAverage(detailedResults.map((r) => r.memory));
   const averageTime = getAverage(detailedResults.map((r) => r.time));
 
@@ -139,17 +139,9 @@ const executeCode = asyncHandler(async (req, res) => {
     memory: averageMemory ? `${averageMemory} KB` : null,
     time: averageTime ? `${averageTime}s` : null,
   };
-  console.log("type: ", type);
-  console.log("Submission Data: ", {
-    ...submissionData,
-    testCases: detailedResults,
-  });
-  console.log(
-    "type === ExecutionTypeEnum.RUN: ",
-    type === ExecutionTypeEnum.RUN
-  );
+  
+ 
   if (type === ExecutionTypeEnum.RUN) {
-    console.log("hello");
     return res.status(200).json(
       new ApiResponse(
         200,
@@ -166,7 +158,6 @@ const executeCode = asyncHandler(async (req, res) => {
   const submission = await db.submission.create({
     data: submissionData,
   });
-  console.log("Submission: ", submission);
 
   // if all passed true mark problem solved to true;
 
@@ -218,8 +209,10 @@ const executeCode = asyncHandler(async (req, res) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); //  midnight
 
+  // console.log("today: ",today)
+
   //  user streak info
-  const user = await db.user.findUnique({
+  let user = await db.user.findUnique({
     where: { id: userId },
     select: {
       dailyProblemStreak: true,
@@ -228,24 +221,32 @@ const executeCode = asyncHandler(async (req, res) => {
     },
   });
 
+  // console.log("user: ",user)
+
   const lastSubmissionDate = user?.lastSubmissionDate
     ? new Date(user.lastSubmissionDate)
     : null;
 
+    // console.log("before last submission :",lastSubmissionDate)
   if (lastSubmissionDate) lastSubmissionDate.setHours(0, 0, 0, 0);
+  //  console.log("after last submission :",lastSubmissionDate)
 
   const isNewDay =
     !lastSubmissionDate || lastSubmissionDate.getTime() !== today.getTime();
-
+   
+    // console.log("isNewDay: ",isNewDay)
+     let updatedUser;
   //  If it's a new day, reset isStreakMaintained to false
   if (isNewDay && user?.isStreakMaintained) {
-    await db.user.update({
+    updatedUser =  await db.user.update({
       where: { id: userId },
       data: {
         isStreakMaintained: false,
       },
     });
   }
+
+  // console.log("updated user: ",updatedUser)
 
   // checking if user submitted today
   const currentDaySubmission = await db.submission.findFirst({
@@ -258,10 +259,12 @@ const executeCode = asyncHandler(async (req, res) => {
       },
     },
   });
-
+  // console.log("currentDaySubmission: ",currentDaySubmission)
+  
+  // console.log("user streak: ",updatedUser?.isStreakMaintained)
   //  If user submitted and streak isn't already marked for today, update
-  if (currentDaySubmission && !user?.isStreakMaintained) {
-    const currentStreak = user?.dailyProblemStreak || 0;
+  if (currentDaySubmission && !updatedUser?.isStreakMaintained) {
+    const currentStreak = updatedUser?.dailyProblemStreak || 0;
 
     await db.user.update({
       where: { id: userId },

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TbFlameFilled } from "react-icons/tb";
 import { ListTodo, User } from "lucide-react";
+import API from "@/utils/AxiosInstance";
 
 type User = {
   id: string;
@@ -25,8 +25,8 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:3000/api/v1/auth/all/users",
+        const res = await API.get(
+          "/auth/all/users",
           {
             withCredentials: true,
           }
@@ -39,8 +39,8 @@ const Dashboard = () => {
 
     const fetchTotalProblems = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:3000/api/v1/problem/all-problems"
+        const res = await API.get(
+          "/problem/all-problems"
         );
         setTotalProblems(res.data.data.length);
       } catch (err) {

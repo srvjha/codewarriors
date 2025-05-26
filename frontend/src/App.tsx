@@ -17,6 +17,7 @@ import DiscussPage from "./pages/DiscussPage";
 import ProfilePage from "./pages/ProfilePage";
 import CreateProblem from "./pages/CreateProblem";
 import VerifyEmail from "./pages/VerifyEmail";
+import PlaylistPage from "./pages/PlaylistPage";
 
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -81,6 +82,15 @@ const App = () => {
           element={
             <PrivateRoute>
               <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+
+         <Route
+          path="/my-list"
+          element={
+            <PrivateRoute>
+              <PlaylistPage/>
             </PrivateRoute>
           }
         />

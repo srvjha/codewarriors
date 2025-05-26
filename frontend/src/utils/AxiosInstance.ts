@@ -33,7 +33,7 @@ API.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await axios.get("http://localhost:3000/api/v1/auth/refresh", {
+        await API.get("/auth/refresh", {
           withCredentials: true, 
         });
 

@@ -9,6 +9,6 @@ router.get("/:plid",verifyUser,getPlaylistDetails);
 router.post("/create",verifyUser,createPlaylist);
 router.delete("/:plid",verifyUser,deletePlaylist);
 router.post("/:plid/problem/:pid/add",verifyUser,addProblemToPlaylist)
-router.put("/:plid/remove/problem",verifyUser,removeProblemFromPlaylist);
+router.delete("/:plid/problem/:pid/remove",verifyUser,removeProblemFromPlaylist);
 
 export default router;

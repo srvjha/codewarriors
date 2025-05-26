@@ -21,7 +21,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Editor from "@monaco-editor/react";
-import axios from "axios";
 import { Toast, ToastSuccess } from "@/utils/ToastContainers";
 import { useNavigate } from "react-router-dom";
 import type {
@@ -30,6 +29,7 @@ import type {
   ToggleLangFn,
 } from "@/redux/slices/createProblem/createProblemTypes";
 import { CreateProblemResolver } from "@/utils/ZodResolver";
+import API from "@/utils/AxiosInstance";
 
 const CreateProblemForm = () => {
   const [expandedLang, setExpandedLang] = useState<
@@ -79,8 +79,8 @@ const CreateProblemForm = () => {
     }
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/v1/problem/create",
+      const response = await API.post(
+        "/problem/create",
         {
           title: data.title,
           description: data.description,

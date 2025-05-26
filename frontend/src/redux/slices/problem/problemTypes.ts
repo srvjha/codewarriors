@@ -41,6 +41,20 @@ export type ResultType = {
   [key: string]: any;
 };
 
+export interface Playlist{
+  id: string;
+  name: string;
+  description: string;
+  userId: string;
+  problems: {
+    problem: Problem;
+    id: string;
+    playListId: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const ExecutionStatus = {
   RUN: "run",
   SUBMIT: "submit",
