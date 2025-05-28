@@ -151,32 +151,34 @@ const ProblemsetPage = () => {
     }
   };
 
-  const handleFilterClick = (value: string) => {
-    let newFilteredProblems: Problem[] = [];
-    if (value.toUpperCase() === "EASY") {
-      setActive(false);
-      newFilteredProblems = allProblems.filter(
-        (problem) => problem.difficulty === "EASY"
-      );
-    } else if (value.toUpperCase() === "MEDIUM") {
-      setActive(false);
-      newFilteredProblems = allProblems.filter(
-        (problem) => problem.difficulty === "MEDIUM"
-      );
-    } else if (value.toUpperCase() === "HARD") {
-      setActive(false);
-      newFilteredProblems = allProblems.filter(
-        (problem) => problem.difficulty === "HARD"
-      );
-    } else if (value === "all" && !active) {
-      setActive(true);
-      newFilteredProblems = allProblems;
-    }
+ const handleSortClick = (value: string) => {
+  const difficulties = ["EASY", "MEDIUM", "HARD"];
+  let sortedProblems: Problem[] = [...allProblems];
 
-    setFilteredProblems(newFilteredProblems);
-    setVisibleProblems([]);
-    setHasMore(newFilteredProblems.length > problemsPerPage);
-  };
+  const clicked = value.toUpperCase();
+
+  if (difficulties.includes(clicked)) {
+    const startIndex = difficulties.indexOf(clicked);
+    const reordered = [...difficulties.slice(startIndex), ...difficulties.slice(0, startIndex)];
+
+    sortedProblems.sort(
+      (a, b) =>
+        reordered.indexOf(a.difficulty.toUpperCase()) -
+        reordered.indexOf(b.difficulty.toUpperCase())
+    );
+
+    setActive(false);
+  } else if (value === "all" && !active) {
+    setActive(true);
+    sortedProblems = [...allProblems];
+  }
+
+  setFilteredProblems(sortedProblems);
+  setVisibleProblems([]);
+  setHasMore(sortedProblems.length > problemsPerPage);
+};
+
+
 
    const handleLabelBasedSearch = (tag:string)=>{
      let tagBasedData = allProblems;
@@ -253,7 +255,7 @@ const ProblemsetPage = () => {
             {/* Difficulty Filter */}
             <DropdownMenuSub>
               {!active ? (
-                <DropdownMenuItem onClick={() => handleFilterClick("all")}>
+                <DropdownMenuItem onClick={() => handleSortClick("all")}>
                   All Problems
                 </DropdownMenuItem>
               ) : (
@@ -266,21 +268,21 @@ const ProblemsetPage = () => {
               <DropdownMenuSubContent className="bg-zinc-800 text-zinc-100 border-none p-2 rounded-lg">
                 <DropdownMenuItem
                   className="hover:bg-zinc-700 text-green-500"
-                  onClick={() => handleFilterClick("Easy")}
+                  onClick={() => handleSortClick("Easy")}
                 >
                   Easy
                 </DropdownMenuItem>
                 <hr className="border-gray-700 my-1" />
                 <DropdownMenuItem
                   className="hover:bg-zinc-700 text-yellow-500"
-                  onClick={() => handleFilterClick("Medium")}
+                  onClick={() => handleSortClick("Medium")}
                 >
                   Medium
                 </DropdownMenuItem>
                 <hr className="border-gray-700 my-1" />
                 <DropdownMenuItem
                   className="hover:bg-zinc-700 text-red-600"
-                  onClick={() => handleFilterClick("Hard")}
+                  onClick={() => handleSortClick("Hard")}
                 >
                   Hard
                 </DropdownMenuItem>

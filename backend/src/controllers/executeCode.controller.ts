@@ -204,78 +204,66 @@ const executeCode = asyncHandler(async (req, res) => {
     },
   });
  
+   const today = new Date();
+today.setHours(0, 0, 0, 0);
 
-  //handling daily streak feat
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); //  midnight
+let user = await db.user.findUnique({
+  where: { id: userId },
+  select: {
+    dailyProblemStreak: true,
+    isStreakMaintained: true,
+    lastSubmissionDate: true,
+  },
+});
 
-  //  console.log("today: ",today)
+if (!user) return; 
 
-  //  user streak info
-  let user = await db.user.findUnique({
+const lastSubmissionDate = user.lastSubmissionDate
+  ? new Date(user.lastSubmissionDate)
+  : null;
+
+if (lastSubmissionDate) lastSubmissionDate.setHours(0, 0, 0, 0);
+
+const isNewDay =
+  !lastSubmissionDate || lastSubmissionDate.getTime() !== today.getTime();
+
+// Resetting streak maintenance if it's a new day
+if (isNewDay && user.isStreakMaintained) {
+  await db.user.update({
     where: { id: userId },
-    select: {
-      dailyProblemStreak: true,
+    data: {
+      isStreakMaintained: false,
+    },
+  });
+  user.isStreakMaintained = false; 
+}
+
+
+const currentDaySubmission = await db.submission.findFirst({
+  where: {
+    userId,
+    status: "Accepted",
+    createdAt: {
+      gte: new Date(today),
+      lte: new Date(new Date(today).setHours(23, 59, 59, 999)),
+    },
+  },
+});
+
+// If they submitted and the streak is not incremented yet
+if (currentDaySubmission && !user.isStreakMaintained) {
+  await db.user.update({
+    where: { id: userId },
+    data: {
+      dailyProblemStreak: user.dailyProblemStreak === 0
+        ? 1
+        : { increment: 1 },
       isStreakMaintained: true,
-      lastSubmissionDate: true,
+      lastSubmissionDate: new Date(),
     },
   });
+}
 
-  // console.log("user: ",user)
-
-  const lastSubmissionDate = user?.lastSubmissionDate
-    ? new Date(user.lastSubmissionDate)
-    : null;
-
-    // console.log("before last submission :",lastSubmissionDate)
-  if (lastSubmissionDate) lastSubmissionDate.setHours(0, 0, 0, 0);
-  //  console.log("after last submission :",lastSubmissionDate)
-
-  const isNewDay =
-    !lastSubmissionDate || lastSubmissionDate.getTime() !== today.getTime();
-   
-    //  console.log("isNewDay: ",isNewDay)
-     let updatedUser;
-  //  If it's a new day, reset isStreakMaintained to false
-  if (isNewDay && user?.isStreakMaintained) {
-    updatedUser =  await db.user.update({
-      where: { id: userId },
-      data: {
-        isStreakMaintained: false,
-      },
-    });
-  }
-
-  // console.log("updated user: ",updatedUser)
-
-  // checking if user submitted today
-  const currentDaySubmission = await db.submission.findFirst({
-    where: {
-      userId,
-      status: "Accepted",
-      createdAt: {
-        gte: new Date(new Date().setHours(0, 0, 0, 0)),
-        lte: new Date(new Date().setHours(23, 59, 59, 999)),
-      },
-    },
-  });
-  // console.log("currentDaySubmission: ",currentDaySubmission)
-  
-  // console.log("user streak: ",updatedUser?.isStreakMaintained)
-  //  If user submitted and streak isn't already marked for today, update
-  if (currentDaySubmission && updatedUser && !updatedUser?.isStreakMaintained) {
-    const currentStreak = updatedUser?.dailyProblemStreak || 0;
-    // console.log("currentStreak: ",currentStreak)
-
-    await db.user.update({
-      where: { id: userId },
-      data: {
-        dailyProblemStreak: currentStreak === 0 ? 1 : { increment: 1 },
-        isStreakMaintained: true,
-        lastSubmissionDate: new Date(), // Update for tomorrow's check
-      },
-    });
-  }
 
   res
     .status(200)
