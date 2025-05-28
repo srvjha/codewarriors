@@ -25,7 +25,7 @@ console.log('Missing Number:', result);
       transition={{ duration: 0.6 }}
       className="w-full max-w-4xl mx-auto mt-10"
     >
-      <div className="relative rounded-2xl overflow-hidden bg-[#0d0d0d] shadow-lg shadow-[#088bd7]">
+      <div className="relative rounded-2xl overflow-hidden bg-[#0d0d0d]">
         {/* Top bar */}
         <div className="px-4 py-2 flex items-center justify-between bg-[#1a1a1a]">
           <div className="flex items-center space-x-2">

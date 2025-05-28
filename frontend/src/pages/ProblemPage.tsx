@@ -28,7 +28,7 @@ import {
   type Problem,
   type ResultType,
   type TestCaseResultType,
-} from "@/redux/slices/problem/problemTypes";
+} from "@/types/problem/problemTypes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,7 +42,7 @@ import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { DifficultyBadge } from "@/components/ui/DifficultyBadge";
 import { StatusIndicator } from "@/helper/Problem.helper";
 import { ClipLoader } from "react-spinners";
-import type { SubmissionType } from "@/redux/slices/submit/SubmissionTypes";
+import type { SubmissionType } from "@/types/submit/SubmissionTypes";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import tags from '../../companyTags.json'

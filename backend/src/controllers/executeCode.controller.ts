@@ -209,7 +209,7 @@ const executeCode = asyncHandler(async (req, res) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0); //  midnight
 
-  // console.log("today: ",today)
+  //  console.log("today: ",today)
 
   //  user streak info
   let user = await db.user.findUnique({
@@ -234,7 +234,7 @@ const executeCode = asyncHandler(async (req, res) => {
   const isNewDay =
     !lastSubmissionDate || lastSubmissionDate.getTime() !== today.getTime();
    
-    // console.log("isNewDay: ",isNewDay)
+    //  console.log("isNewDay: ",isNewDay)
      let updatedUser;
   //  If it's a new day, reset isStreakMaintained to false
   if (isNewDay && user?.isStreakMaintained) {
@@ -263,8 +263,9 @@ const executeCode = asyncHandler(async (req, res) => {
   
   // console.log("user streak: ",updatedUser?.isStreakMaintained)
   //  If user submitted and streak isn't already marked for today, update
-  if (currentDaySubmission && !updatedUser?.isStreakMaintained) {
+  if (currentDaySubmission && updatedUser && !updatedUser?.isStreakMaintained) {
     const currentStreak = updatedUser?.dailyProblemStreak || 0;
+    // console.log("currentStreak: ",currentStreak)
 
     await db.user.update({
       where: { id: userId },

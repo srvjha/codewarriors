@@ -18,6 +18,9 @@ import ProfilePage from "./pages/ProfilePage";
 import CreateProblem from "./pages/CreateProblem";
 import VerifyEmail from "./pages/VerifyEmail";
 import PlaylistPage from "./pages/PlaylistPage";
+import ForgotPasswordPage from "./pages/ForgotPassword";
+import ResetPasswordPage from "./pages/ResetPassword";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -86,11 +89,11 @@ const App = () => {
           }
         />
 
-         <Route
+        <Route
           path="/my-list"
           element={
             <PrivateRoute>
-              <PlaylistPage/>
+              <PlaylistPage />
             </PrivateRoute>
           }
         />
@@ -104,14 +107,38 @@ const App = () => {
           }
         />
 
-      </Route>
+        <Route
+          path="/forgot-password"
+          element={
+            <PrivateRoute>
+              <ForgotPasswordPage />
+            </PrivateRoute>
+          }
+        />
 
-      
+        <Route
+          path="/reset-password/:token"
+          element={
+            <PrivateRoute>
+              <ResetPasswordPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/verify/:token"
+          element={
+            <PrivateRoute>
+              <VerifyEmail />
+            </PrivateRoute>
+          }
+        />
+      </Route>
 
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/pricing" element={<PricingPage />} />
-      <Route path="/verify/:token" element={<VerifyEmail />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };

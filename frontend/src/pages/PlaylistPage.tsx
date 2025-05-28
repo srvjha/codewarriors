@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/Card";
 import { difficultyColor } from "@/helper/Problem.helper";
-import type { Playlist } from "@/redux/slices/problem/problemTypes";
+import type { Playlist } from "@/types/problem/problemTypes";
 import API from "@/utils/AxiosInstance";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { List, Target, Trash } from "lucide-react";
@@ -66,10 +66,10 @@ const PlaylistPage = () => {
     <>
       <Toast />
       <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <div className="min-h-screen flex gap-4">
+        <div className=" min-h-[calc(100vh-100px)] flex gap-4">
           {/* Left: List Deatils */}
-          <div className="w-[250px] bg-neutral-900 px-4 py-3 rounded-lg shadow-md shadow-blue-500">
-            <p className="text-xl font-semibold text-white mb-4 flex items-center">
+          <div className="w-[350px] bg-gradient-to-r from-neutral-800 via-neutral-900 to-neutral-900 px-4 py-3 rounded-lg shadow-md shadow-blue-500">
+            <p className="text-xl font-semibold text-neutral-100 mb-4 flex items-center">
               <List className="mr-2" />
               Playlists
             </p>
@@ -78,10 +78,10 @@ const PlaylistPage = () => {
                 <Card
                   key={playlist.id}
                   onClick={() => setSelectedPlaylistIndex(index)}
-                  className={`p-2 w-full border-none rounded-lg flex justify-between cursor-pointer text-white ${
+                  className={`p-4 w-full border-none rounded-lg flex justify-between cursor-pointer text-neutral-100 shadow-lg shadow-neutral-950 bg-zinc-800 font-semibold ${
                     selectedPlaylistIndex === index
-                      ? "bg-zinc-700"
-                      : "hover:bg-zinc-800"
+                      ? "bg-zinc-700 "
+                      : "hover:bg-zinc-800 "
                   }`}
                 >
                   {playlist.name}
@@ -96,17 +96,17 @@ const PlaylistPage = () => {
           </div>
 
           {/* Right: Problems in List*/}
-          <div className="flex-1 bg-neutral-900 px-6 py-4 rounded-lg shadow-md shadow-blue-500">
+          <div className="flex-1 bg-gradient-to-r from-neutral-800 via-neutral-900 to-neutral-900 px-6 py-4 rounded-lg shadow-md shadow-blue-500">
             <p className="text-xl font-semibold text-white mb-4 flex">
               {selectedPlaylist?.name} Problems{" "}
               <Target className="mt-1.5 ml-2" size={18} />
             </p>
             {selectedPlaylist?.problems?.length > 0 ? (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 {selectedPlaylist.problems.map((item) => (
                   <Card
                     key={item.id}
-                    className="p-4 w-full cursor-pointer border-none shadow-md shadow-neutral-800 rounded-md flex justify-between items-center text-white"
+                    className="p-4 w-full cursor-pointer border-none shadow-lg shadow-neutral-950 bg-zinc-800 rounded-md flex justify-between items-center text-white"
                   >
                     <Link to={`/problem/${item.problem.id}`}>
                       <span>{item.problem.title}</span>

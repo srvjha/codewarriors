@@ -156,7 +156,7 @@ body{
 .react-calendar-heatmap .color-scale-2 { fill: #8cc665; }
 .react-calendar-heatmap .color-scale-3 { fill: #44a340; }
 .react-calendar-heatmap .color-scale-4 { fill: #1e6823; }
-.react-calendar-heatmap .color-scale-0 { fill: #161b22; }
+.react-calendar-heatmap .color-scale-0 { fill: #8b8c8e; }
 .react-calendar-heatmap rect { 
   width: 9px;
   height: 9px;
@@ -179,4 +179,33 @@ body{
     linear-gradient(to bottom, rgba(60, 88, 131, 0.08) 1px, transparent 2px);
   background-size: 60px 60px;
 }
+
+
+@keyframes matrix-fall {
+  to {
+    transform: translateY(120vh);
+  }
+}
+
+.matrix-char {
+  animation-name: matrix-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+ .blur-bg {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .glass-card {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
 

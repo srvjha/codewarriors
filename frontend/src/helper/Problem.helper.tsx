@@ -1,4 +1,4 @@
-import type { Problem } from "@/redux/slices/problem/problemTypes";
+import type { Problem } from "@/types/problem/problemTypes";
 import { CheckCircle, XCircle, XOctagon } from "lucide-react";
 
 // format Runtime

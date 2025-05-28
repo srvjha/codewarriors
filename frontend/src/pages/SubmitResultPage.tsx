@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/Card";
-import type { SubmissionType } from "@/redux/slices/submit/SubmissionTypes";
+import type { SubmissionType } from "@/types/submit/SubmissionTypes";
 import { CheckCircle2, Cpu, Timer } from "lucide-react";
 
 const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {

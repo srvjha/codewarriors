@@ -178,6 +178,18 @@ const ProblemsetPage = () => {
     setHasMore(newFilteredProblems.length > problemsPerPage);
   };
 
+   const handleLabelBasedSearch = (tag:string)=>{
+     let tagBasedData = allProblems;
+    if(tag !== "All Topics"){
+       tagBasedData = allProblems.filter((problem)=>problem.tags.includes(tag))
+    }
+    
+    setFilteredProblems(tagBasedData);
+    setVisibleProblems([]);
+    setHasMore(tagBasedData.length > problemsPerPage);
+   }
+   
+
   const handleAddPlaylist = (problemId: string) => {
     setAddProblem(problemId);
     setShowPlaylist(true);
@@ -209,7 +221,8 @@ const ProblemsetPage = () => {
         {topicList.map((topic) => (
           <Badge
             key={topic.label}
-            className="text-sm px-3 py-1 bg-zinc-800 text-white hover:bg-zinc-700"
+            className="text-sm px-3 py-1 cursor-pointer bg-zinc-800 text-white hover:bg-zinc-700"
+            onClick={()=>handleLabelBasedSearch(topic.label)}
           >
             {topic.label}{" "}
             <span className="ml-1 text-gray-400">({topic.count})</span>

@@ -3,7 +3,7 @@ import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
-import type { SubmissionType } from "@/redux/slices/submit/SubmissionTypes";
+import type { SubmissionType } from "@/types/submit/SubmissionTypes";
 import API from "@/utils/AxiosInstance";
 
 type Calendar = {

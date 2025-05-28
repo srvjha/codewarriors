@@ -1,5 +1,6 @@
-import type { CreateProblemFormValues } from "@/redux/slices/createProblem/createProblemTypes";
+import type { CreateProblemFormValues } from "@/types/createProblem/createProblemTypes";
 import type { Resolver } from "react-hook-form";
+import { z } from "zod";
 
 export type FormValues = {
   fullName: string;
@@ -12,6 +13,12 @@ export type FormValues = {
 export type LoginFormValues = {
   email:string,
   password: string
+}
+
+export type PasswordFormValues = {
+  oldPassword:string,
+  newPassword:string,
+  confirmNewPassword:string,
 }
 
 
@@ -141,3 +148,46 @@ export const CreateProblemResolver: Resolver<CreateProblemFormValues> = async (v
     errors,
   };
 }
+
+export const PasswordResolver: Resolver<PasswordFormValues> = async (values) => {
+  const errors: Record<string, any> = {};
+
+  if (!values.oldPassword) {
+    errors.oldPassword = {
+      type: "required",
+      message: "Old Password is required.",
+    };
+  }
+
+  if (!values.newPassword) {
+    errors.newPassword = {
+      type: "required",
+      message: "New Password is required.",
+    };
+  }
+
+  if (!values.confirmNewPassword) {
+    errors.confirmNewPassword = {
+      type: "required",
+      message: "Confirm New Password is required.",
+    };
+  }
+
+  
+  return {
+    values: Object.keys(errors).length === 0 ? values : {},
+    errors,
+  };
+};
+
+export const ForgotPasswordSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+});
+
+export type ForgotPasswordFormValues = z.infer<typeof ForgotPasswordSchema>;
+
+export const ResetPasswordSchema = z.object({
+  password: z.string().nonempty("Password Required!"),
+});
+
+export type ResetPasswordFormValues = z.infer<typeof ResetPasswordSchema>;

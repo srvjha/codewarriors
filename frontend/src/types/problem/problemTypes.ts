@@ -61,3 +61,16 @@ export const ExecutionStatus = {
 } as const;
 
 export type ExecutionStatus = keyof typeof ExecutionStatus;
+
+export interface ProgressData {
+     totalProblems: number;
+    easyProblems: number;
+    medProblems: number;
+    hardProblems: number;
+    solvedProblems: number;
+  }
+
+
+export type P =  {
+  progressData:ProgressData
+}

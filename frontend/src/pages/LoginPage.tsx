@@ -207,26 +207,14 @@ const LoginPage = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          id="remember"
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-zinc-700 bg-zinc-800 text-blue-500"
-                        />
-                        <label
-                          htmlFor="remember"
-                          className="text-sm text-zinc-400"
-                        >
-                          Remember me
-                        </label>
-                      </div>
-                      <a
-                        href="#"
+                    <div className="flex items-center justify-start">
+                      
+                      <Link
+                        to="/forgot-password"
                         className="text-sm text-blue-400 hover:text-blue-300 hover:underline"
                       >
                         Forgot password?
-                      </a>
+                      </Link>
                     </div>
                     <Button
                       className="w-full text-base bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white py-6 flex items-center justify-center"

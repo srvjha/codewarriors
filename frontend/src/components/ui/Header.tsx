@@ -56,14 +56,9 @@ export const Header = () => {
             />
           </Link>
           <div className="hidden md:flex space-x-6">
-            <Link
-              to="/problemset"
-              className="hover:text-blue-400 transition-colors"
-            >
-              Problems
-            </Link>
+           
 
-            <Link
+            {/* <Link
               to="/discuss"
               className="hover:text-blue-400 transition-colors"
             >
@@ -74,7 +69,7 @@ export const Header = () => {
               className="hover:text-blue-400 transition-colors"
             >
               Pricing
-            </Link>
+            </Link> */}
           </div>
         </div>
         <div className="flex flex-row items-center gap-5 mr-3">
@@ -98,6 +93,13 @@ export const Header = () => {
             </div>
           )}
 
+           <Link
+              to="/problemset"
+              className="hover:text-blue-400 transition-colors"
+            >
+              Problems
+            </Link>
+
           <Link to="/about" className="hover:text-blue-400 transition-colors">
             About
           </Link>
@@ -112,16 +114,18 @@ export const Header = () => {
 
           {userData ? (
             // <img src={user?.avatar} alt="User Avatar" className="h-12 w-12 rounded-full" />
-            <DropdownMenu>
-              <DropdownMenuTrigger className="cursor-pointer">
+            <DropdownMenu >
+              <DropdownMenuTrigger asChild>
+                <div className="ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0 border-none">
                 <Avatar className=" h-10 w-10 ">
                   <AvatarImage src={userData.avatar} />
                   <AvatarFallback className="text-black font-semibold text-xl bg-white">
                     {userData?.fullName.split("")[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
+                </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-black text-white border-none shadow-sm shadow-gray-800">
+              <DropdownMenuContent className="bg-black text-white border-none shadow-sm shadow-gray-800 z-50">
                 <Link to="/profile">
                   <DropdownMenuItem className="cursor-pointer"> 
                     <User />

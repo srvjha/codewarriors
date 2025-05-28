@@ -230,6 +230,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 const resendEmailVerification = asyncHandler(async (req, res) => {
   const { email } = handleZodError(validateEmailData(req.body));
+  console.log("email: ",email)
 
   const user = await db.user.findUnique({
     where: {
@@ -394,16 +395,22 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, null, " Password reset successfully"));
+    .json(new ApiResponse(200, null, "Password reset successfully"));
 });
 
 const changeCurrentPassword = asyncHandler(async (req, res) => {
-  const { oldPassword, newPassword } = handleZodError(
+  const { oldPassword, newPassword, confirmNewPassword } = handleZodError(
     validateChangePassword(req.body)
   );
+
   const user = req.user;
-  if (!oldPassword || !newPassword) {
+
+  if (!oldPassword || !newPassword || !confirmNewPassword) {
     throw new ApiError("Missing fields required", 400);
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    throw new ApiError("New password and confirm password do not match", 400);
   }
 
   if (!user) {
@@ -436,8 +443,9 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, null, "New Password changed successfully"));
+    .json(new ApiResponse(200, null, "Password changed successfully"));
 });
+
 
 const getCurrentUser = asyncHandler(async (req, res) => {
   const userId = req.user?.id;

@@ -27,7 +27,7 @@ import type {
   CreateProblemFormValues,
   Languages,
   ToggleLangFn,
-} from "@/redux/slices/createProblem/createProblemTypes";
+} from "@/types/createProblem/createProblemTypes";
 import { CreateProblemResolver } from "@/utils/ZodResolver";
 import API from "@/utils/AxiosInstance";
 

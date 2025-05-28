@@ -1,6 +1,4 @@
-// components/ui/Playlist.tsx
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import { X, Plus, PlusSquare, Trash } from "lucide-react";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
@@ -92,7 +90,7 @@ const Playlist = ({
     <>
     <Toast/>
     <div className="fixed inset-0 bg-black/30 bg-opacity-60 z-50 flex items-center justify-center">
-      <div className="bg-zinc-900 p-5 rounded-xl w-[350px] relative max-h-[80vh] overflow-auto">
+      <div className="bg-neutral-900 p-5 rounded-xl w-[350px] relative max-h-[80vh] overflow-auto">
         <button
           className="absolute top-3 right-3 text-zinc-400 hover:text-white cursor-pointer"
           onClick={onClose}
@@ -138,11 +136,12 @@ const Playlist = ({
               placeholder="Enter playlist name"
               className="bg-zinc-800 text-white border-zinc-700"
             />
-            <Button
+            <button
               onClick={handleCreatePlaylist}
+              className="bg-zinc-100 text-black w-9 h-9 text-center px-1.5 py-1.5 rounded-lg cursor-pointer hover:bg-zinc-200"
             >
               <Plus />
-            </Button>
+            </button>
           </div>
         </div>
       </div>
