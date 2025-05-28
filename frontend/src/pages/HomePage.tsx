@@ -10,13 +10,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import faqs from "../contants/Faqs.json";
-import features from "../contants/features.json"
+import faqs from "../constants/Faqs.json";
+import features from "../constants/features.json";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 
 const HomePage = () => {
-  const {isAuthenticated} = useSelector((state:RootState)=>state.auth)
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   return (
     <div className="relative flex flex-col min-h-screen">
       <motion.div
@@ -56,9 +56,8 @@ const HomePage = () => {
                   Start Solving
                 </Button>
               </Link>
-             
-             
-              <Link to={isAuthenticated?"/":"/login"}>
+
+              <Link to={isAuthenticated ? "/" : "/login"}>
                 <Button
                   variant="outline"
                   className="text-lg px-6 py-6 border-gray-700 hover:bg-zinc-800"
@@ -107,7 +106,6 @@ const HomePage = () => {
               </p>
             </div>
 
-            
             <div className="flex-1 max-w-lg w-full ">
               <img
                 src="coder2.gif"
@@ -125,17 +123,19 @@ const HomePage = () => {
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div
-                key={index}
-                className="bg-gradient-to-br from-[#111] to-[#1a1a1a] border border-white/10 rounded-2xl px-6 py-10 backdrop-blur-md transition duration-300 hover:shadow-lg hover:shadow-blue-500/40"
-              >
-                <h3 className="text-xl font-semibold mb-2 text-white">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-gray-400">{feature.desc}</p>
-              </div>
-            ))}
+            {features.map(
+              (feature: { title: string; desc: string }, index: number) => (
+                <div
+                  key={index}
+                  className="bg-gradient-to-br from-[#111] to-[#1a1a1a] border border-white/10 rounded-2xl px-6 py-10 backdrop-blur-md transition duration-300 hover:shadow-lg hover:shadow-blue-500/40"
+                >
+                  <h3 className="text-xl font-semibold mb-2 text-white">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-gray-400">{feature.desc}</p>
+                </div>
+              )
+            )}
           </div>
         </div>
 
@@ -144,15 +144,13 @@ const HomePage = () => {
             FAQs
           </h2>
           <Accordion type="multiple" className="space-y-2">
-            {faqs.map((faq, index) => (
+            {faqs.map((faq: { q: string; a: string }, index: number) => (
               <AccordionItem
                 key={index}
                 value={`faq-${index}`}
                 className=" rounded-xl backdrop-blur-sm"
               >
-                <AccordionTrigger
-                  className=" text-white text-left text-lg font-medium px-4 py-3 "
-                >
+                <AccordionTrigger className=" text-white text-left text-lg font-medium px-4 py-3 ">
                   {faq.q}
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-gray-300 px-4 pb-4">
