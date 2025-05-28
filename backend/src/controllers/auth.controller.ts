@@ -28,6 +28,7 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { UserRole } from "@prisma/client";
 import { sanitizeUser } from "../utils/sanitizeUser";
+import { CookieOptions } from "express";
 
 const generateAccessAndRefreshToken = async (userId: string) => {
   try {
@@ -40,7 +41,7 @@ const generateAccessAndRefreshToken = async (userId: string) => {
       id: user.id,
       email: user.email,
       username: user.username,
-      role:user.role
+      role: user.role,
     });
     const refreshToken = generateRefreshToken(user.id);
 
@@ -87,14 +88,14 @@ const register = asyncHandler(async (req, res) => {
       username,
       fullName,
       password: hashedPassword,
-      role:UserRole.USER,
+      role: UserRole.USER,
       refreshToken: "",
       emailVerificationToken: hashedToken,
       emailVerificationExpiry: tokenExpiry,
       avatar: avatarURL,
     },
   });
- console.log("Base uri: ",env.BASE_URI)
+  console.log("Base uri: ", env.BASE_URI);
   const verificationUrl = `${env.BASE_URI}/verify/${unHashedToken}`;
 
   await sendEmail(
@@ -110,15 +111,15 @@ const register = asyncHandler(async (req, res) => {
     ...userInfo
   } = user;
 
-   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     user.id as string
   );
-  const cookieOption = {
+  const cookieOption: CookieOptions = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
   };
-
 
   res
     .status(200)
@@ -148,7 +149,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
     },
   });
 
-  console.log("user: ",user)
+  console.log("user: ", user);
   if (!user) {
     throw new ApiError("Invalid User or token expired", 400);
   }
@@ -162,8 +163,6 @@ const verifyEmail = asyncHandler(async (req, res) => {
     },
   });
 
- 
-
   res
     .status(200)
     .json(new ApiResponse(200, null, "Email verified successfully"));
@@ -174,7 +173,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const user = await db.user.findUnique({
     where: {
-      email
+      email,
     },
   });
 
@@ -190,16 +189,19 @@ const loginUser = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     user.id as string
   );
-  const cookieOption = {
+  const cookieOption: CookieOptions = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 24 * 60 * 60 * 1000,
   };
   res
     .cookie("accessToken", accessToken, cookieOption)
     .cookie("refreshToken", refreshToken, cookieOption)
     .status(200)
-    .json(new ApiResponse(200, sanitizeUser(user), "User logged in Successfully"));
+    .json(
+      new ApiResponse(200, sanitizeUser(user), "User logged in Successfully")
+    );
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -230,7 +232,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 const resendEmailVerification = asyncHandler(async (req, res) => {
   const { email } = handleZodError(validateEmailData(req.body));
-  console.log("email: ",email)
+  console.log("email: ", email);
 
   const user = await db.user.findUnique({
     where: {
@@ -263,8 +265,7 @@ const resendEmailVerification = asyncHandler(async (req, res) => {
     "Verify Email",
     emailVerificationContent(user.username, verificationUrl)
   );
-  
-  
+
   res
     .status(200)
     .json(
@@ -342,8 +343,8 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   }
 
   if (incomingRefreshToken !== user.refreshToken) {
-    console.log("in: ",incomingRefreshToken);
-    console.log("user token: ",user.refreshToken)
+    console.log("in: ", incomingRefreshToken);
+    console.log("user token: ", user.refreshToken);
     throw new ApiError("Refresh Token Expired", 400);
   }
   const options = {
@@ -446,7 +447,6 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Password changed successfully"));
 });
 
-
 const getCurrentUser = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
 
@@ -462,8 +462,8 @@ const getCurrentUser = asyncHandler(async (req, res) => {
       email: true,
       avatar: true,
       isEmailVerified: true,
-      role:true,
-      dailyProblemStreak:true
+      role: true,
+      dailyProblemStreak: true,
     },
   });
 
@@ -478,33 +478,24 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     );
 });
 
-const allUsers = asyncHandler(async(req,res)=>{
+const allUsers = asyncHandler(async (req, res) => {
   const getUsers = await db.user.findMany({
-    select:{
-      id:true,
-      fullName:true,
-      username:true,
-      avatar:true,
-      email:true,
-      isEmailVerified:true,
-      isStreakMaintained:true,
-      lastSubmissionDate:true,
-      dailyProblemStreak:true
-    }
-  })
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      getUsers,
-      "All users fetched successfully"
-    )
-  )
-})
-
-
-
-
-
+    select: {
+      id: true,
+      fullName: true,
+      username: true,
+      avatar: true,
+      email: true,
+      isEmailVerified: true,
+      isStreakMaintained: true,
+      lastSubmissionDate: true,
+      dailyProblemStreak: true,
+    },
+  });
+  return res
+    .status(200)
+    .json(new ApiResponse(200, getUsers, "All users fetched successfully"));
+});
 
 export {
   changeCurrentPassword,
@@ -517,5 +508,5 @@ export {
   resendEmailVerification,
   resetForgottenPassword,
   verifyEmail,
-  allUsers
+  allUsers,
 };
