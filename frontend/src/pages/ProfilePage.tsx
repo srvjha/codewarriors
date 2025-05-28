@@ -8,6 +8,7 @@ import ProgressChart from "@/components/ui/ProgressChart";
 import type { ProgressData } from "@/types/problem/problemTypes";
 import PasswordChangeModal from "@/components/ui/PasswordChangeModal";
 import { Dot } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Submission = {
   id: string;
@@ -98,11 +99,11 @@ const ProfilePage = () => {
   };
 
   const langColor: { [key: string]: string } = {
-    "javascript":"text-amber-600",
-    "python":"text-green-600",
-    "cpp":"text-purple-400",
-    "java":"text-rose-400"
-  }
+    javascript: "text-amber-600",
+    python: "text-green-600",
+    cpp: "text-purple-400",
+    java: "text-rose-400",
+  };
 
   return (
     <div className="flex flex-col items-center min-h-screen  p-4">
@@ -110,11 +111,12 @@ const ProfilePage = () => {
         {/* User Info */}
         <div className="flex items-center gap-4 justify-between mb-6 border-b border-b-gray-700 pb-4">
           <div className="flex items-center gap-4">
-            <img
-              src={avatar}
-              alt={`${username} avatar`}
-              className="w-18 h-18 rounded-xl object-cover border-none"
-            />
+            <Avatar className=" h-18 w-18 rounded-xl object-cover border-none">
+              <AvatarImage src={avatar} />
+              <AvatarFallback className="text-black font-semibold text-xl bg-white">
+                {fullName.split("")[0].toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
             <div>
               <h2 className="text-2xl font-semibold">{fullName}</h2>
               <p className="text-gray-500">{email}</p>
@@ -154,7 +156,11 @@ const ProfilePage = () => {
                   className="p-4 bg-gradient-to-r from-neutral-800 via-neutral-900 to-neutral-900 mt-6 rounded-lg "
                 >
                   <div className="flex justify-between items-center">
-                    <span className={`font-medium text-sm ${langColor[sub.language.toLowerCase()]}`}>
+                    <span
+                      className={`font-medium text-sm ${
+                        langColor[sub.language.toLowerCase()]
+                      }`}
+                    >
                       {sub.language}
                     </span>
                     <span
@@ -171,11 +177,23 @@ const ProfilePage = () => {
                     {sub.problem.title}
                   </p>
                   <div className="text-xs text-gray-500 mt-2 flex gap-4">
-                    <span className="flex justify-center">Memory: {sub.memory} <span><Dot size={26} className="-mt-1 -ml-1 text-blue-600"/></span></span>
-                    <span className="flex justify-center" >Time: {sub.time}  <span><Dot size={26} className="-mt-1 -ml-1 text-[#05db4d]"/></span></span>
-                    <span className="flex justify-center" >
+                    <span className="flex justify-center">
+                      Memory: {sub.memory}{" "}
+                      <span>
+                        <Dot size={26} className="-mt-1 -ml-1 text-blue-600" />
+                      </span>
+                    </span>
+                    <span className="flex justify-center">
+                      Time: {sub.time}{" "}
+                      <span>
+                        <Dot size={26} className="-mt-1 -ml-1 text-[#05db4d]" />
+                      </span>
+                    </span>
+                    <span className="flex justify-center">
                       Submitted: {new Date(sub.createdAt).toLocaleString()}
-                      <span><Dot size={26} className="-mt-1 -ml-1 text-[#b8e113]"/></span>
+                      <span>
+                        <Dot size={26} className="-mt-1 -ml-1 text-[#b8e113]" />
+                      </span>
                     </span>
                   </div>
                 </li>

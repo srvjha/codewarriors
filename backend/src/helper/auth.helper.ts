@@ -25,7 +25,7 @@ export function generateToken() {
     .update(unHashedToken)
     .digest("hex");
 
-  const tokenExpiry = new Date(Date.now() + 20 * 60 * 1000); // 20 mins
+  const tokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 day
 
   return { unHashedToken, hashedToken, tokenExpiry };
 }

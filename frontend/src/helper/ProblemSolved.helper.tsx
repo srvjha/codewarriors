@@ -1,11 +1,10 @@
-import axios from 'axios'
+import API from '@/utils/AxiosInstance';
 
 export const problemSolved = async (pid:string)=>{
-   const response = await axios.get("http://localhost:3000/api/problem/solved/all-problems",{
+   const response = await API.get("/problem/solved/all-problems",{
     withCredentials:true
     });
 
-    console.log("response: ",response);
     const allProblems = response.data.data;
     return allProblems.includes(pid)
 }
