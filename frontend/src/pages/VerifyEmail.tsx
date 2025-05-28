@@ -20,7 +20,7 @@ const VerifyEmail = () => {
     API
       .get(`/auth/verify/email/${token}`)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setMessage(`✅ ${res.data.message}`);
         setIsSuccess(true);
         setIsLoading(false);

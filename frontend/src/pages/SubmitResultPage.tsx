@@ -14,11 +14,10 @@ const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {
     sourceCode
   } = submission;
 
-  console.log("Submission Result: ", submission);
+  // console.log("Submission Result: ", submission);
 
   return (
     <div className="p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="text-green-600 font-semibold text-lg flex items-center gap-2">
           <CheckCircle2 className="text-green-500" size={20} />
@@ -29,7 +28,6 @@ const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {
         </div>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card>
           <CardContent className="p-4">
@@ -42,7 +40,6 @@ const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {
                 </div>
               </div>
               <div className="text-xs text-right text-muted-foreground">
-                {/* Optional histogram/graph data */}
                 Based on internal test
               </div>
             </div>
@@ -67,7 +64,6 @@ const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {
         </Card>
       </div>
 
-      {/* Code Output */}
       <Card>
         <CardContent className="p-4">
           <div className="font-mono text-sm text-muted-foreground mb-2">Output (stdout)</div>

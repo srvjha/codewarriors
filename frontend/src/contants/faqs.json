@@ -1,0 +1,22 @@
+[
+  {
+    "q": "Is this platform free to use?",
+    "a": "Yes! You can solve problems, track your progress, and learn—all for free. Some advanced features may be added later."
+  },
+  {
+    "q": "What kind of problems do you offer?",
+    "a": "We offer DSA problems across topics like arrays, strings, graphs, DP, and more—organized by difficulty and company."
+  },
+  {
+    "q": "Can I track my progress?",
+    "a": "Absolutely! You get a personalized dashboard with solved problem count, topic coverage, and weekly streaks."
+  },
+  {
+    "q": "Do you have company-specific problems?",
+    "a": "Yes, we’ve curated questions asked in interviews by top tech companies like Google, Amazon, and Meta."
+  },
+  {
+    "q": "Is this platform good for interview preparation?",
+    "a": "Definitely! We focus on real interview-style questions and include hints and detailed explanations."
+  }
+]

@@ -38,7 +38,6 @@ const PlaylistPage = () => {
         `/playlist/${playlistId}/problem/${problemId}/remove`,
         { withCredentials: true }
       );
-      console.log(res);
       if (res.data.success) {
         ToastSuccess(res.data.message);
         await allPlaylistsDetails();

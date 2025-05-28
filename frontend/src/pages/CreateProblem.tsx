@@ -102,7 +102,6 @@ const CreateProblemForm = () => {
           withCredentials: true,
         }
       );
-      console.log("Response:", response.data);
       if (response.status === 200) {
         ToastSuccess(response.data.message);
         // Reset the form or redirect as needed
@@ -154,7 +153,6 @@ const CreateProblemForm = () => {
             )}
           </div>
 
-          {/* Difficulty */}
           <div className="space-y-2">
             <Label className="text-gray-300 text-xl">Difficulty</Label>
             <Select onValueChange={(value) => setValue("difficulty", value)}>
@@ -172,7 +170,6 @@ const CreateProblemForm = () => {
             )}
           </div>
 
-          {/* Tags */}
           <div className="space-y-2">
             <Label className="text-gray-300 text-xl">Tags</Label>
             <Input
@@ -185,7 +182,6 @@ const CreateProblemForm = () => {
             )}
           </div>
 
-          {/* Examples */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-semibold flex items-center gap-2 text-green-400">
@@ -233,7 +229,6 @@ const CreateProblemForm = () => {
             ))}
           </div>
 
-          {/* Test Cases */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-semibold flex items-center gap-2 text-green-400">
@@ -277,7 +272,6 @@ const CreateProblemForm = () => {
             )}
           </div>
 
-          {/* Languages */}
           {(["JAVASCRIPT", "PYTHON", "JAVA", "CPP"] as (keyof Languages)[]).map(
             (lang) => (
               <div key={lang} className="space-y-4">
@@ -294,7 +288,6 @@ const CreateProblemForm = () => {
 
                 {expandedLang[lang] && (
                   <div className="space-y-6">
-                    {/* Starter Code */}
                     <div>
                       <h4 className="text-white font-semibold mb-2">
                         Starter Code
@@ -340,7 +333,6 @@ const CreateProblemForm = () => {
             )
           )}
 
-          {/* Constraints, Hints, Editorial */}
           <div className="space-y-6">
             <div className="space-y-2">
               <Label className="text-gray-300">Constraints</Label>
@@ -374,7 +366,6 @@ const CreateProblemForm = () => {
             </div>
           </div>
 
-          {/* Submit */}
           <div className="pt-6">
             <Button
               type="submit"

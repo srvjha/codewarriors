@@ -222,9 +222,16 @@ const logoutUser = asyncHandler(async (req, res) => {
     },
   });
 
+  const cookieOption: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    maxAge: 24 * 60 * 60 * 1000,
+  };
+
   res
-    .clearCookie("accessToken")
-    .clearCookie("refreshToken")
+    .clearCookie("accessToken",cookieOption)
+    .clearCookie("refreshToken",cookieOption)
     .status(200)
     .json(new ApiResponse(200, null, "User Logged Out Successfully"));
 });

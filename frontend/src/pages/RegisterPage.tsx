@@ -97,7 +97,7 @@ const RegisterPage = () => {
         </div>
 
         <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative z-10">
-          {/* Left Content with Motion */}
+          {/* Left Content */}
           <motion.div
             className="text-center md:text-left space-y-8 px-2 md:px-8"
             variants={fadeUp}
@@ -151,7 +151,7 @@ const RegisterPage = () => {
             </motion.ul>
           </motion.div>
 
-          {/* Right Card with Motion */}
+          {/* Right Card */}
           <motion.div
             variants={fadeUp}
             initial="hidden"

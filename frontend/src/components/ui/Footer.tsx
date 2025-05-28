@@ -1,4 +1,5 @@
 import { Github, Linkedin, Twitter } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   return (
@@ -18,13 +19,13 @@ export const Footer = () => {
                 challenges, and community.
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-white">
+                <a href="https://github.com/srvjha" target="_blank" className="text-gray-400 hover:text-white">
                   <Github className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-gray-400 hover:text-white">
+                <a href="https://x.com/J_srv001" target="_blank" className="text-gray-400 hover:text-white">
                   <Twitter className="h-5 w-5" />
                 </a>
-                <a href="#" className="text-gray-400 hover:text-white">
+                <a href="https://www.linkedin.com/in/saurav-jha-a30362196/" target="_blank" className="text-gray-400 hover:text-white">
                   <Linkedin className="h-5 w-5" />
                 </a>
               </div>
@@ -34,24 +35,24 @@ export const Footer = () => {
               <h4 className="font-semibold text-white mb-4">Platform</h4>
               <ul className="space-y-2">
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Challenges
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Leaderboard
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Discussion Forum
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Documentation
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -60,24 +61,24 @@ export const Footer = () => {
               <h4 className="font-semibold text-white mb-4">Resources</h4>
               <ul className="space-y-2">
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Blog
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Tutorials
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     API
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     FAQ
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -86,24 +87,24 @@ export const Footer = () => {
               <h4 className="font-semibold text-white mb-4">Company</h4>
               <ul className="space-y-2">
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     About
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Careers
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Contact
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-blue-400 transition-colors">
+                 <Link to="/" className="hover:text-blue-400 transition-colors">
                     Legal
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -115,15 +116,15 @@ export const Footer = () => {
               reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-sm text-gray-400 hover:text-blue-400">
+             <Link to="/" className="text-sm text-gray-400 hover:text-blue-400">
                 Privacy Policy
-              </a>
-              <a href="#" className="text-sm text-gray-400 hover:text-blue-400">
+              </Link>
+             <Link to="/" className="text-sm text-gray-400 hover:text-blue-400">
                 Terms of Service
-              </a>
-              <a href="#" className="text-sm text-gray-400 hover:text-blue-400">
+              </Link>
+             <Link to="/" className="text-sm text-gray-400 hover:text-blue-400">
                 Cookie Policy
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -1,0 +1,26 @@
+[
+  {
+    "title": "Structured DSA Practice",
+    "desc": "Solve curated problems across Arrays, Strings, DP, Trees, and more."
+  },
+  {
+    "title": "Real-Time Code Evaluation",
+    "desc": "Instant feedback on submissions with input/output and explanation."
+  },
+  {
+    "title": "Company-Wise Questions",
+    "desc": "Master top tech interviews with problems asked by Google, Amazon, etc."
+  },
+  {
+    "title": "Profile & Coding Graph",
+    "desc": "Track your daily progress, submission streaks, and improvement curve."
+  },
+  {
+    "title": "Progress Tracker",
+    "desc": "Visualize your topic-wise coverage and stay on top of your learning goals."
+  },
+  {
+    "title": "Admin Panel for Problems",
+    "desc": "Easily add, update, and manage problem sets with rich metadata."
+  }
+]

@@ -3,25 +3,35 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import CodeEditor from "@/components/ui/CodeEditor";
 import { Link } from "react-router-dom";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+import faqs from "../contants/Faqs.json";
+import features from "../contants/features.json"
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 const HomePage = () => {
+  const {isAuthenticated} = useSelector((state:RootState)=>state.auth)
   return (
     <div className="relative flex flex-col min-h-screen">
       <motion.div
-        initial={{scale: 0.9}}
-        animate={{scale: [0.9, 1.1, 0.9]}}
-        transition={{repeat: Infinity, duration: 8, ease: 'easeInOut'}}
+        initial={{ scale: 0.9 }}
+        animate={{ scale: [0.9, 1.1, 0.9] }}
+        transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
         className=" absolute top-20 right-20 w-64 h-64 rounded-full bg-blue-400  opacity-30 blur-3xl pointer-events-none z-0"
       />
 
       <motion.div
-        initial={{scale: 1}}
-        animate={{scale: [1, 1.2, 1]}}
-        transition={{repeat: Infinity, duration: 10, ease: 'easeInOut'}}
+        initial={{ scale: 1 }}
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
         className="absolute top-[400px] -left-20 w-96 h-96 rounded-full bg-blue-500  opacity-20 blur-3xl pointer-events-none z-10"
       />
-
-     
 
       <div className="text-white px-6 py-12 md:py-24 min-h-screen ">
         <div className="max-w-3xl mx-auto flex flex-col items-center gap-12 -mt-6 text-center">
@@ -41,25 +51,24 @@ const HomePage = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-               <Link to="/problemset">
-              <Button className="text-lg px-6 py-6 bg-blue-600 hover:bg-blue-500 rounded-lg">
-                Start Solving
-              </Button>
-               </Link>
-              
-              <Link to="/login">
-              <Button
-                variant="outline"
-                className="text-lg px-6 py-6 border-gray-700 hover:bg-zinc-800"
-              >
-                Join Codewarrior <ChevronRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link to="/problemset">
+                <Button className="text-lg px-6 py-6 bg-blue-600 hover:bg-blue-500 rounded-lg">
+                  Start Solving
+                </Button>
               </Link>
              
+             
+              <Link to={isAuthenticated?"/":"/login"}>
+                <Button
+                  variant="outline"
+                  className="text-lg px-6 py-6 border-gray-700 hover:bg-zinc-800"
+                >
+                  Join Codewarrior <ChevronRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </motion.div>
 
-          {/* Code Editor Preview (Right) */}
           <div className="w-full">
             <CodeEditor />
           </div>
@@ -98,7 +107,7 @@ const HomePage = () => {
               </p>
             </div>
 
-            {/* Right GIF */}
+            
             <div className="flex-1 max-w-lg w-full ">
               <img
                 src="coder2.gif"
@@ -112,46 +121,46 @@ const HomePage = () => {
 
         <div className="max-w-7xl mx-auto mt-44 px-4">
           <h2 className="text-4xl font-bold mb-12 text-center text-white">
-            Features
+            Key Features of Our Coding Platform
           </h2>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Real-World Challenges",
-                desc: "Practice problems modeled after real interview scenarios.",
-              },
-              {
-                title: "Instant Feedback",
-                desc: "Know what went wrong and how to improve immediately.",
-              },
-              {
-                title: "Leaderboard",
-                desc: "Climb ranks by solving challenges and beating the clock.",
-              },
-              {
-                title: "Discuss & Learn",
-                desc: "Join discussions, ask questions, and learn from others.",
-              },
-              {
-                title: "Admin Problem Management",
-                desc: "Admins can easily add, edit, and monitor problems.",
-              },
-              {
-                title: "Coding Profile",
-                desc: "Track your growth, performance, and rank over time.",
-              },
-            ].map((feature, index) => (
+            {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-transparent border border-white/10 rounded-2xl px-6 py-12 backdrop-blur-md transition duration-300 hover:shadow-sm hover:shadow-blue-400"
+                className="bg-gradient-to-br from-[#111] to-[#1a1a1a] border border-white/10 rounded-2xl px-6 py-10 backdrop-blur-md transition duration-300 hover:shadow-lg hover:shadow-blue-500/40"
               >
-                <h3 className="text-lg font-semibold mb-2 text-white">
+                <h3 className="text-xl font-semibold mb-2 text-white">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-gray-300">{feature.desc}</p>
+                <p className="text-sm text-gray-400">{feature.desc}</p>
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto mt-32 px-4">
+          <h2 className="text-4xl font-bold text-center text-white mb-12">
+            FAQs
+          </h2>
+          <Accordion type="multiple" className="space-y-2">
+            {faqs.map((faq, index) => (
+              <AccordionItem
+                key={index}
+                value={`faq-${index}`}
+                className=" rounded-xl backdrop-blur-sm"
+              >
+                <AccordionTrigger
+                  className=" text-white text-left text-lg font-medium px-4 py-3 "
+                >
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-gray-300 px-4 pb-4">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </div>
     </div>

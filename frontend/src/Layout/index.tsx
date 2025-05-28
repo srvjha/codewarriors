@@ -5,7 +5,6 @@ import { Footer } from "@/components/ui/Footer";
 const Layout = () => {
   const params = useParams();
   const { problemId } = params;
-  console.log("problemId", problemId);
   return (
     <>
       <Header />

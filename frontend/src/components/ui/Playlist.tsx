@@ -39,9 +39,7 @@ const Playlist = ({
         {},
         { withCredentials: true }
       );
-      console.log(res)
       if (res.data.success) {
-        console.log("res data: ",res.data.message)
         ToastSuccess(res.data.message);
         setTimeout(()=>onClose(),2000);
       }
@@ -57,7 +55,6 @@ const Playlist = ({
         `/playlist/${playlistId}/problem/${problemId}/remove`,
         { withCredentials: true }
       );
-      console.log(res)
       if (res.data.success) {
         ToastSuccess(res.data.message);
         setTimeout(()=>onClose(),2000);

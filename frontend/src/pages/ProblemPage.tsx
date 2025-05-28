@@ -22,7 +22,6 @@ import {
   X,
 } from "lucide-react";
 
-
 import {
   ExecutionStatus,
   type Problem,
@@ -45,7 +44,7 @@ import { ClipLoader } from "react-spinners";
 import type { SubmissionType } from "@/types/submit/SubmissionTypes";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
-import tags from '../../companyTags.json'
+import tags from "../../companyTags.json";
 import API from "@/utils/AxiosInstance";
 
 const ProblemPage = () => {
@@ -73,12 +72,9 @@ const ProblemPage = () => {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const res = await API.get(
-          `/problem/${problemId}`,
-          {
-            withCredentials: true,
-          }
-        );
+        const res = await API.get(`/problem/${problemId}`, {
+          withCredentials: true,
+        });
 
         if (res.data.success) {
           setProblem(res.data.data);
@@ -204,12 +200,9 @@ const ProblemPage = () => {
   const getSubmissions = async () => {
     try {
       setActiveTab("submissions");
-      const res = await API.get(
-        `/submission/problem/${problemId}`,
-        {
-          withCredentials: true,
-        }
-      );
+      const res = await API.get(`/submission/problem/${problemId}`, {
+        withCredentials: true,
+      });
 
       if (res.data.success) {
         const resData = res.data.data.sort(
@@ -225,15 +218,22 @@ const ProblemPage = () => {
 
   const getCompanyTags = (title: string) => {
     const tagObj = tags.find((tag) => tag.problem === title);
-    if (!tagObj || !tagObj.companies || tagObj.companies.length === 0) return null;
+    if (!tagObj || !tagObj.companies || tagObj.companies.length === 0)
+      return null;
     return (
       <div className="flex flex-wrap gap-2 mb-2">
         {tagObj.companies.map((company: string, idx: number) => (
-          <div className="flex bg-zinc-900  px-2 py-1 text-[12px] rounded-lg" key={idx}>
-            <img src = {`https://logo.clearbit.com/${company.toLowerCase()}.com`} alt="companylogo" className="w-4 h-4 rounded-lg" />
-             <div className="ml-1">{company}</div>
+          <div
+            className="flex bg-zinc-900  px-2 py-1 text-[12px] rounded-lg"
+            key={idx}
+          >
+            <img
+              src={`https://logo.clearbit.com/${company.toLowerCase()}.com`}
+              alt="companylogo"
+              className="w-4 h-4 rounded-lg"
+            />
+            <div className="ml-1">{company}</div>
           </div>
-         
         ))}
       </div>
     );
@@ -241,11 +241,9 @@ const ProblemPage = () => {
 
   return (
     <div className=" text-white -mt-2 ">
-      {/* Main Content */}
       <div className="flex flex-row p-4 gap-2">
         {/* Left Panel */}
         <div className="bg-[#242222] w-1/2 h-[calc(100vh-80px)] rounded-lg flex flex-col shadow-lg overflow-hidden">
-          {/* Tab Navigation */}
           <div className="bg-[#2d2d2d] border-b border-gray-700 flex space-x-1 px-2 py-1">
             <button
               className={`flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
@@ -325,31 +323,31 @@ const ProblemPage = () => {
             )}
           </div>
 
-          {/* Content Area */}
           <div className="flex-1 overflow-y-auto p-6">
             {activeTab === "description" && (
               <div>
-                {/* Problem Metadata */}
                 <h1 className="text-xl font-medium">{problem.title}</h1>
                 <div className="flex items-center gap-3 mb-4 mt-2">
                   <DifficultyBadge difficulty={problem.difficulty} />
                   {problem.tags.map((tag, index) => (
-                    <span key={index} className="bg-zinc-900 text-gray-300 px-2 py-1 text-xs rounded-md mr-2">  {tag} </span>
+                    <span
+                      key={index}
+                      className="bg-zinc-900 text-gray-300 px-2 py-1 text-xs rounded-md mr-2"
+                    >
+                      {" "}
+                      {tag}{" "}
+                    </span>
                   ))}
                 </div>
 
-                <div>
-                  {getCompanyTags(problem.title)}
-                </div>
+                <div>{getCompanyTags(problem.title)}</div>
 
-                {/* Problem Description */}
                 <div className="mb-6">
                   <p className="text-gray-300 leading-relaxed">
                     {problem.description}
                   </p>
                 </div>
 
-                {/* Constraints */}
                 <div className="mb-6">
                   <h3 className="text-gray-200 font-medium mb-2">
                     Constraints:
@@ -359,7 +357,6 @@ const ProblemPage = () => {
                   </div>
                 </div>
 
-                {/* Examples */}
                 {selectedExample &&
                   selectedExample.map((example, index) => (
                     <div className="mb-6" key={index + 1}>
@@ -508,10 +505,8 @@ const ProblemPage = () => {
             {activeTab === "submit" && results && (
               <div className=" text-white min-h-screen py-10 px-4 flex justify-center -mt-8 ">
                 <div className="w-full max-w-4xl space-y-8">
-                  {/* Header */}
                   <div className="flex justify-between items-start sm:items-center flex-col sm:flex-row">
                     <div className="flex flex-col gap-2 text-sm">
-                      {/* Status */}
                       <div className="flex items-center gap-1  font-semibold text-base">
                         {results.status === "Accepted" ? (
                           <CheckCircle size={18} className="text-green-500" />
@@ -536,7 +531,6 @@ const ProblemPage = () => {
                         </span>
                       </div>
 
-                      {/* User Info */}
                       <div className="flex items-center gap-2 text-gray-400">
                         <img
                           src={userData?.avatar}
@@ -554,7 +548,6 @@ const ProblemPage = () => {
                     </div>
                   </div>
 
-                  {/* Runtime & Memory */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6  p-4 rounded-lg">
                     <div className="bg-gradient-to-br from-[#232323] to-[#1A1A1A] p-4 rounded-lg shadow space-y-2">
                       <div className="text-sm text-gray-400">Runtime</div>
@@ -572,7 +565,6 @@ const ProblemPage = () => {
                     </div>
                   </div>
 
-                  {/* Code */}
                   <div className=" p-4 rounded-lg bg-gradient-to-br from-[#232323] to-[#1A1A1A] ">
                     <div className="text-sm text-gray-400 mb-2">
                       Code ({results?.language})
@@ -599,9 +591,8 @@ const ProblemPage = () => {
           </div>
         </div>
 
-        {/* Right Panel - Code Editor and Results */}
+        {/* Right Panel*/}
         <div className=" w-1/2 h-[calc(100vh-80px)] rounded-lg flex flex-col shadow-lg overflow-hidden bg-[#1e1e1e]">
-          {/* Tab Navigation */}
           <div className="bg-[#2d2d2d] border-b border-gray-700 flex px-2 py-1">
             <div className="flex-1 flex items-center">
               <button className="flex items-center px-3 py-1.5 text-sm font-medium bg-[#3e3e3e] text-white rounded-md">
@@ -616,10 +607,8 @@ const ProblemPage = () => {
             </div>
           </div>
 
-          {/* Editor Controls */}
           <div className="flex justify-between items-center p-2 ">
             <div className="relative">
-              {/* Language dropdown would go here */}
               <DropdownMenu>
                 <DropdownMenuTrigger className="flex text-gray-300 cursor-pointer focus:outline-none focus-visible:outline-none hover:bg-[#464242] px-2 py-1 rounded-md text-sm ">
                   {selectedLang.charAt(0).toUpperCase() +
@@ -668,7 +657,6 @@ const ProblemPage = () => {
               />
             )}
 
-            {/* Action Buttons */}
             <div className="flex justify-end p-1 mr-1">
               <Button
                 className="bg-[#343131] h-8 hover:bg-[#464242] cursor-pointer text-white  rounded-md mr-2 text-sm font-semibold"
@@ -690,7 +678,6 @@ const ProblemPage = () => {
           </div>
 
           <div className="bg-[#2e2e2d] h-[300px] -mt-4 rounded-b-md shadow-inner flex flex-col">
-            {/* Header Section */}
             <div className="px-4 py-2 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
               <div className="text-base font-medium flex items-center space-x-2">
                 <button
@@ -727,12 +714,9 @@ const ProblemPage = () => {
               </div>
             </div>
 
-            {/* Content area with proper scrolling */}
             <div className="flex-1 overflow-hidden">
-              {/* Testcase Tab */}
               {activeResultTab === "testcase" && (
                 <div className="h-full overflow-y-auto px-4 py-3 bg-[#212121]">
-                  {/* Test case tabs */}
                   <div className="flex items-center space-x-2 mb-3 sticky top-0 bg-[#212121] z-10 pb-2">
                     {testCases.slice(0, 3).map((_, index) => (
                       <button
@@ -754,7 +738,6 @@ const ProblemPage = () => {
 
                   {testCases.length > 0 && (
                     <div className="space-y-4">
-                      {/* Input Display */}
                       <div>
                         <label className="text-sm text-gray-400 font-semibold mb-1 block">
                           Input
@@ -764,7 +747,6 @@ const ProblemPage = () => {
                         </div>
                       </div>
 
-                      {/* Output Display */}
                       <div>
                         <label className="text-sm text-gray-400 font-semibold mb-1 block">
                           Output
@@ -778,7 +760,6 @@ const ProblemPage = () => {
                 </div>
               )}
 
-              {/* Result Tab */}
               {activeResultTab === "result" && (
                 <div className="h-full scroll-hidden overflow-y-scroll px-4 py-3">
                   {isRunning ? (
@@ -791,7 +772,6 @@ const ProblemPage = () => {
                     </div>
                   ) : results ? (
                     <div className="space-y-4 ">
-                      {/* Result header with status */}
                       <div className="flex items-center justify-between">
                         <StatusIndicator status={results.status} />
                         <div className="flex items-center text-gray-300 text-sm">
@@ -800,7 +780,6 @@ const ProblemPage = () => {
                         </div>
                       </div>
 
-                      {/* Test case results */}
                       <div className=" rounded-md overflow-hidden">
                         <table className="w-full text-sm">
                           <thead>
@@ -863,7 +842,6 @@ const ProblemPage = () => {
                         </table>
                       </div>
 
-                      {/* Output details */}
                       <div>
                         <h3 className="text-sm font-medium text-gray-300 mb-2">
                           Output:
@@ -873,7 +851,6 @@ const ProblemPage = () => {
                         </div>
                       </div>
 
-                      {/* Error details, if any */}
                       {results.stderr && (
                         <div>
                           <h3 className="text-sm font-medium text-red-400 mb-2">

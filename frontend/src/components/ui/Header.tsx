@@ -140,9 +140,9 @@ export const Header = () => {
                   
                 </DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem variant="destructive">
+                <DropdownMenuItem variant="destructive" onClick={() => logout()} className="cursor-pointer">
                   <LogOut />
-                  <div onClick={() => logout()} className="cursor-pointer">
+                  <div>
                     Logout
                   </div>
                 </DropdownMenuItem>
