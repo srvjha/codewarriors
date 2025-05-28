@@ -10,7 +10,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-import faqs from "../constants/Faqs.json";
+import faqs from "../constants/faqs.json";
 import features from "../constants/features.json";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
