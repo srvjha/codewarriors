@@ -18,7 +18,6 @@ API.interceptors.response.use(
   (response) => response, 
   async (error) => {
     const originalRequest = error.config;
-    console.log("JWT Expiry Check Triggered");
     console.log(error.response?.data?.error)
 
    

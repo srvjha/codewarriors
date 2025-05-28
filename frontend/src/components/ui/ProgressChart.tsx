@@ -82,8 +82,7 @@ const ProgressChart = ({ progressData }: P) => {
   };
 
   return (
-    <div className="flex items-center justify-between shadow-lg shadow-neutral-900 mb-4  rounded-xl px-6 py-4 w-[400px] text-white bg-gradient-to-r from-neutral-900  to-neutral-800">
-      {/* Chart Section */}
+    <div className="flex items-center bg-neutral-900  justify-between mb-4  rounded-xl px-6 py-4 w-[400px] text-white ">
       <div className="relative w-[200px] h-[200px]">
         <Doughnut data={data} options={options} />
         <div className="absolute inset-0 flex flex-col items-center justify-center">

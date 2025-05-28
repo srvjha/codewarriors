@@ -7,9 +7,9 @@ import type { SubmissionType } from "@/types/submit/SubmissionTypes";
 import API from "@/utils/AxiosInstance";
 
 type Calendar = {
-    date:string,
-    count:number
-}
+  date: string;
+  count: number;
+};
 
 const ContributionCalendar = () => {
   const [heatmapData, setHeatmapData] = useState<Calendar[]>([]);
@@ -22,14 +22,16 @@ const ContributionCalendar = () => {
         });
 
         const submissions = res.data.data;
-       
-        const dateMap = submissions.reduce((acc: { [key: string]: number }, submission: SubmissionType) => {
-          const date = new Date(submission?.createdAt).toLocaleDateString();
-          acc[date] = (acc[date] || 0) + 1;
-          return acc;
-        }, {});
-        
-       
+
+        const dateMap = submissions.reduce(
+          (acc: { [key: string]: number }, submission: SubmissionType) => {
+            const date = new Date(submission?.createdAt).toLocaleDateString();
+            acc[date] = (acc[date] || 0) + 1;
+            return acc;
+          },
+          {}
+        );
+
         const formatted = Object.entries(dateMap).map(([date, count]) => ({
           date,
           count: Number(count),
@@ -45,12 +47,17 @@ const ContributionCalendar = () => {
   }, []);
 
   const endDate = new Date();
-  const startDate = new Date(new Date().setFullYear(endDate.getFullYear() - 1));
-  console.log("startDate: ",startDate)
+  const rawStartDate = new Date(
+    new Date().setFullYear(endDate.getFullYear() - 1)
+  );
+  const startDate = new Date(rawStartDate);
+  startDate.setDate(startDate.getDate() + ((6 - startDate.getDay()) % 7)); 
 
   return (
-    <div className="p-4  rounded shadow w-[990px] h-[100px]">
-      <h2 className="text-xl font-bold mb-8 text-center">Your Submission Activity</h2>
+    <div className="px-4 py-4  rounded shadow w-[970px] h-[100px]">
+      <h2 className="text-xl font-bold mb-8 text-center">
+        Your Submission Activity
+      </h2>
       <CalendarHeatmap
         startDate={startDate}
         endDate={endDate}
@@ -72,7 +79,6 @@ const ContributionCalendar = () => {
           return {};
         }}
         showWeekdayLabels={false}
-
       />
       <ReactTooltip id="tooltip" />
     </div>

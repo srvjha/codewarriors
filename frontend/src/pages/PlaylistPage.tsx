@@ -68,7 +68,7 @@ const PlaylistPage = () => {
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         <div className=" min-h-[calc(100vh-100px)] flex gap-4">
           {/* Left: List Deatils */}
-          <div className="w-[350px] bg-gradient-to-r from-neutral-800 via-neutral-900 to-neutral-900 px-4 py-3 rounded-lg shadow-md shadow-blue-500">
+          <div className="w-[350px] bg-neutral-900  px-4 py-3 rounded-lg shadow-sm shadow-neutral-900 border border-neutral-800 ">
             <p className="text-xl font-semibold text-neutral-100 mb-4 flex items-center">
               <List className="mr-2" />
               Playlists
@@ -96,7 +96,7 @@ const PlaylistPage = () => {
           </div>
 
           {/* Right: Problems in List*/}
-          <div className="flex-1 bg-gradient-to-r from-neutral-800 via-neutral-900 to-neutral-900 px-6 py-4 rounded-lg shadow-md shadow-blue-500">
+          <div className="flex-1 bg-neutral-900  px-6 py-4 rounded-lg  shadow-sm shadow-neutral-900 border border-neutral-800 ">
             <p className="text-xl font-semibold text-white mb-4 flex">
               {selectedPlaylist?.name} Problems{" "}
               <Target className="mt-1.5 ml-2" size={18} />

@@ -15,12 +15,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-} from "@radix-ui/react-dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import Playlist from "@/components/ui/Playlist";
 import { difficultyColor } from "@/helper/Problem.helper";
 import API from "@/utils/AxiosInstance";
@@ -34,7 +32,7 @@ type Problem = {
   isSolved: boolean;
 };
 
-
+const problemsPerPage = 10;
 
 const ProblemsetPage = () => {
   const [allProblems, setAllProblems] = useState<Problem[]>([]);
@@ -44,75 +42,53 @@ const ProblemsetPage = () => {
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState(true);
   const { userData } = useSelector((state: RootState) => state.auth);
-  const problemsPerPage = 10;
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [addProblem, setAddProblem] = useState("");
+
+  const searchRef =
+    useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
 
   useEffect(() => {
     const fetchProblems = async () => {
       try {
-        const res = await API.get(
-          "/problem/all-problems",
-          { withCredentials: true }
-        );
+        const res = await API.get("/problem/all-problems", {
+          withCredentials: true,
+        });
         const data: Problem[] = res.data.data;
 
-        setAllProblems(data);
-        setFilteredProblems(data);
-        setVisibleProblems(data.slice(0, problemsPerPage));
-        setHasMore(data.length > problemsPerPage);
+        const solvedRes = await API.get("/problem/solved/all-problems", {
+          withCredentials: true,
+        });
+        const solvedIds = solvedRes.data.data.map((p: Problem) => p.id);
+
+        const updated = data.map((problem) => ({
+          ...problem,
+          isSolved: solvedIds.includes(problem.id),
+        }));
+
+        setAllProblems(updated);
+        setFilteredProblems(updated);
+        setVisibleProblems(updated.slice(0, problemsPerPage));
+        setHasMore(updated.length > problemsPerPage);
       } catch (err) {
         console.error("Failed to fetch problems:", err);
       } finally {
         setLoading(false);
       }
     };
+
     fetchProblems();
   }, []);
 
-  const fetchSolvedStatus = async (problems: Problem[]) => {
-    try {
-      const response = await API.get(
-        "/problem/solved/all-problems",
-        { withCredentials: true }
-      );
-
-      const solvedIds = response.data.data;
-
-      return problems.map((problem) => ({
-        ...problem,
-        isSolved: solvedIds.some((solved: Problem) => solved.id === problem.id),
-      }));
-    } catch (error) {
-      console.error("Failed to fetch solved problems:", error);
-      return problems.map((p) => ({ ...p, isSolved: false }));
-    }
-  };
-
-  const fetchMoreData = async () => {
-    if (visibleProblems.length >= filteredProblems.length) {
-      setHasMore(false);
-      return;
-    }
-
-    const nextProblems = filteredProblems.slice(
+  const fetchMoreData = () => {
+    const next = filteredProblems.slice(
       visibleProblems.length,
       visibleProblems.length + problemsPerPage
     );
 
-    const updatedNext = await fetchSolvedStatus(nextProblems);
-    setVisibleProblems((prev) => [...prev, ...updatedNext]);
+    setVisibleProblems((prev) => [...prev, ...next]);
+    setHasMore(visibleProblems.length + next.length < filteredProblems.length);
   };
-
-  useEffect(() => {
-    const initializeSolvedStatus = async () => {
-      const updated = await fetchSolvedStatus(
-        filteredProblems.slice(0, problemsPerPage)
-      );
-      setVisibleProblems(updated);
-    };
-    initializeSolvedStatus();
-  }, [filteredProblems]);
 
   const tagCounts: Record<string, number> = {};
   allProblems.forEach((problem) => {
@@ -127,9 +103,6 @@ const ProblemsetPage = () => {
     ...Object.entries(tagCounts).map(([tag, count]) => ({ label: tag, count })),
   ];
 
-  const searchRef =
-    useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
-
   useEffect(() => {
     searchRef.current = debounce(
       (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,7 +111,7 @@ const ProblemsetPage = () => {
           problem.title.toLowerCase().includes(query)
         );
         setFilteredProblems(filtered);
-        setVisibleProblems([]);
+        setVisibleProblems(filtered.slice(0, problemsPerPage));
         setHasMore(filtered.length > problemsPerPage);
       },
       1000
@@ -151,46 +124,48 @@ const ProblemsetPage = () => {
     }
   };
 
- const handleSortClick = (value: string) => {
-  const difficulties = ["EASY", "MEDIUM", "HARD"];
-  let sortedProblems: Problem[] = [...allProblems];
+  const handleSortClick = (value: string) => {
+    const difficulties = ["EASY", "MEDIUM", "HARD"];
+    let sortedProblems: Problem[] = [...filteredProblems];
 
-  const clicked = value.toUpperCase();
+    const clicked = value.toUpperCase();
 
-  if (difficulties.includes(clicked)) {
-    const startIndex = difficulties.indexOf(clicked);
-    const reordered = [...difficulties.slice(startIndex), ...difficulties.slice(0, startIndex)];
+    if (difficulties.includes(clicked)) {
+      const startIndex = difficulties.indexOf(clicked);
+      const reordered = [
+        ...difficulties.slice(startIndex),
+        ...difficulties.slice(0, startIndex),
+      ];
 
-    sortedProblems.sort(
-      (a, b) =>
-        reordered.indexOf(a.difficulty.toUpperCase()) -
-        reordered.indexOf(b.difficulty.toUpperCase())
-    );
+      sortedProblems.sort(
+        (a, b) =>
+          reordered.indexOf(a.difficulty.toUpperCase()) -
+          reordered.indexOf(b.difficulty.toUpperCase())
+      );
 
-    setActive(false);
-  } else if (value === "all" && !active) {
-    setActive(true);
-    sortedProblems = [...allProblems];
-  }
-
-  setFilteredProblems(sortedProblems);
-  setVisibleProblems([]);
-  setHasMore(sortedProblems.length > problemsPerPage);
-};
-
-
-
-   const handleLabelBasedSearch = (tag:string)=>{
-     let tagBasedData = allProblems;
-    if(tag !== "All Topics"){
-       tagBasedData = allProblems.filter((problem)=>problem.tags.includes(tag))
+      setActive(false);
+    } else if (value === "all" && !active) {
+      setActive(true);
+      sortedProblems = [...allProblems];
     }
-    
+
+    setFilteredProblems(sortedProblems);
+    setVisibleProblems(sortedProblems.slice(0, problemsPerPage));
+    setHasMore(sortedProblems.length > problemsPerPage);
+  };
+
+  const handleLabelBasedSearch = (tag: string) => {
+    let tagBasedData = allProblems;
+    if (tag !== "All Topics") {
+      tagBasedData = allProblems.filter((problem) =>
+        problem.tags.includes(tag)
+      );
+    }
+
     setFilteredProblems(tagBasedData);
-    setVisibleProblems([]);
+    setVisibleProblems(tagBasedData.slice(0, problemsPerPage));
     setHasMore(tagBasedData.length > problemsPerPage);
-   }
-   
+  };
 
   const handleAddPlaylist = (problemId: string) => {
     setAddProblem(problemId);
@@ -199,7 +174,6 @@ const ProblemsetPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">
@@ -218,13 +192,12 @@ const ProblemsetPage = () => {
         )}
       </div>
 
-      {/* Tags */}
       <div className="flex flex-wrap gap-2">
         {topicList.map((topic) => (
           <Badge
             key={topic.label}
             className="text-sm px-3 py-1 cursor-pointer bg-zinc-800 text-white hover:bg-zinc-700"
-            onClick={()=>handleLabelBasedSearch(topic.label)}
+            onClick={() => handleLabelBasedSearch(topic.label)}
           >
             {topic.label}{" "}
             <span className="ml-1 text-gray-400">({topic.count})</span>
@@ -232,7 +205,6 @@ const ProblemsetPage = () => {
         ))}
       </div>
 
-      {/* Search and Filters */}
       <div className="flex items-center gap-2">
         <div className="relative w-full">
           <Search className="absolute left-2 top-2.5 text-gray-400" size={16} />
@@ -252,7 +224,6 @@ const ProblemsetPage = () => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40 text-left px-2  bg-zinc-800 text-zinc-100 border-none">
-            {/* Difficulty Filter */}
             <DropdownMenuSub>
               {!active ? (
                 <DropdownMenuItem onClick={() => handleSortClick("all")}>
@@ -261,7 +232,6 @@ const ProblemsetPage = () => {
               ) : (
                 <DropdownMenuItem>All Problems</DropdownMenuItem>
               )}
-
               <DropdownMenuSubTrigger className="text-zinc-100 hover:bg-zinc-100 hover:text-zinc-800 hover:rounded-lg p-1.5 ">
                 Sort By Difficulty
               </DropdownMenuSubTrigger>
@@ -292,7 +262,6 @@ const ProblemsetPage = () => {
         </DropdownMenu>
       </div>
 
-      {/* Infinite Scroll */}
       {loading ? (
         <p className="text-gray-400">Loading problems...</p>
       ) : visibleProblems.length === 0 ? (
@@ -354,7 +323,6 @@ const ProblemsetPage = () => {
                     className="mt-1 text-zinc-600 hover:text-yellow-600"
                     onClick={() => handleAddPlaylist(problem.id)}
                   />
-
                   <span
                     className={`text-sm font-semibold ${
                       difficultyColor[problem.difficulty]

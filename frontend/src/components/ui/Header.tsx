@@ -125,7 +125,7 @@ export const Header = () => {
                 </Avatar>
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-black text-white border-none shadow-sm shadow-gray-800 z-50">
+              <DropdownMenuContent className="bg-zinc-900 text-white border-none shadow-sm shadow-neutral-800 z-50">
                 <Link to="/profile">
                   <DropdownMenuItem className="cursor-pointer"> 
                     <User />

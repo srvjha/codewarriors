@@ -116,15 +116,14 @@ const register = asyncHandler(async (req, res) => {
   );
   const cookieOption: CookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure:true,
+    sameSite:"none",
     maxAge: 24 * 60 * 60 * 1000,
   };
-
+   res.cookie("accessToken", accessToken, cookieOption)
+    res.cookie("refreshToken", refreshToken, cookieOption)
   res
     .status(200)
-    .cookie("accessToken", accessToken, cookieOption)
-    .cookie("refreshToken", refreshToken, cookieOption)
     .json(
       new ApiResponse(
         200,
@@ -191,8 +190,8 @@ const loginUser = asyncHandler(async (req, res) => {
   );
   const cookieOption: CookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true,
+    sameSite: "none",
     maxAge: 24 * 60 * 60 * 1000,
   };
   res

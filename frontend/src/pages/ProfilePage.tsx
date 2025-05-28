@@ -108,7 +108,6 @@ const ProfilePage = () => {
   return (
     <div className="flex flex-col items-center min-h-screen  p-4">
       <div className="w-full max-w-5xl  p-6 rounded-lg  ">
-        {/* User Info */}
         <div className="flex items-center gap-4 justify-between mb-6 border-b border-b-gray-700 pb-4">
           <div className="flex items-center gap-4">
             <Avatar className=" h-18 w-18 rounded-xl object-cover border-none">
@@ -136,13 +135,11 @@ const ProfilePage = () => {
 
         <ProgressChart progressData={progressData} />
 
-        {/* Contribution Graph */}
-        <div className="mb-8 shadow-lg shadow-neutral-900 h-[300px] bg-gradient-to-r from-neutral-900  to-neutral-800 rounded-xl">
+        <div className="mb-8 bg-neutral-900  shadow-sm shadow-neutral-900 border border-neutral-800 h-[300px] rounded-xl">
           <ContributionCalendar />
         </div>
 
-        {/* Submissions List */}
-        <div className="rounded-lg shadow-lg shadow-neutral-900 bg-gradient-to-r from-neutral-900  to-neutral-800  mb-4 mt-20 px-8 py-8">
+        <div className="rounded-lg shadow-lg shadow-neutral-900 border border-neutral-800 bg-neutral-900   mb-4 mt-20 px-8 py-8">
           <h3 className="text-lg font-semibold mt  bg-neutral-800 w-[120px] px-2 py-2 rounded-xl flex items-center justify-center text-center">
             Recent AC
           </h3>
@@ -153,7 +150,7 @@ const ProfilePage = () => {
               submissions.map((sub) => (
                 <li
                   key={sub.id}
-                  className="p-4 bg-gradient-to-r from-neutral-800 via-neutral-900 to-neutral-900 mt-6 rounded-lg "
+                  className="p-4 bg-neutral-800 mt-6 rounded-lg "
                 >
                   <div className="flex justify-between items-center">
                     <span
