@@ -29,6 +29,8 @@ import jwt from "jsonwebtoken";
 import { UserRole } from "@prisma/client";
 import { sanitizeUser } from "../utils/sanitizeUser";
 import { CookieOptions } from "express";
+import { verifyGoogleToken } from "../utils/VerifyGoogleToken";
+import { logger } from "../configs/logger";
 
 const generateAccessAndRefreshToken = async (userId: string) => {
   try {
@@ -116,14 +118,15 @@ const register = asyncHandler(async (req, res) => {
   );
   const cookieOption: CookieOptions = {
     httpOnly: true,
-    secure:true,
-    sameSite:"none",
+    secure: true,
+    sameSite: "none",
     maxAge: 24 * 60 * 60 * 1000,
   };
-   res.cookie("accessToken", accessToken, cookieOption)
-    res.cookie("refreshToken", refreshToken, cookieOption)
+
   res
     .status(200)
+    .cookie("accessToken", accessToken, cookieOption)
+    .cookie("refreshToken", refreshToken, cookieOption)
     .json(
       new ApiResponse(
         200,
@@ -230,8 +233,8 @@ const logoutUser = asyncHandler(async (req, res) => {
   };
 
   res
-    .clearCookie("accessToken",cookieOption)
-    .clearCookie("refreshToken",cookieOption)
+    .clearCookie("accessToken", cookieOption)
+    .clearCookie("refreshToken", cookieOption)
     .status(200)
     .json(new ApiResponse(200, null, "User Logged Out Successfully"));
 });
@@ -503,6 +506,66 @@ const allUsers = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, getUsers, "All users fetched successfully"));
 });
 
+const googleLogin = asyncHandler(async (req, res) => {
+  const { credential } = req.body;
+  const payload = await verifyGoogleToken(credential);
+
+  const { email, name, picture, email_verified } = payload;
+  if (!email || !name || !picture || !email_verified) {
+    throw new ApiError("Missing required Fields", 500);
+  }
+
+  const existingUser = await db.user.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  let user = existingUser;
+  // if no user found then we will create new user
+
+  if (!user) {
+    const baseUsername = email.split("@")[0];
+    let username = baseUsername;
+    const existing = await db.user.findUnique({ where: { username } });
+    if (existing) {
+      username = `${baseUsername}_${crypto.randomUUID().slice(0, 6)}`;
+    }
+    user = await db.user.create({
+      data: {
+        email,
+        fullName: name,
+        isEmailVerified: email_verified,
+        avatar: picture,
+        username,
+        provider: "google",
+      },
+    });
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    user.id as string
+  );
+  const cookieOption: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    maxAge: 24 * 60 * 60 * 1000,
+  };
+
+
+  logger.info(`${email} logged in via Google`);
+
+
+  res
+    .status(200)
+    .cookie("accessToken", accessToken, cookieOption)
+    .cookie("refreshToken", refreshToken, cookieOption)
+    .json(
+      new ApiResponse(200,null, "Google login successful")
+    );
+});
+
 export {
   changeCurrentPassword,
   forgotPasswordRequest,
@@ -515,4 +578,5 @@ export {
   resetForgottenPassword,
   verifyEmail,
   allUsers,
+  googleLogin
 };

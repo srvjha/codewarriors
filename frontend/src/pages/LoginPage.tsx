@@ -20,6 +20,8 @@ import { BeatLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/redux/store";
 import { LoginUser } from "@/redux/slices/auth/authThunks";
+import { GoogleLogin } from "@react-oauth/google";
+import API from "@/utils/AxiosInstance";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -250,6 +252,30 @@ const LoginPage = () => {
                   </Link>
                 </p>
               </CardFooter>
+              <div className="w-full flex justify-center mt-4">
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                    try {
+                      if (credentialResponse.credential) {
+                        const res = await API.post("/auth/google-auth", {
+                          credential: credentialResponse.credential, // fix: use `.credential` here
+                        });
+                        ToastSuccess(res.data.message);
+                        navigate(from, { replace: true });
+                      }
+                    } catch (err:any) {
+                      console.error("Google Auth API Error: ", err);
+                      const errorMsg =
+                        err.response.data.message ||
+                        "Something went wrong with login";
+                      ToastError(errorMsg);
+                    }
+                  }}
+                  onError={() => {
+                    ToastError("Google Login Failed at Google Auth step");
+                  }}
+                />
+              </div>
             </Card>
           </motion.div>
         </div>

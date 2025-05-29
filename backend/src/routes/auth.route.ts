@@ -4,6 +4,7 @@ import {
   changeCurrentPassword,
   forgotPasswordRequest,
   getCurrentUser,
+  googleLogin,
   loginUser,
   logoutUser,
   refreshAccessToken,
@@ -29,5 +30,6 @@ router.get("/me", verifyUser, getCurrentUser);
 router.get("/refresh", refreshAccessToken);
 router.get("/logout", verifyUser, logoutUser);
 router.get("/all/users", verifyUser, checkRole, allUsers);
+router.post("/google-auth",googleLogin)
 
 export default router;
