@@ -142,7 +142,7 @@ const ProblemPage = () => {
       );
 
       if (res.data.success) {
-        console.log("Execution result:", res.data.data);
+        // console.log("Execution result:", res.data.data);
         setResults(res.data.data);
         setActiveTab("submit");
       }

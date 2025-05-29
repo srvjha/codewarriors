@@ -39,6 +39,23 @@ export const LoginUser = createAsyncThunk(
   }
 );
 
+export const googleAuthLoginUser = createAsyncThunk(
+  "auth/google-auth",
+  async (userData: {credential:string},{rejectWithValue}) => {
+    try {
+      const response = await API.post("/auth/google-auth", userData, {
+          withCredentials:true
+        });
+      return {
+        data:response.data.data,
+        message:response.data.message
+      }
+    } catch (error:any) {
+        return rejectWithValue(error.response.data.error)
+    }
+  }
+);
+
 
 export const LogoutUser = createAsyncThunk(
   "auth/logout",

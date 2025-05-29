@@ -19,9 +19,8 @@ import { useState } from "react";
 import { BeatLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/redux/store";
-import { LoginUser } from "@/redux/slices/auth/authThunks";
+import { googleAuthLoginUser, LoginUser } from "@/redux/slices/auth/authThunks";
 import { GoogleLogin } from "@react-oauth/google";
-import API from "@/utils/AxiosInstance";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -241,29 +240,31 @@ const LoginPage = () => {
                 </form>
               </CardContent>
 
-              <CardFooter className="flex flex-col space-y-3 mt-4">
-                <p className="text-sm text-center text-zinc-400 mt-2">
-                  Not a CodeWarrior yet?{" "}
-                  <Link
-                    to="/register"
-                    className="text-blue-400 hover:text-blue-300 hover:underline"
-                  >
-                    Join the arena
-                  </Link>
-                </p>
-              </CardFooter>
+              
+              <div className="flex items-center justify-center my-4">
+                <div className="flex-grow h-px bg-gray-600"></div>
+                <span className="px-4 text-sm text-gray-400">OR</span>
+                <div className="flex-grow h-px bg-gray-600"></div>
+              </div>
+
               <div className="w-full flex justify-center mt-4">
                 <GoogleLogin
+                theme="filled_blue"
                   onSuccess={async (credentialResponse) => {
                     try {
                       if (credentialResponse.credential) {
-                        const res = await API.post("/auth/google-auth", {
-                          credential: credentialResponse.credential, // fix: use `.credential` here
-                        });
-                        ToastSuccess(res.data.message);
-                        navigate(from, { replace: true });
+                        const res = await dispatch(
+                          googleAuthLoginUser({
+                            credential: credentialResponse.credential,
+                          })
+                        ).unwrap();
+                        ToastSuccess(res.message);
+
+                        setTimeout(() => {
+                          navigate(from, { replace: true });
+                        }, 3000);
                       }
-                    } catch (err:any) {
+                    } catch (err: any) {
                       console.error("Google Auth API Error: ", err);
                       const errorMsg =
                         err.response.data.message ||
@@ -276,6 +277,18 @@ const LoginPage = () => {
                   }}
                 />
               </div>
+
+              <CardFooter className="flex flex-col space-y-3 mt-4">
+                <p className="text-sm text-center text-zinc-400 mt-2">
+                  Not a CodeWarrior yet?{" "}
+                  <Link
+                    to="/register"
+                    className="text-blue-400 hover:text-blue-300 hover:underline"
+                  >
+                    Join the arena
+                  </Link>
+                </p>
+              </CardFooter>
             </Card>
           </motion.div>
         </div>

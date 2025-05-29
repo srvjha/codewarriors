@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
+    "dev-start":"ts-node-dev --respawn --transpile-only src/index.ts",
     "generate-swagger": "ts-node src/swagger-gen.ts"
   },
   "keywords": [],

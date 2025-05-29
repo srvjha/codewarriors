@@ -26,8 +26,12 @@ import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
 import { useDispatch } from "react-redux";
-import { registerUser } from "@/redux/slices/auth/authThunks";
+import {
+  googleAuthLoginUser,
+  registerUser,
+} from "@/redux/slices/auth/authThunks";
 import type { AppDispatch } from "@/redux/store";
+import { GoogleLogin } from "@react-oauth/google";
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -50,7 +54,7 @@ const featureItem = {
 
 const RegisterPage = () => {
   const dispatch = useDispatch<AppDispatch>();
- const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -63,7 +67,7 @@ const RegisterPage = () => {
   const from = location.state?.from?.pathname || "/";
 
   const onSubmit = handleSubmit(async (data: FormValues) => {
-   const formData = new FormData();
+    const formData = new FormData();
     formData.append("username", data.username);
     formData.append("fullName", data.fullName);
     formData.append("email", data.email);
@@ -76,20 +80,20 @@ const RegisterPage = () => {
   });
 
   const registerUserFunction = async (userInfo: FormData) => {
-    try{
-       setIsLoading(true);
-    const result = await dispatch(registerUser(userInfo)).unwrap();
+    try {
+      setIsLoading(true);
+      const result = await dispatch(registerUser(userInfo)).unwrap();
       ToastSuccess(result.message);
       setTimeout(() => {
         reset();
         navigate(from, { replace: true });
       }, 3000);
-    } catch(error:any) {
+    } catch (error: any) {
       ToastError(
         error || error?.response?.data?.message || "Something went wrong"
-      )
-    }finally{
-       setIsLoading(false);
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -177,7 +181,7 @@ const RegisterPage = () => {
 
               <CardContent>
                 <form className="mt-4" onSubmit={onSubmit}>
-                  <div className="grid w-full items-center gap-4">
+                  <div className="grid w-full items-center gap-3">
                     <div className="flex flex-col space-y-1.5">
                       <label
                         htmlFor="email"
@@ -300,7 +304,45 @@ const RegisterPage = () => {
                 </form>
               </CardContent>
 
-              <CardFooter className="flex flex-col gap-3 mt-6">
+              <div className="flex items-center justify-center my-4">
+                <div className="flex-grow h-px bg-gray-600"></div>
+                <span className="px-4 text-sm text-gray-400">OR</span>
+                <div className="flex-grow h-px bg-gray-600"></div>
+              </div>
+
+              <div className="w-full flex justify-center mt-4">
+                <GoogleLogin
+                  theme="filled_blue"
+                  text="signup_with"
+                  onSuccess={async (credentialResponse) => {
+                    try {
+                      if (credentialResponse.credential) {
+                        const res = await dispatch(
+                          googleAuthLoginUser({
+                            credential: credentialResponse.credential,
+                          })
+                        ).unwrap();
+                        ToastSuccess(res.message);
+
+                        setTimeout(() => {
+                          navigate(from, { replace: true });
+                        }, 3000);
+                      }
+                    } catch (err: any) {
+                      console.error("Google Auth API Error: ", err);
+                      const errorMsg =
+                        err.response.data.message ||
+                        "Something went wrong with login";
+                      ToastError(errorMsg);
+                    }
+                  }}
+                  onError={() => {
+                    ToastError("Google Login Failed at Google Auth step");
+                  }}
+                />
+              </div>
+
+              <CardFooter className="flex flex-col gap-3 mt-4">
                 <p className="text-sm text-center text-zinc-400">
                   Already a CodeWarrior?{" "}
                   <Link

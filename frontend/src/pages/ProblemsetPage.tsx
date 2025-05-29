@@ -44,7 +44,6 @@ const ProblemsetPage = () => {
   const { userData } = useSelector((state: RootState) => state.auth);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [addProblem, setAddProblem] = useState("");
-
   const searchRef =
     useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
 

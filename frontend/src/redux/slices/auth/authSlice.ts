@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchCurrentUser,
+  googleAuthLoginUser,
   LoginUser,
   LogoutUser,
   registerUser,
@@ -49,6 +50,22 @@ export const authSlice = createSlice({
       state.message = action.payload.message;
     });
     builder.addCase(LoginUser.rejected, (state,_) => {
+      state.isLoading = false;
+      state.isError = true;
+    });
+
+     // google login
+
+    builder.addCase(googleAuthLoginUser.pending, (state, _) => {
+      state.isLoading = true;
+    });
+    builder.addCase(googleAuthLoginUser.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isAuthenticated = true;
+      state.userData = action.payload.data;
+      state.message = action.payload.message;
+    });
+    builder.addCase(googleAuthLoginUser.rejected, (state,_) => {
       state.isLoading = false;
       state.isError = true;
     });
