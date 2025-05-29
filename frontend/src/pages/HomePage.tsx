@@ -110,7 +110,7 @@ const HomePage = () => {
               <img
                 src="coder2.gif"
                 alt="CodeWarrior demo"
-                className="w-full rounded-xl shadow-lg"
+                className="w-full rounded-xl shadow-lg mix-blend-multiply"
                 loading="lazy"
               />
             </div>

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "ts-node-dev --respawn --transpile-only src/index.ts",
     "generate-swagger": "ts-node src/swagger-gen.ts"
   },
   "keywords": [],
@@ -34,6 +34,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "google-auth-library": "^9.15.1",
     "jsonwebtoken": "^9.0.2",
     "mailgen": "^2.0.29",
     "multer": "^1.4.5-lts.2",
