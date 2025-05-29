@@ -20,7 +20,6 @@ export const Header = () => {
   const { userData, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
- 
 
   if (!userData && isAuthenticated) {
     return (
@@ -37,11 +36,13 @@ export const Header = () => {
     );
   }
   const logout = async () => {
-    const result = await dispatch(LogoutUser());
-    if (LogoutUser.fulfilled.match(result)) {
-      ToastSuccess(result.payload);
-    } else {
-      ToastError(`${result.payload}`);
+    try {
+      const result = await dispatch(LogoutUser()).unwrap();
+      ToastSuccess(result);
+    } catch (error: any) {
+      ToastError(
+        error || error?.response?.data?.message || "Something went wrong"
+      );
     }
   };
   return (
@@ -56,8 +57,6 @@ export const Header = () => {
             />
           </Link>
           <div className="hidden md:flex space-x-6">
-           
-
             {/* <Link
               to="/discuss"
               className="hover:text-blue-400 transition-colors"
@@ -93,12 +92,12 @@ export const Header = () => {
             </div>
           )}
 
-           <Link
-              to="/problemset"
-              className="hover:text-blue-400 transition-colors"
-            >
-              Problems
-            </Link>
+          <Link
+            to="/problemset"
+            className="hover:text-blue-400 transition-colors"
+          >
+            Problems
+          </Link>
 
           <Link to="/about" className="hover:text-blue-400 transition-colors">
             About
@@ -114,37 +113,37 @@ export const Header = () => {
 
           {userData ? (
             // <img src={user?.avatar} alt="User Avatar" className="h-12 w-12 rounded-full" />
-            <DropdownMenu >
+            <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0 border-none">
-                <Avatar className=" h-10 w-10 ">
-                  <AvatarImage src={userData.avatar} />
-                  <AvatarFallback className="text-black font-semibold text-xl bg-white">
-                    {userData?.fullName.split("")[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                  <Avatar className=" h-10 w-10 ">
+                    <AvatarImage src={userData.avatar} />
+                    <AvatarFallback className="text-black font-semibold text-xl bg-white">
+                      {userData?.fullName.split("")[0].toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-zinc-900 text-white border-none shadow-sm shadow-neutral-800 z-50">
                 <Link to="/profile">
-                  <DropdownMenuItem className="cursor-pointer"> 
+                  <DropdownMenuItem className="cursor-pointer">
                     <User />
                     Profile
                   </DropdownMenuItem>
                 </Link>
-                 <Link to="/my-list">
-                <DropdownMenuItem className="cursor-pointer">
-                  <List />
-                 
+                <Link to="/my-list">
+                  <DropdownMenuItem className="cursor-pointer">
+                    <List />
                     My List
-                  
-                </DropdownMenuItem>
+                  </DropdownMenuItem>
                 </Link>
-                <DropdownMenuItem variant="destructive" onClick={() => logout()} className="cursor-pointer">
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => logout()}
+                  className="cursor-pointer"
+                >
                   <LogOut />
-                  <div>
-                    Logout
-                  </div>
+                  <div>Logout</div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

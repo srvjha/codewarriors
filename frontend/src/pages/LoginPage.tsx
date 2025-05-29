@@ -10,15 +10,15 @@ import {
 } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Code, Brain, Trophy, Zap, LogIn, EyeOff, Eye } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { LoginFormValues } from "@/utils/ZodResolver";
 import { LoginResolver } from "@/utils/ZodResolver";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "@/redux/store";
 import { LoginUser } from "@/redux/slices/auth/authThunks";
 
 const fadeUp = {
@@ -43,7 +43,7 @@ const featureItem = {
 
 const LoginPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const {isLoading} = useSelector((state: RootState) => state.auth);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -52,20 +52,27 @@ const LoginPage = () => {
   } = useForm<LoginFormValues>({ resolver: LoginResolver });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
   const onSubmit = handleSubmit(async (data: LoginFormValues) => {
     await LoginUserFunction(data);
   });
 
   const LoginUserFunction = async (userInfo: LoginFormValues) => {
-    const result = await dispatch(LoginUser(userInfo));
-    if (LoginUser.fulfilled.match(result)) {
-      ToastSuccess(result.payload.message);
+    try {
+      setIsLoading(true);
+      const result = await dispatch(LoginUser(userInfo)).unwrap();
+      ToastSuccess(result.message);
       setTimeout(() => {
         reset();
-        navigate("/");
+        navigate(from, { replace: true });
       }, 3000);
-    } else {
-      ToastError(`${result.payload}`);
+    } catch (error: any) {
+      ToastError(
+        error || error?.response?.data?.message || "Something went wrong"
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -208,7 +215,6 @@ const LoginPage = () => {
                     </div>
 
                     <div className="flex items-center justify-start">
-                      
                       <Link
                         to="/forgot-password"
                         className="text-sm text-blue-400 hover:text-blue-300 hover:underline"

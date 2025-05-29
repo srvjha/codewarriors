@@ -18,16 +18,16 @@ import {
   EyeOff,
   Eye,
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { FormValues } from "@/utils/ZodResolver";
 import { resolver } from "@/utils/ZodResolver";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { registerUser } from "@/redux/slices/auth/authThunks";
-import type { AppDispatch, RootState } from "@/redux/store";
+import type { AppDispatch } from "@/redux/store";
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -50,7 +50,7 @@ const featureItem = {
 
 const RegisterPage = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const {isLoading} = useSelector((state: RootState) => state.auth);
+ const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -59,6 +59,8 @@ const RegisterPage = () => {
   } = useForm<FormValues>({ resolver });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
 
   const onSubmit = handleSubmit(async (data: FormValues) => {
    const formData = new FormData();
@@ -74,15 +76,20 @@ const RegisterPage = () => {
   });
 
   const registerUserFunction = async (userInfo: FormData) => {
-    const result = await dispatch(registerUser(userInfo));
-    if (registerUser.fulfilled.match(result)) {
-      ToastSuccess(result.payload.message);
+    try{
+       setIsLoading(true);
+    const result = await dispatch(registerUser(userInfo)).unwrap();
+      ToastSuccess(result.message);
       setTimeout(() => {
         reset();
-        navigate("/");
-      }, 4000);
-    } else {
-      ToastError(`${result.payload}`);
+        navigate(from, { replace: true });
+      }, 3000);
+    } catch(error:any) {
+      ToastError(
+        error || error?.response?.data?.message || "Something went wrong"
+      )
+    }finally{
+       setIsLoading(false);
     }
   };
 

@@ -63,15 +63,6 @@ const App = () => {
         />
 
         <Route
-          path="/about"
-          element={
-            <PrivateRoute>
-              <About />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
           path="/discuss"
           element={
             <PrivateRoute>
@@ -138,6 +129,7 @@ const App = () => {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/about" element={<About />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
