@@ -564,17 +564,7 @@ const ProblemPage = () => {
                         {results?.time}
                       </div>
 
-                      <div
-                        className="text-[#2563eb] bg-clip-text flex cursor-pointer text-sm gap-0.5 "
-                        style={{
-                          backgroundImage:
-                            "linear-gradient(to right, rgb(175, 82, 222), rgb(0, 122, 255))",
-                          WebkitTextFillColor: "transparent",
-                        }}
-                        onClick={()=>handleComplexity("time")}
-                      > <Sparkles size={16} className="mt-0.5 text-purple-500" />
-                        Analyze Complexity
-                      </div>
+                    
                     </div>
                     <div className="bg-white/8  p-4 rounded-lg shadow space-y-2">
                       <div className="text-sm text-neutral-300 flex gap-1">
@@ -585,19 +575,21 @@ const ProblemPage = () => {
                         {results?.memory}
                       </div>
 
-                       <div
-                        className="text-[#2563eb] bg-clip-text flex cursor-pointer text-sm gap-0.5  "
+                      
+                    </div>
+                  </div>
+
+                    <div
+                        className="text-[#061a45] bg-clip-text cursor-pointer text-lg font-semibold gap-0.5 px-2 -mt-2 hidden"
                         style={{
                           backgroundImage:
                             "linear-gradient(to right, rgb(175, 82, 222), rgb(0, 122, 255))",
                           WebkitTextFillColor: "transparent",
                         }}
-                         onClick={()=>handleComplexity("space")}
-                      > <Sparkles size={16} className="mt-0.5 text-purple-500" />
+                        onClick={()=>handleComplexity("time")}
+                      > <Sparkles size={20} className="mt-0.5 text-purple-500" />
                         Analyze Complexity
                       </div>
-                    </div>
-                  </div>
 
                   <div className=" p-4 rounded-lg bg-gradient-to-br from-[#232323] to-[#1A1A1A] ">
                     <div className="text-sm text-gray-400 mb-2">
