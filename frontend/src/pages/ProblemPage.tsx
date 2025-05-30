@@ -242,6 +242,7 @@ const ProblemPage = () => {
 
    const handleComplexity = (type:string)=>{
     // send the code snippet and get the time complexity
+    console.log("type: ",type)
    }
 
   return (
