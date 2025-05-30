@@ -16,6 +16,7 @@ import {
 import { upload } from "../middleware/multer.middleware";
 import { verifyUser } from "../middleware/auth.middleware";
 import { checkRole } from "../middleware/permission.middleware";
+import { getTimeComplexity } from "../controllers/ai.controller";
 
 const router = Router();
 
@@ -31,5 +32,6 @@ router.get("/refresh", refreshAccessToken);
 router.get("/logout", verifyUser, logoutUser);
 router.get("/all/users", verifyUser, checkRole, allUsers);
 router.post("/google-auth",googleLogin)
+router.post("/get-complexity",getTimeComplexity)
 
 export default router;

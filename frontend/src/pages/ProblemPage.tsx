@@ -20,6 +20,7 @@ import {
   Timer,
   Cpu,
   X,
+  Sparkles,
 } from "lucide-react";
 
 import {
@@ -239,11 +240,15 @@ const ProblemPage = () => {
     );
   };
 
+   const handleComplexity = (type:string)=>{
+    // send the code snippet and get the time complexity
+   }
+
   return (
     <div className=" text-white -mt-2 ">
       <div className="flex flex-row p-4 gap-2">
         {/* Left Panel */}
-        <div className="bg-[#242222] w-1/2 h-[calc(100vh-80px)] rounded-lg flex flex-col shadow-lg overflow-hidden">
+        <div className="bg-[#242222] w-1/2 h-[calc(100vh-80px)] rounded-lg flex flex-col shadow-lg overflow-hidden ">
           <div className="bg-[#2d2d2d] border-b border-gray-700 flex space-x-1 px-2 py-1">
             <button
               className={`flex items-center px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
@@ -323,7 +328,7 @@ const ProblemPage = () => {
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6 hide-scrollbar">
             {activeTab === "description" && (
               <div>
                 <h1 className="text-xl font-medium">{problem.title}</h1>
@@ -548,19 +553,47 @@ const ProblemPage = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6  p-4 rounded-lg">
-                    <div className="bg-gradient-to-br from-[#232323] to-[#1A1A1A] p-4 rounded-lg shadow space-y-2">
-                      <div className="text-sm text-gray-400">Runtime</div>
-                      <div className="text-xl font-bold text-green-400 flex items-center gap-2">
-                        <Timer size={18} />
+                  <div className="grid grid-cols-1 md:grid-cols-2  gap-6  p-2 rounded-lg">
+                    <div className="bg-white/8 p-4 rounded-lg shadow space-y-2">
+                      <div className="text-sm text-neutral-300 flex gap-1">
+                        <Timer size={17} className="text-green-500" />
+                        Runtime
+                      </div>
+                      <div className="text-lg font-bold text-neutral-300 flex items-center gap-2">
                         {results?.time}
                       </div>
+
+                      <div
+                        className="text-[#2563eb] bg-clip-text flex cursor-pointer text-sm gap-0.5 "
+                        style={{
+                          backgroundImage:
+                            "linear-gradient(to right, rgb(175, 82, 222), rgb(0, 122, 255))",
+                          WebkitTextFillColor: "transparent",
+                        }}
+                        onClick={()=>handleComplexity("time")}
+                      > <Sparkles size={16} className="mt-0.5 text-purple-500" />
+                        Analyze Complexity
+                      </div>
                     </div>
-                    <div className="bg-gradient-to-br from-[#232323] to-[#1A1A1A]  p-4 rounded-lg shadow space-y-2">
-                      <div className="text-sm text-gray-400">Memory</div>
-                      <div className="text-xl font-bold text-cyan-400 flex items-center gap-2">
-                        <Cpu size={18} />
+                    <div className="bg-white/8  p-4 rounded-lg shadow space-y-2">
+                      <div className="text-sm text-neutral-300 flex gap-1">
+                        <Cpu size={18} className="text-cyan-500" />
+                        Memory
+                      </div>
+                      <div className="text-lg font-bold text-neutral-300 flex items-center gap-2">
                         {results?.memory}
+                      </div>
+
+                       <div
+                        className="text-[#2563eb] bg-clip-text flex cursor-pointer text-sm gap-0.5  "
+                        style={{
+                          backgroundImage:
+                            "linear-gradient(to right, rgb(175, 82, 222), rgb(0, 122, 255))",
+                          WebkitTextFillColor: "transparent",
+                        }}
+                         onClick={()=>handleComplexity("space")}
+                      > <Sparkles size={16} className="mt-0.5 text-purple-500" />
+                        Analyze Complexity
                       </div>
                     </div>
                   </div>

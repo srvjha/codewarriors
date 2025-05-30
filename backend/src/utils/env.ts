@@ -29,7 +29,8 @@ const createEnv = (env: NodeJS.ProcessEnv) => {
     CLOUDINARY_API_SECRET: z.string().nonempty(),
 
     JUDGE0_API_URL: z.string().nonempty(),
-    GOOGLE_CLIENT_ID: z.string().nonempty()
+    GOOGLE_CLIENT_ID: z.string().nonempty(),
+    GEMINI_API_KEY:z.string().nonempty()
   });
 
   const validationResult = envSchema.safeParse(env);
