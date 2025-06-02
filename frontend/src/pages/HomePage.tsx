@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
 import CodeEditor from "@/components/ui/CodeEditor";
 import { Link } from "react-router-dom";
 import {
@@ -52,17 +51,17 @@ const HomePage = () => {
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link to="/problemset">
-                <Button className="text-lg px-6 py-6 bg-blue-600 hover:bg-blue-500 rounded-lg">
+                <Button className="text-lg px-6 py-6 cursor-pointer bg-blue-600 hover:bg-blue-500 rounded-lg">
                   Start Solving
                 </Button>
               </Link>
 
               <Link to={isAuthenticated ? "/" : "/login"}>
                 <Button
-                  variant="outline"
-                  className="text-lg px-6 py-6 border-gray-700 hover:bg-zinc-800"
+                  
+                  className="text-lg cursor-pointer px-6 py-6 bg-neutral-800  border-gray-700 hover:bg-neutral-900"
                 >
-                  Join Codewarrior <ChevronRight className="ml-2 h-4 w-4" />
+                  Join Codewarrior 
                 </Button>
               </Link>
             </div>

@@ -47,7 +47,7 @@ const MyEditor: React.FC<MyEditorProps> = ({ codeSnippet,language,onCodeChange }
 
   return (
     <Editor
-      height="80%"
+      height="100%"
       language={selectedLanguage.toLowerCase()} 
       value={code}
       onChange={handleEditorChange}

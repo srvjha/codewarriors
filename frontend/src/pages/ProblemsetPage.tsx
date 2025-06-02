@@ -184,8 +184,8 @@ const ProblemsetPage = () => {
         </div>
         {userData?.role === "ADMIN" && (
           <Link to="/create/problem">
-            <Button variant="primary">
-              Create Problem <CirclePlus className="ml-2" />
+            <Button variant="secondary" className="text-sm mr-2 cursor-pointer">
+              Create Problem <CirclePlus />
             </Button>
           </Link>
         )}

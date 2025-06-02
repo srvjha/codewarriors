@@ -24,42 +24,61 @@ const ProgressChart = ({ progressData }: P) => {
     getAllProblems();
   }, []);
 
- const problemsData = problemData.reduce((acc, problem) => {
-     const difficulty = problem.difficulty;
- 
-     if (difficulty === "EASY") acc.totalEasyProblems += 1;
-     else if (difficulty === "MEDIUM") acc.totalMedProblems+= 1;
-     else if (difficulty === "HARD") acc.totalHardProblems += 1;
- 
-     return acc;
- }, {
-     
-     totalEasyProblems: 0,
-     totalMedProblems: 0,
-     totalHardProblems: 0,
-     totalProblems: 0
- });
+  const problemsData = problemData.reduce(
+    (acc, problem) => {
+      const difficulty = problem.difficulty;
 
- problemsData.totalProblems = problemsData.totalEasyProblems + problemsData.totalMedProblems + problemsData.totalMedProblems
+      if (difficulty === "EASY") acc.totalEasyProblems += 1;
+      else if (difficulty === "MEDIUM") acc.totalMedProblems += 1;
+      else if (difficulty === "HARD") acc.totalHardProblems += 1;
+
+      return acc;
+    },
+    {
+      totalEasyProblems: 0,
+      totalMedProblems: 0,
+      totalHardProblems: 0,
+      totalProblems: 0,
+    }
+  );
+
+  problemsData.totalProblems =
+    problemsData.totalEasyProblems +
+    problemsData.totalMedProblems +
+    problemsData.totalMedProblems;
 
   const totalSolved = progressData.solvedProblems;
 
-  const data = {
-    labels: ["Easy", "Medium", "Hard"],
-    datasets: [
-      {
-        data: [
-          progressData.easyProblems,
-          progressData.medProblems,
-          progressData.hardProblems,
-        ],
-        backgroundColor: ["#00bfa6", "#f9a825", "#c62828"],
-        borderWidth: 0,
-        cutout: "90%",
-        radius: "90%",
-      },
-    ],
-  };
+  const data =
+    totalSolved > 0
+      ? {
+          labels: ["Easy", "Medium", "Hard"],
+          datasets: [
+            {
+              data: [
+                progressData.easyProblems,
+                progressData.medProblems,
+                progressData.hardProblems,
+              ],
+              backgroundColor: ["#00bfa6", "#f9a825", "#c62828"],
+              borderWidth: 0,
+              cutout: "90%",
+              radius: "90%",
+            },
+          ],
+        }
+      : {
+          labels: ["No Data"],
+          datasets: [
+            {
+              data: [1],
+              backgroundColor: ["#484d54"],
+              borderWidth: 0,
+              cutout: "90%",
+              radius: "90%",
+            },
+          ],
+        };
 
   const options = {
     plugins: {
@@ -103,21 +122,27 @@ const ProgressChart = ({ progressData }: P) => {
           <span className="ml-2 text-white font-bold">
             {progressData.easyProblems}
           </span>
-          <span className="ml-1 text-white">/{problemsData.totalEasyProblems}</span>
+          <span className="ml-1 text-white">
+            /{problemsData.totalEasyProblems}
+          </span>
         </div>
         <div className="bg-neutral-900 px-4 py-2 rounded-md text-[#f9a825] text-sm font-medium flex justify-between">
           <span>Med.</span>
           <span className="ml-2 text-white font-bold">
             {progressData.medProblems}
           </span>
-          <span className="ml-1 text-white">/{problemsData.totalMedProblems}</span>
+          <span className="ml-1 text-white">
+            /{problemsData.totalMedProblems}
+          </span>
         </div>
         <div className="bg-neutral-900 px-4 py-2 rounded-md text-[#c62828] text-sm font-medium flex justify-between">
           <span>Hard</span>
           <span className="ml-2 text-white font-bold">
             {progressData.hardProblems}
           </span>
-          <span className="ml-1 text-white">/{problemsData.totalHardProblems}</span>
+          <span className="ml-1 text-white">
+            /{problemsData.totalHardProblems}
+          </span>
         </div>
       </div>
     </div>

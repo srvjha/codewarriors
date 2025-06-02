@@ -119,7 +119,7 @@ const CreateProblemForm = () => {
       <div className="max-w-5xl mx-auto p-8 text-white">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="bg-[#131212] rounded-2xl shadow-md p-8 space-y-10 shadow-blue-400 border border-blue-400"
+          className="bg-[#131212] rounded-2xl shadow-md p-8 space-y-10 shadow-neutral-800 border border-neutral-800"
         >
           <h1 className="text-3xl font-bold flex items-center gap-3 text-white">
             <FileText className="w-6 h-6 text-blue-500" />
@@ -188,14 +188,13 @@ const CreateProblemForm = () => {
                 <CheckCircle2 className="w-5 h-5" /> Examples
               </h3>
               <Button
-                type="button"
-                variant="outline"
+               variant="secondary"
                 onClick={() =>
                   appendExample({ input: "", output: "", explanation: "" })
                 }
-                className="text-white border-white"
+               
               >
-                <Plus className="w-4 h-4 mr-1" /> Add Examples
+                <Plus className="w-4 h-4" /> Add Examples
               </Button>
             </div>
 
@@ -235,12 +234,11 @@ const CreateProblemForm = () => {
                 <CheckCircle2 className="w-5 h-5" /> Test Cases
               </h3>
               <Button
-                type="button"
-                variant="outline"
+                variant="secondary"
                 onClick={() => appendTestCase({ input: "", output: "" })}
-                className="text-white border-white"
+                
               >
-                <Plus className="w-4 h-4 mr-1" /> Add Test Case
+                <Plus className="w-4 h-4" /> Add Test Case
               </Button>
             </div>
 

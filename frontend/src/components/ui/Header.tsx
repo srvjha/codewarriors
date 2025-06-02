@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { ClipLoader } from "react-spinners";
 import { TbFlame, TbFlameFilled } from "react-icons/tb";
 
-export const Header = () => {
+export const Header = ({ children }: React.PropsWithChildren) => {
   const dispatch = useDispatch<AppDispatch>();
   const { userData, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
@@ -57,13 +57,24 @@ export const Header = () => {
             />
           </Link>
           <div className="hidden md:flex space-x-6">
-            {/* <Link
+            <Link
+              to="/problemset"
+              className="hover:text-blue-400 transition-colors"
+            >
+              Problems
+            </Link>
+
+            <Link
               to="/discuss"
               className="hover:text-blue-400 transition-colors"
             >
               Discuss
             </Link>
-            <Link
+
+            <Link to="/about" className="hover:text-blue-400 transition-colors">
+              About
+            </Link>
+            {/*  <Link
               to="/pricing"
               className="hover:text-blue-400 transition-colors"
             >
@@ -71,6 +82,8 @@ export const Header = () => {
             </Link> */}
           </div>
         </div>
+        {children && <div className="ml-[160px] -mt-2">{children}</div>}
+
         <div className="flex flex-row items-center gap-5 mr-3">
           {userData && userData?.dailyProblemStreak > 0 ? (
             <div className="flex gap-1">
@@ -92,16 +105,6 @@ export const Header = () => {
             </div>
           )}
 
-          <Link
-            to="/problemset"
-            className="hover:text-blue-400 transition-colors"
-          >
-            Problems
-          </Link>
-
-          <Link to="/about" className="hover:text-blue-400 transition-colors">
-            About
-          </Link>
           {userData?.role === "ADMIN" && (
             <Link
               to="/admin/dashboard"

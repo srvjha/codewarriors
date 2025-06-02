@@ -21,6 +21,9 @@ import PlaylistPage from "./pages/PlaylistPage";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import ResetPasswordPage from "./pages/ResetPassword";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import DiscussCreatePage from "./pages/DiscussCreatePage";
+import DiscussUpdatePage from "./pages/DiscussUpdatePage";
+import PostPage from "./pages/PostPage";
 
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -67,6 +70,31 @@ const App = () => {
           element={
             <PrivateRoute>
               <DiscussPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/discuss/create"
+          element={
+            <PrivateRoute>
+              <DiscussCreatePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/discuss/:postid"
+          element={
+            <PrivateRoute>
+             <PostPage/>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/discuss/edit/:postid"
+          element={
+            <PrivateRoute>
+             <DiscussUpdatePage/>
             </PrivateRoute>
           }
         />
@@ -124,12 +152,13 @@ const App = () => {
             </PrivateRoute>
           }
         />
+
+          <Route path="/about" element={<About />} />
       </Route>
 
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/pricing" element={<PricingPage />} />
-      <Route path="/about" element={<About />} />
       <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );

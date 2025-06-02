@@ -7,21 +7,24 @@ export type FormValues = {
   username: string;
   email: string;
   password: string;
-  avatar?: FileList | null | string; 
+  avatar?: FileList | null | string;
 };
 
 export type LoginFormValues = {
-  email:string,
-  password: string
-}
+  email: string;
+  password: string;
+};
 
 export type PasswordFormValues = {
-  oldPassword:string,
-  newPassword:string,
-  confirmNewPassword:string,
-}
+  oldPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+};
 
-
+export type DiscussFormValues = {
+  title: string;
+  content: string;
+};
 
 export const resolver: Resolver<FormValues> = async (values) => {
   const errors: Record<string, any> = {};
@@ -54,7 +57,7 @@ export const resolver: Resolver<FormValues> = async (values) => {
     };
   }
 
-  // avatar is optional 
+  // avatar is optional
 
   return {
     values: Object.keys(errors).length === 0 ? values : {},
@@ -84,7 +87,9 @@ export const LoginResolver: Resolver<LoginFormValues> = async (values) => {
   };
 };
 
-export const CreateProblemResolver: Resolver<CreateProblemFormValues> = async (values) => {
+export const CreateProblemResolver: Resolver<CreateProblemFormValues> = async (
+  values
+) => {
   const errors: Record<string, any> = {};
 
   if (!values.title) {
@@ -136,7 +141,7 @@ export const CreateProblemResolver: Resolver<CreateProblemFormValues> = async (v
     };
   }
 
-  if(!values.languages){
+  if (!values.languages) {
     errors.languages = {
       type: "required",
       message: "At least one language is required.",
@@ -147,9 +152,11 @@ export const CreateProblemResolver: Resolver<CreateProblemFormValues> = async (v
     values: Object.keys(errors).length === 0 ? values : {},
     errors,
   };
-}
+};
 
-export const PasswordResolver: Resolver<PasswordFormValues> = async (values) => {
+export const PasswordResolver: Resolver<PasswordFormValues> = async (
+  values
+) => {
   const errors: Record<string, any> = {};
 
   if (!values.oldPassword) {
@@ -173,7 +180,29 @@ export const PasswordResolver: Resolver<PasswordFormValues> = async (values) => 
     };
   }
 
-  
+  return {
+    values: Object.keys(errors).length === 0 ? values : {},
+    errors,
+  };
+};
+
+export const DiscussResolver: Resolver<DiscussFormValues> = async (values) => {
+  const errors: Record<string, any> = {};
+
+  if (!values.title) {
+    errors.title = {
+      type: "required",
+      message: "Title is required.",
+    };
+  }
+
+  if (!values.content) {
+    errors.Content = {
+      type: "required",
+      message: "Content is required.",
+    };
+  }
+
   return {
     values: Object.keys(errors).length === 0 ? values : {},
     errors,

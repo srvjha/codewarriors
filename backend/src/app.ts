@@ -26,6 +26,7 @@ import problemRoutes from "./routes/problem.route";
 import executeCode from "./routes/executeCode.route";
 import submissionRoutes from "./routes/submission.route";
 import playlistRoutes from "./routes/playlist.routes";
+import discussionRoutes from "./routes/discussion.route"
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/problem", problemRoutes);
@@ -33,6 +34,7 @@ app.use("/api/v1/execute/code", executeCode);
 app.use("/api/v1/submission", submissionRoutes);
 app.use("/api/v1/playlist", playlistRoutes);
 app.use("/api/v1/health", healthRoutes);
+app.use("/api/v1/discuss",discussionRoutes)
 app.use(errorHandler);
 
 export { app };

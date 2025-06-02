@@ -24,13 +24,14 @@ type Submission = {
 };
 
 const ProfilePage = () => {
-  const { userData } = useSelector((state: RootState) => state.auth);
+  const { userData} = useSelector((state: RootState) => state.auth);
   const username = userData?.username ?? "";
   const fullName = userData?.fullName ?? "";
   const email = userData?.email ?? "";
   const avatar = userData?.avatar ?? "";
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [openModal, setModal] = useState(false);
+   const [loading, setLoading] = useState(true);
 
   const totalProblems = 33;
 
@@ -60,6 +61,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const fetchSubmissions = async () => {
+      setLoading(true)
       try {
         const res = await API.get("/submission/all", {
           withCredentials: true,
@@ -88,6 +90,8 @@ const ProfilePage = () => {
         setSubmissions(uniqueLatestSubmissions.slice(0, 10));
       } catch (error) {
         console.error("Failed to fetch submissions", error);
+      } finally{
+        setLoading(false)
       }
     };
 
@@ -107,6 +111,8 @@ const ProfilePage = () => {
 
   return (
     <div className="flex flex-col items-center min-h-screen  p-4">
+      {loading ? (<div className="text-gray-500 flex justify-center items-center">No Profile Page Found</div>)
+      : 
       <div className="w-full max-w-5xl  p-6 rounded-lg  ">
         <div className="flex items-center gap-4 justify-between mb-6 border-b border-b-gray-700 pb-4">
           <div className="flex items-center gap-4">
@@ -199,6 +205,7 @@ const ProfilePage = () => {
           </ul>
         </div>
       </div>
+}
     </div>
   );
 };

@@ -1,9 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-body{
+body {
   background-color: #111010;
-  color:aliceblue
+  color: aliceblue;
+   pointer-events: auto !important;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -119,6 +120,7 @@ body{
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -131,8 +133,10 @@ body{
 
 /* Hide scrollbar for Firefox */
 .scroll-hidden {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
 }
 
 
@@ -141,10 +145,12 @@ body{
     transform: translateY(0px) scale(1);
     opacity: 0.08;
   }
+
   50% {
     transform: translateY(-10px) scale(1.1);
     opacity: 0.15;
   }
+
   100% {
     transform: translateY(0px) scale(1);
     opacity: 0.08;
@@ -152,20 +158,35 @@ body{
 }
 
 
-.react-calendar-heatmap .color-scale-1 { fill: #d6e685; }
-.react-calendar-heatmap .color-scale-2 { fill: #8cc665; }
-.react-calendar-heatmap .color-scale-3 { fill: #44a340; }
-.react-calendar-heatmap .color-scale-4 { fill: #1e6823; }
-.react-calendar-heatmap .color-scale-0 { fill: #312d2d; }
-.react-calendar-heatmap rect { 
+.react-calendar-heatmap .color-scale-1 {
+  fill: #d6e685;
+}
+
+.react-calendar-heatmap .color-scale-2 {
+  fill: #8cc665;
+}
+
+.react-calendar-heatmap .color-scale-3 {
+  fill: #44a340;
+}
+
+.react-calendar-heatmap .color-scale-4 {
+  fill: #1e6823;
+}
+
+.react-calendar-heatmap .color-scale-0 {
+  fill: #312d2d;
+}
+
+.react-calendar-heatmap rect {
   width: 9px;
   height: 9px;
-   rx:2px;
- }
+  rx: 2px;
+}
 
- .react-calendar-heatmap text {
+.react-calendar-heatmap text {
   fill: rgb(238, 241, 241) !important;
-  font-weight: 600  !important;
+  font-weight: 600 !important;
   font-size: 10px !important;
 }
 
@@ -193,31 +214,91 @@ body{
   animation-iteration-count: infinite;
 }
 
- .blur-bg {
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    background: rgba(15, 23, 42, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .glass-card {
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    background: rgba(30, 41, 59, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  }
+.blur-bg {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
 
 
-  /* Hide scrollbar for Chrome, Safari and Opera */
+/* Hide scrollbar for Chrome, Safari and Opera */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
 /* Hide scrollbar for IE, Edge and Firefox */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+
+}
+
+
+/* Override uiw editor dark theme to match Tailwind's neutral-900 */
+.w-md-editor {
+  background-color: #000000 !important;
+  color: #fff !important;
+  border-color: #130101 !important;
+  box-shadow: none !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: #1f1f1f !important;
+  border-color: #262626 !important;
+}
+
+.w-md-editor-content {
+  background-color: #171717 !important;
+
+}
+
+.w-md-editor-content .w-md-editor-input {
+  background-color: #171717 !important;
+  color: #fff !important;
+}
+
+.wmde-markdown {
+  background-color: transparent !important;
+}
+
+
+
+
+.w-md-editor-preview {
+  background-color: #171717 !important;
+  color: #fff !important;
+}
+
+.w-md-editor-toolbar button {
+  color: #e5e5e5 !important;
+}
+
+.w-md-editor-toolbar button:hover {
+  background-color: #2a2a2a !important;
+}
+
+/* Target all toolbar buttons */
+.w-md-editor-toolbar button {
+  font-size: 18px !important;
+  /* You can increase this to 20px, 22px, etc. */
+  padding: 6px 10px !important;
+  /* Optional: increase padding for bigger buttons */
+}
+
+/* Optional: increase button height */
+.w-md-editor-toolbar {
+  min-height: 50px !important;
 }
 
 
