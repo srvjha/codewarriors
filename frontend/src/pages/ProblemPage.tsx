@@ -23,6 +23,10 @@ import {
   Copy,
   Play,
   SendHorizontal,
+  Lock,
+  Eye,
+  Settings,
+  Share2,
 } from "lucide-react";
 
 import {
@@ -58,6 +62,10 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Header } from "@/components/ui/Header";
+import DiscussWithAI from "@/components/ui/DiscussWithAI";
+import AiChatModal from "@/components/AiChatModal";
+import ComplexityModal from "@/components/ComplexityModal";
+import ViewCode from "@/components/ui/ViewCode";
 const ProblemPage = () => {
   const params = useParams();
   const { problemId } = params;
@@ -80,6 +88,10 @@ const ProblemPage = () => {
   const { userData } = useSelector((state: RootState) => state.auth);
   const [executionType, setExecutionType] = useState<ExecutionStatus>();
   const [defaultCodeSnippet, setDefaultCodeSnippet] = useState("");
+  const [viewCodeStatus, setViewCodeStatus] = useState(false);
+  const [viewCode, setViewCode] = useState("");
+  const [aiChatOpen, setAiChatOpen] = useState(false);
+  const [complexity, setShowComplexity] = useState(false);
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -253,9 +265,11 @@ const ProblemPage = () => {
     );
   };
 
-  const handleComplexity = (type: string) => {
-    // send the code snippet and get the time complexity
-    console.log("type: ", type);
+  const handleComplexity = () => {
+    setShowComplexity(true);
+  };
+  const handleCancelComplexity = () => {
+    setShowComplexity(false);
   };
 
   const handleReset = () => {
@@ -266,6 +280,19 @@ const ProblemPage = () => {
     navigator.clipboard.writeText(content);
   };
 
+  const handleViewCode = (code: string) => {
+    setViewCode(code);
+    setViewCodeStatus(true);
+  };
+  const handleCancel = () => {
+    setViewCodeStatus(false);
+  };
+
+  const handleDiscuss = () => {
+    setAiChatOpen(true);
+    // You can also trigger a chat modal or send code to AI for explanation
+  };
+
   return (
     <>
       <Header>
@@ -274,16 +301,46 @@ const ProblemPage = () => {
             className="bg-[#343131] h-8 hover:bg-[#464242] cursor-pointer text-white rounded-md mr-2 text-sm font-semibold"
             onClick={handleRunCode}
           >
-            {isRunning ? <ClipLoader size={18} color={"#fff"} /> : <><Play size={16} /> Run</>}
+            {isRunning ? (
+              <ClipLoader size={18} color={"#fff"} />
+            ) : (
+              <>
+                <Play size={16} /> Run
+              </>
+            )}
           </Button>
           <Button
             className="bg-green-600 h-8 hover:bg-green-700 cursor-pointer text-white rounded-md text-sm font-semibold"
             onClick={handleSubmitCode}
           >
-            {isSubmitting ? <ClipLoader size={18} color={"#fff"} /> : <><SendHorizontal size={16}  />Submit</>}
+            {isSubmitting ? (
+              <ClipLoader size={18} color={"#fff"} />
+            ) : (
+              <>
+                <SendHorizontal size={16} />
+                Submit
+              </>
+            )}
           </Button>
         </div>
       </Header>
+
+      {viewCodeStatus && (
+        <ViewCode onCancel={handleCancel} codeString={viewCode} />
+      )}
+      <DiscussWithAI onClick={handleDiscuss} />
+      <AiChatModal
+        aiChatOpen={aiChatOpen}
+        setAiChatOpen={setAiChatOpen}
+        userData={userData!}
+        context={problem}
+      />
+      {complexity && (
+        <ComplexityModal
+          onCancel={handleCancelComplexity}
+          sourceCode={codeSnippet}
+        />
+      )}
 
       <div className=" text-white -mt-2 ">
         <ResizablePanelGroup
@@ -479,9 +536,11 @@ const ProblemPage = () => {
                       dangerouslySetInnerHTML={{ __html: problem.editorial }}
                     />
                   ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                      <BookOpen size={48} className="mb-4 opacity-50" />
-                      <p>No editorial available yet.</p>
+                    <div className="w-full h-[70vh]">
+                      <div className="flex flex-col  w-full items-center justify-center h-full text-gray-400">
+                        <BookOpen size={48} className="mb-4 opacity-50" />
+                        <p>No editorial available yet.</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -489,32 +548,39 @@ const ProblemPage = () => {
 
               {activeTab === "solution" && (
                 <div className="flex flex-col  h-full text-gray-400">
-                  <pre className="bg-transparent p-4 rounded-md overflow-x-auto hide-scrollbar">
-                    <p className="text-cyan-100">{selectedLang}:</p>
-                    <div className="flex relative bg-[#2f2f2f] rounded-lg">
-                      <SyntaxHighlighter
-                        class="hide-scrollbar"
-                        language="javascript"
-                        style={materialDark}
-                        wrapLines={true}
-                        wrapLongLines={true}
-                        customStyle={{
-                          borderRadius: "0.5rem",
-                          padding: "1rem",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        {problem.referenceSolutions[selectedLang]}
-                      </SyntaxHighlighter>
-                      <Copy
-                        className=" top-6 right-6 absolute cursor-pointer hover:text-neutral-500 "
-                        size={20}
-                        onClick={() =>
-                          handleCopy(problem.referenceSolutions[selectedLang])
-                        }
-                      />
+                  {executionType === "SUBMIT" ? (
+                    <pre className="bg-transparent p-4 rounded-md overflow-x-auto hide-scrollbar">
+                      <p className="text-cyan-100">{selectedLang}:</p>
+                      <div className="flex relative bg-[#2f2f2f] rounded-lg">
+                        <SyntaxHighlighter
+                          class="hide-scrollbar"
+                          language="javascript"
+                          style={materialDark}
+                          wrapLines={true}
+                          wrapLongLines={true}
+                          customStyle={{
+                            borderRadius: "0.5rem",
+                            padding: "1rem",
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          {problem.referenceSolutions[selectedLang]}
+                        </SyntaxHighlighter>
+                        <Copy
+                          className=" top-6 right-6 absolute cursor-pointer hover:text-neutral-500 "
+                          size={20}
+                          onClick={() =>
+                            handleCopy(problem.referenceSolutions[selectedLang])
+                          }
+                        />
+                      </div>
+                    </pre>
+                  ) : (
+                    <div className="h-full w-full flex flex-col justify-center items-center text-center gap-2 text-gray-500">
+                      <Lock size={48} className="mb-4 opacity-50" />
+                      <p>Solve the problem to see the solution</p>
                     </div>
-                  </pre>
+                  )}
                 </div>
               )}
 
@@ -530,36 +596,59 @@ const ProblemPage = () => {
                       <thead className=" text-gray-400 uppercase text-xs">
                         <tr>
                           <th className="px-4 py-3">Language</th>
-                          <th className="px-4 py-3">Status</th>
-                          <th className="px-4 py-3">Time</th>
-                          <th className="px-4 py-3">Memory</th>
-                          <th className="px-4 py-3">Submitted At</th>
+                          <th className="px-4  py-3">Status</th>
+                          <th className="px-4 py-3 ">Time</th>
+                          <th className="px-4 py-3 text-xs">Memory</th>
+                          <th className="px-4  py-3">Submitted At</th>
+                          <th className="px-4 py-2">Code</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {submissions.map((sub: any, index: number) => (
-                          <tr
-                            key={index}
-                            className={`border-t border-gray-700 `}
-                          >
-                            <td className="px-4 py-3 font-mono">
-                              {sub.language}
-                            </td>
-                            <td className="px-4 py-3 flex items-center gap-2">
-                              {sub.status === "Accepted" ? (
-                                <CheckCircle className="text-green-400 w-4 h-4" />
-                              ) : (
-                                <XCircle className="text-red-400 w-4 h-4" />
-                              )}
-                              {sub.status}
-                            </td>
-                            <td className="px-4 py-3">{sub.time || "--"}</td>
-                            <td className="px-4 py-3">{sub.memory || "--"}</td>
-                            <td className="px-4 py-3 text-sm text-gray-400">
-                              {new Date(sub.createdAt).toLocaleString()}
-                            </td>
-                          </tr>
-                        ))}
+                        {submissions.map(
+                          (sub: SubmissionType, index: number) => (
+                            <tr
+                              key={index}
+                              className={`border-t border-gray-700 `}
+                            >
+                              <td className="px-4 py-3 font-mono">
+                                {sub.language}
+                              </td>
+                              <td className="px-4 py-3 flex items-center gap-2">
+                                {sub.status === "Accepted" ? (
+                                  <CheckCircle className="text-green-400 w-4 h-4" />
+                                ) : (
+                                  <XCircle className="text-red-400 w-4 h-4" />
+                                )}
+                                {sub.status}
+                              </td>
+                              <td className="px-4 py-3 ">
+                                {Number(String(sub.time).split("s").join(" ")) *
+                                  1000 +
+                                  " ms" || "--"}
+                              </td>
+                              <td className="px-4 py-3">
+                                {(() => {
+                                  const memStr = String(sub.memory);
+                                  const memNum = parseFloat(
+                                    memStr.replace(/[^0-9.]/g, "")
+                                  );
+                                  return !isNaN(memNum)
+                                    ? (memNum / 1000).toFixed(2) + " MB"
+                                    : "--";
+                                })()}
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-400">
+                                {new Date(sub.createdAt).toLocaleString()}
+                              </td>
+                              <td
+                                className="text-center  flex justify-center items-center cursor-pointer hover:text-neutral-500"
+                                onClick={() => handleViewCode(sub.sourceCode)}
+                              >
+                                <Eye size={18} />
+                              </td>
+                            </tr>
+                          )
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -631,20 +720,27 @@ const ProblemPage = () => {
                         </div>
                       </div>
                     </div>
-                   {/* hidden ke jgh flex  */}
-                    <div
-                      className="text-[#061a45] hidden bg-clip-text cursor-pointer text-lg font-semibold gap-0.5 px-2 -mt-2"
-                      style={{
-                        backgroundImage:
-                          "linear-gradient(to right, rgb(175, 82, 222), rgb(0, 122, 255))",
-                        WebkitTextFillColor: "transparent",
-                      }}
-                      onClick={() => handleComplexity("time")}
-                    >
-                      {" "}
-                      <Sparkles size={20} className="mt-0.5 text-purple-500" />
-                      Analyze Complexity
-                    </div>
+                    {/* hidden ke jgh flex  */}
+                    {activeTab === "submit" &&
+                      results &&
+                      results.status === "Accepted" && (
+                        <div
+                          className="text-[#061a45] flex bg-clip-text cursor-pointer text-base font-semibold gap-0.5 px-2 -mt-2"
+                          style={{
+                            backgroundImage:
+                              "linear-gradient(to right, rgb(175, 82, 222), rgb(0, 122, 255))",
+                            WebkitTextFillColor: "transparent",
+                          }}
+                          onClick={handleComplexity}
+                        >
+                          {" "}
+                          <Sparkles
+                            size={18}
+                            className="mt-0.5 text-purple-500"
+                          />
+                          Analyze Complexity
+                        </div>
+                      )}
 
                     <div className=" p-4 rounded-lg bg-gradient-to-br from-[#232323] to-[#1A1A1A] ">
                       <div className="text-sm text-gray-400 mb-2">
@@ -687,9 +783,12 @@ const ProblemPage = () => {
                 </button>
               </div>
               <div className="flex items-center">
-                {/* <button className="p-1.5 text-gray-400 hover:text-white hover:bg-[#3e3e3e] rounded-md">
+                <button className="p-1.5 text-gray-400 hover:text-white hover:bg-[#3e3e3e] rounded-md">
                   <Settings size={16} />
-                </button> */}
+                </button>
+                <button className="p-1.5 text-gray-400 hover:text-white hover:bg-[#3e3e3e] rounded-md">
+                  <Share2 size={16} />
+                </button>
               </div>
             </div>
 
@@ -728,226 +827,223 @@ const ProblemPage = () => {
                 </button>
               </div>
             </div>
-             
-             <ResizablePanelGroup 
-             direction="vertical"
-             
-             >
-            <ResizablePanel >
-              {codeSnippet.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                  <RotateCw
-                    size={48}
-                    className="mb-4 opacity-50 animate-spin"
-                  />
-                  <p>Loading code editor...</p>
-                </div>
-              ) : (
-                <MyEditor
-                  codeSnippet={codeSnippet}
-                  language={selectedLang}
-                  onCodeChange={handleCodeUpdate}
-                />
-              )}
-            </ResizablePanel>
-               <ResizableHandle className=" bg-gray-600 " withHandle />
-            <ResizablePanel className="bg-[#2e2e2d] rounded-b-md shadow-inner flex flex-col">
-              <div className="px-4 py-2 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
-                <div className="text-base font-medium flex items-center space-x-2">
-                  <button
-                    className={`flex items-center px-3 py-1 rounded ${
-                      activeResultTab === "testcase"
-                        ? "text-green-500 border-b-2 border-green-500"
-                        : "text-gray-300 hover:text-white"
-                    }`}
-                    onClick={() => setActiveResultTab("testcase")}
-                  >
-                    <SquareCheck className="mr-2" size={20} />
-                    Testcase
-                  </button>
-                  <span className="text-gray-500">|</span>
-                  <button
-                    className={`flex items-center px-3 py-1 rounded ${
-                      activeResultTab === "result"
-                        ? "text-green-500 border-b-2 border-green-500"
-                        : "text-gray-300 hover:text-white"
-                    }`}
-                    onClick={() => setActiveResultTab("result")}
-                    disabled={isRunning}
-                  >
-                    <ChevronRight className="mr-2" size={20} />
-                    {isRunning ? (
-                      <span className="flex items-center">
-                        Test Result{" "}
-                        <RotateCw className="ml-2 animate-spin" size={14} />
-                      </span>
-                    ) : (
-                      "Test Result"
-                    )}
-                  </button>
-                </div>
-              </div>
 
-              <div className="flex-1 overflow-hidden">
-                {activeResultTab === "testcase" && (
-                  <div className="h-full overflow-y-auto px-4 py-3 bg-[#212121]">
-                    <div className="flex items-center space-x-2 mb-3 sticky top-0 bg-[#212121] z-10 pb-2">
-                      {testCases.slice(0, 3).map((_, index) => (
-                        <button
-                          key={index}
-                          className={`h-8 px-3 text-sm font-medium rounded-md ${
-                            activeTestCase === index + 1
-                              ? "bg-[#3e3e3e] text-white hover:bg-[#3e3e3e]"
-                              : "text-gray-400 bg-transparent hover:bg-[#3e3e3e]"
-                          }`}
-                          onClick={() => setActiveTestCase(index + 1)}
-                        >
-                          Case {index + 1}
-                        </button>
-                      ))}
-                      <button className="px-2 py-1 text-gray-400 hover:bg-[#3e3e3e] rounded-md">
-                        +
-                      </button>
-                    </div>
-
-                    {testCases.length > 0 && (
-                      <div className="space-y-4">
-                        <div>
-                          <label className="text-sm text-gray-400 font-semibold mb-1 block">
-                            Input
-                          </label>
-                          <div className="bg-[#363535] px-3 py-2 rounded-md text-white text-sm w-full font-mono">
-                            {testCases[activeTestCase - 1]?.input || ""}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="text-sm text-gray-400 font-semibold mb-1 block">
-                            Output
-                          </label>
-                          <div className="bg-[#363535] px-3 py-2 rounded-md text-white text-sm w-full font-mono">
-                            {testCases[activeTestCase - 1]?.output || ""}
-                          </div>
-                        </div>
-                      </div>
-                    )}
+            <ResizablePanelGroup direction="vertical">
+              <ResizablePanel>
+                {codeSnippet.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <RotateCw
+                      size={48}
+                      className="mb-4 opacity-50 animate-spin"
+                    />
+                    <p>Loading code editor...</p>
                   </div>
+                ) : (
+                  <MyEditor
+                    codeSnippet={codeSnippet}
+                    language={selectedLang}
+                    onCodeChange={handleCodeUpdate}
+                  />
                 )}
+              </ResizablePanel>
+              <ResizableHandle className=" bg-gray-600 " withHandle />
+              <ResizablePanel className="bg-[#2e2e2d] rounded-b-md shadow-inner flex flex-col">
+                <div className="px-4 py-2 flex items-center justify-between border-b border-gray-700 flex-shrink-0">
+                  <div className="text-base font-medium flex items-center space-x-2">
+                    <button
+                      className={`flex items-center px-3 py-1 rounded ${
+                        activeResultTab === "testcase"
+                          ? "text-green-500 border-b-2 border-green-500"
+                          : "text-gray-300 hover:text-white"
+                      }`}
+                      onClick={() => setActiveResultTab("testcase")}
+                    >
+                      <SquareCheck className="mr-2" size={20} />
+                      Testcase
+                    </button>
+                    <span className="text-gray-500">|</span>
+                    <button
+                      className={`flex items-center px-3 py-1 rounded ${
+                        activeResultTab === "result"
+                          ? "text-green-500 border-b-2 border-green-500"
+                          : "text-gray-300 hover:text-white"
+                      }`}
+                      onClick={() => setActiveResultTab("result")}
+                      disabled={isRunning}
+                    >
+                      <ChevronRight className="mr-2" size={20} />
+                      {isRunning ? (
+                        <span className="flex items-center">
+                          Test Result{" "}
+                          <RotateCw className="ml-2 animate-spin" size={14} />
+                        </span>
+                      ) : (
+                        "Test Result"
+                      )}
+                    </button>
+                  </div>
+                </div>
 
-                {activeResultTab === "result" && (
-                  <div className="h-full scroll-hidden overflow-y-scroll px-4 py-3">
-                    {isRunning ? (
-                      <div className="flex flex-col items-center justify-center h-40">
-                        <RotateCw
-                          className="animate-spin text-blue-500 mb-3"
-                          size={24}
-                        />
-                        <p className="text-green-500">Running code...</p>
+                <div className="flex-1 overflow-hidden">
+                  {activeResultTab === "testcase" && (
+                    <div className="h-full overflow-y-auto px-4 py-3 bg-[#212121]">
+                      <div className="flex items-center space-x-2 mb-3 sticky top-0 bg-[#212121] z-10 pb-2">
+                        {testCases.slice(0, 3).map((_, index) => (
+                          <button
+                            key={index}
+                            className={`h-8 px-3 text-sm font-medium rounded-md ${
+                              activeTestCase === index + 1
+                                ? "bg-[#3e3e3e] text-white hover:bg-[#3e3e3e]"
+                                : "text-gray-400 bg-transparent hover:bg-[#3e3e3e]"
+                            }`}
+                            onClick={() => setActiveTestCase(index + 1)}
+                          >
+                            Case {index + 1}
+                          </button>
+                        ))}
+                        <button className="px-2 py-1 text-gray-400 hover:bg-[#3e3e3e] rounded-md">
+                          +
+                        </button>
                       </div>
-                    ) : results ? (
-                      <div className="space-y-4 ">
-                        <div className="flex items-center justify-between">
-                          <StatusIndicator status={results.status} />
-                          <div className="flex items-center text-gray-300 text-sm">
-                            <Clock size={16} className="mr-1" />
-                            Runtime: {results.time}
-                          </div>
-                        </div>
 
-                        <div className=" rounded-md overflow-hidden">
-                          <table className="w-full text-sm">
-                            <thead>
-                              <tr>
-                                <th className="py-2 px-3 text-left text-gray-300">
-                                  Test Case
-                                </th>
-                                <th className="py-2 px-3 text-left text-gray-300">
-                                  Status
-                                </th>
-                                <th className="py-2 px-3 text-left text-gray-300">
-                                  Runtime
-                                </th>
-                                <th className="py-2 px-3 text-left text-gray-300">
-                                  Memory
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {results.testCases
-                                ?.slice(0, 3)
-                                .map(
-                                  (
-                                    result: TestCaseResultType,
-                                    index: number
-                                  ) => (
-                                    <tr
-                                      key={index}
-                                      className="border-t border-gray-700"
-                                    >
-                                      <td className="py-2 px-3 text-gray-300">
-                                        Case {result.testCases}
-                                      </td>
-                                      <td className="py-2 px-3">
-                                        {result.passedTestCases ? (
-                                          <span className="text-green-500 flex items-center">
-                                            <CheckCircle
-                                              size={14}
-                                              className="mr-1"
-                                            />
-                                            Accepted
-                                          </span>
-                                        ) : (
-                                          <span className="text-red-500 flex items-center">
-                                            <XOctagon
-                                              size={14}
-                                              className="mr-1"
-                                            />
-                                            Wrong Answer
-                                          </span>
-                                        )}
-                                      </td>
-                                      <td className="py-2 px-3 text-gray-300">
-                                        {result.time}
-                                      </td>
-                                      <td className="py-2 px-3 text-gray-300">
-                                        {result.memory}
-                                      </td>
-                                    </tr>
-                                  )
-                                )}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-medium text-gray-300 mb-2">
-                            Output:
-                          </h3>
-                          <div className="bg-[#363535] px-3 py-2 rounded-md text-white text-sm font-mono whitespace-pre">
-                            {JSON.parse(results.stdout) || "No output"}
-                          </div>
-                        </div>
-
-                        {results.stderr && (
+                      {testCases.length > 0 && (
+                        <div className="space-y-4">
                           <div>
-                            <h3 className="text-sm font-medium text-red-400 mb-2">
-                              Error:
-                            </h3>
-                            <div className="bg-[#3a2c2c] px-3 py-2 rounded-md text-red-300 text-sm font-mono whitespace-pre">
-                              {results.stderr}
+                            <label className="text-sm text-gray-400 font-semibold mb-1 block">
+                              Input
+                            </label>
+                            <div className="bg-[#363535] px-3 py-2 rounded-md text-white text-sm w-full font-mono">
+                              {testCases[activeTestCase - 1]?.input || ""}
                             </div>
                           </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-40 text-gray-400">
-                        <p>Run your code to see results</p>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </ResizablePanel>
+
+                          <div>
+                            <label className="text-sm text-gray-400 font-semibold mb-1 block">
+                              Output
+                            </label>
+                            <div className="bg-[#363535] px-3 py-2 rounded-md text-white text-sm w-full font-mono">
+                              {testCases[activeTestCase - 1]?.output || ""}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {activeResultTab === "result" && (
+                    <div className="h-full scroll-hidden overflow-y-scroll px-4 py-3">
+                      {isRunning ? (
+                        <div className="flex flex-col items-center justify-center h-40">
+                          <RotateCw
+                            className="animate-spin text-blue-500 mb-3"
+                            size={24}
+                          />
+                          <p className="text-green-500">Running code...</p>
+                        </div>
+                      ) : results ? (
+                        <div className="space-y-4 ">
+                          <div className="flex items-center justify-between">
+                            <StatusIndicator status={results.status} />
+                            <div className="flex items-center text-gray-300 text-sm">
+                              <Clock size={16} className="mr-1" />
+                              Runtime: {results.time}
+                            </div>
+                          </div>
+
+                          <div className=" rounded-md overflow-hidden">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr>
+                                  <th className="py-2 px-3 text-left text-gray-300">
+                                    Test Case
+                                  </th>
+                                  <th className="py-2 px-3 text-left text-gray-300">
+                                    Status
+                                  </th>
+                                  <th className="py-2 px-3 text-left text-gray-300">
+                                    Runtime
+                                  </th>
+                                  <th className="py-2 px-3 text-left text-gray-300">
+                                    Memory
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {results.testCases
+                                  ?.slice(0, 3)
+                                  .map(
+                                    (
+                                      result: TestCaseResultType,
+                                      index: number
+                                    ) => (
+                                      <tr
+                                        key={index}
+                                        className="border-t border-gray-700"
+                                      >
+                                        <td className="py-2 px-3 text-gray-300">
+                                          Case {result.testCases}
+                                        </td>
+                                        <td className="py-2 px-3">
+                                          {result.passedTestCases ? (
+                                            <span className="text-green-500 flex items-center">
+                                              <CheckCircle
+                                                size={14}
+                                                className="mr-1"
+                                              />
+                                              Accepted
+                                            </span>
+                                          ) : (
+                                            <span className="text-red-500 flex items-center">
+                                              <XOctagon
+                                                size={14}
+                                                className="mr-1"
+                                              />
+                                              Wrong Answer
+                                            </span>
+                                          )}
+                                        </td>
+                                        <td className="py-2 px-3 text-gray-300">
+                                          {result.time}
+                                        </td>
+                                        <td className="py-2 px-3 text-gray-300">
+                                          {result.memory}
+                                        </td>
+                                      </tr>
+                                    )
+                                  )}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <div>
+                            <h3 className="text-sm font-medium text-gray-300 mb-2">
+                              Output:
+                            </h3>
+                            <div className="bg-[#363535] px-3 py-2 rounded-md text-white text-sm font-mono whitespace-pre">
+                              {JSON.parse(results.stdout) || "No output"}
+                            </div>
+                          </div>
+
+                          {results.stderr && (
+                            <div>
+                              <h3 className="text-sm font-medium text-red-400 mb-2">
+                                Error:
+                              </h3>
+                              <div className="bg-[#3a2c2c] px-3 py-2 rounded-md text-red-300 text-sm font-mono whitespace-pre">
+                                {results.stderr}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-40 text-gray-400">
+                          <p>Run your code to see results</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </ResizablePanel>
             </ResizablePanelGroup>
           </ResizablePanel>
         </ResizablePanelGroup>

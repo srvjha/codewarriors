@@ -1,93 +1,42 @@
+
 import type { CreateProblemFormValues } from "@/types/createProblem/createProblemTypes";
-import type { Resolver } from "react-hook-form";
 import { z } from "zod";
+import type { Resolver } from "react-hook-form";
 
-export type FormValues = {
-  fullName: string;
-  username: string;
-  email: string;
-  password: string;
-  avatar?: FileList | null | string;
-};
+export const FormSchema = z.object({
+  fullName: z.string().nonempty("Full name is required."),
+  username: z.string().nonempty("Username is required."),
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().nonempty("Password is required."),
+  avatar: z.any().optional(),
+});
 
-export type LoginFormValues = {
-  email: string;
-  password: string;
-};
+export type FormValues = z.infer<typeof FormSchema>;
 
-export type PasswordFormValues = {
-  oldPassword: string;
-  newPassword: string;
-  confirmNewPassword: string;
-};
+export const LoginSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().nonempty("Password is required."),
+});
 
-export type DiscussFormValues = {
-  title: string;
-  content: string;
-};
+export type LoginFormValues = z.infer<typeof LoginSchema>;
 
-export const resolver: Resolver<FormValues> = async (values) => {
-  const errors: Record<string, any> = {};
 
-  if (!values.fullName) {
-    errors.fullName = {
-      type: "required",
-      message: "Full name is required.",
-    };
-  }
+export const PasswordSchema = z.object({
+  oldPassword: z.string().nonempty("Old Password is required."),
+  newPassword: z.string().nonempty("New Password is required."),
+  confirmNewPassword: z.string().nonempty("Confirm New Password is required."),
+});
 
-  if (!values.username) {
-    errors.username = {
-      type: "required",
-      message: "Username is required.",
-    };
-  }
+export type PasswordFormValues = z.infer<typeof PasswordSchema>;
 
-  if (!values.email) {
-    errors.email = {
-      type: "required",
-      message: "Email is required.",
-    };
-  }
+export const DiscussSchema = z.object({
+  title: z.string().nonempty("Title is required."),
+  content: z.string().nonempty("Content is required."),
+});
 
-  if (!values.password) {
-    errors.password = {
-      type: "required",
-      message: "Password is required.",
-    };
-  }
+export type DiscussFormValues = z.infer<typeof DiscussSchema>;
 
-  // avatar is optional
-
-  return {
-    values: Object.keys(errors).length === 0 ? values : {},
-    errors,
-  };
-};
-
-export const LoginResolver: Resolver<LoginFormValues> = async (values) => {
-  const errors: Record<string, any> = {};
-
-  if (!values.email) {
-    errors.email = {
-      type: "required",
-      message: "Email is required.",
-    };
-  }
-
-  if (!values.password) {
-    errors.password = {
-      type: "required",
-      message: "Password is required.",
-    };
-  }
-  return {
-    values: Object.keys(errors).length === 0 ? values : {},
-    errors,
-  };
-};
-
-export const CreateProblemResolver: Resolver<CreateProblemFormValues> = async (
+export const CreateProblemSchema: Resolver<CreateProblemFormValues> = async (
   values
 ) => {
   const errors: Record<string, any> = {};
@@ -154,60 +103,6 @@ export const CreateProblemResolver: Resolver<CreateProblemFormValues> = async (
   };
 };
 
-export const PasswordResolver: Resolver<PasswordFormValues> = async (
-  values
-) => {
-  const errors: Record<string, any> = {};
-
-  if (!values.oldPassword) {
-    errors.oldPassword = {
-      type: "required",
-      message: "Old Password is required.",
-    };
-  }
-
-  if (!values.newPassword) {
-    errors.newPassword = {
-      type: "required",
-      message: "New Password is required.",
-    };
-  }
-
-  if (!values.confirmNewPassword) {
-    errors.confirmNewPassword = {
-      type: "required",
-      message: "Confirm New Password is required.",
-    };
-  }
-
-  return {
-    values: Object.keys(errors).length === 0 ? values : {},
-    errors,
-  };
-};
-
-export const DiscussResolver: Resolver<DiscussFormValues> = async (values) => {
-  const errors: Record<string, any> = {};
-
-  if (!values.title) {
-    errors.title = {
-      type: "required",
-      message: "Title is required.",
-    };
-  }
-
-  if (!values.content) {
-    errors.Content = {
-      type: "required",
-      message: "Content is required.",
-    };
-  }
-
-  return {
-    values: Object.keys(errors).length === 0 ? values : {},
-    errors,
-  };
-};
 
 export const ForgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -215,8 +110,16 @@ export const ForgotPasswordSchema = z.object({
 
 export type ForgotPasswordFormValues = z.infer<typeof ForgotPasswordSchema>;
 
+export const ResetForgotPasswordSchema = z.object({
+  password: z.string().nonempty("Password is required"),
+});
+
+export type ResetForgotPasswordFormValues = z.infer<typeof ResetForgotPasswordSchema>;
+
+
 export const ResetPasswordSchema = z.object({
   password: z.string().nonempty("Password Required!"),
 });
 
 export type ResetPasswordFormValues = z.infer<typeof ResetPasswordSchema>;
+

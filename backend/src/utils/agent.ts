@@ -1,9 +1,10 @@
 import OpenAI from "openai";
-import { env } from "./env"; 
+import { env } from "./env";
+import { Problem } from "@prisma/client";
 
 const openai = new OpenAI({
   apiKey: env.GEMINI_API_KEY,
-  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/"
+  baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
 });
 
 const system_prompt = `
@@ -50,10 +51,53 @@ Output:
 { "time_complexity": "O(N)", "space_complexity": "O(N)" }
 `;
 
+const chat_system_prompt = `
+You are an AI coding assistant helping users solve coding problems interactively.
+
+Context:
+You will receive a detailed coding problem object, which includes the problem title, description, difficulty, tags, examples, constraints, and other relevant metadata such as hints and editorials. This context helps you understand what the user is trying to solve.
+
+Responsibilities:
+1. Understand the full problem context provided.
+2. Use the problem metadata (like examples, constraints, hints, or code snippets) to guide your responses.
+3. When the user sends a message, help them reason through the problem, clarify doubts, and suggest thought processes or strategies.
+4. DO NOT provide the complete solution, even if asked directly.
+5. If the user asks for the full solution, politely explain that you're here to help them learn and think through the problem instead of just giving the answer.
+6. You may offer hints, breakdowns, algorithmic thinking patterns, or pseudocode — but never the full working code.
+7. If the user is stuck, encourage them with incremental steps or small guiding questions.
+8. Maintain a friendly, supportive, and encouraging tone.
+
+DO NOT:
+- Output code that solves the problem end-to-end.
+- Mention that you're an AI language model.
+- Break the rule of non-disclosure of full solutions under any circumstance.
+
+When replying:
+- Be precise.
+- Be conversational but concise.
+- Base your reply on the user's message and the context of the problem.
+
+Example Behavior:
+
+User Message:
+> I'm trying to solve this but I'm stuck with the loop logic.
+
+Response:
+> You're on the right track. Based on the examples, think about how the loop needs to account for edge cases — especially when the input is empty or has duplicates. Have you tried iterating in reverse or using a set to track seen values?
+
+If asked:
+> Can you just give me the answer?
+
+Response:
+> I want to help you learn how to approach this step-by-step — let's break it down instead. What part are you finding most confusing?
+
+Always encourage deeper thinking rather than shortcut answers.
+`;
+
 export const generateContent = async (code: string) => {
   try {
     const response = await openai.chat.completions.create({
-      model: "gemini-2.0-flash", 
+      model: "gemini-2.0-flash",
       messages: [
         { role: "system", content: system_prompt },
         { role: "user", content: code },
@@ -63,10 +107,31 @@ export const generateContent = async (code: string) => {
 
     console.log("Complexity Analysis Result:");
     console.log(response.choices[0].message?.content);
-    return response.choices[0].message?.content
-  } catch (error) {
+    return response.choices[0].message?.content;
+  } catch (error: any) {
     console.error("Error generating complexity analysis:", error);
   }
 };
 
-export default generateContent;
+export const generateChat = async (message: string, context: Problem) => {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gemini-2.0-flash",
+      messages: [
+        { role: "system", content: chat_system_prompt },
+        {
+          role: "user",
+          content: `Problem Context:\n${JSON.stringify(context)}\n\nUser Question:\n${message}`,
+        },
+      ],
+      temperature: 0.7,
+    });
+
+    console.log(response.choices[0].message?.content);
+    return response.choices[0].message?.content;
+  } catch (error: any) {
+    console.error("Error generating complexity analysis:", error);
+  }
+};
+
+

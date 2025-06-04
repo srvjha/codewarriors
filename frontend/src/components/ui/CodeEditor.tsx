@@ -16,6 +16,10 @@ function findMissingNumber(nums) {
 const numbers = [0, 1, 2, 4, 5];
 const result = findMissingNumber(numbers);
 console.log('Missing Number:', result);
+
+const numbers = [0, 1, 2, 3, 4,6];
+const result = findMissingNumber(numbers);
+console.log('Missing Number:', result);
 `.trim();
 
   return (
@@ -23,9 +27,9 @@ console.log('Missing Number:', result);
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6 }}
-      className="w-full max-w-4xl mx-auto mt-10"
+      className="w-full max-w-6xl h-full mx-auto"
     >
-      <div className="relative rounded-2xl overflow-hidden bg-[#0d0d0d]">
+      <div className="relative rounded-2xl overflow-hidden shadow-md shadow-neutral-200">
         {/* Top bar */}
         <div className="px-4 py-2 flex items-center justify-between bg-[#1a1a1a]">
           <div className="flex items-center space-x-2">

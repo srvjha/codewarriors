@@ -21,7 +21,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { FormValues } from "@/utils/ZodResolver";
-import { resolver } from "@/utils/ZodResolver";
+import { FormSchema } from "@/utils/ZodResolver";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
@@ -32,6 +32,8 @@ import {
 } from "@/redux/slices/auth/authThunks";
 import type { AppDispatch } from "@/redux/store";
 import { GoogleLogin } from "@react-oauth/google";
+import { zodResolver } from "@hookform/resolvers/zod";
+import UploadImage from "@/components/ui/UploadImage";
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
@@ -59,12 +61,15 @@ const RegisterPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
     reset,
-  } = useForm<FormValues>({ resolver });
+    watch,
+  } = useForm<FormValues>({ resolver: zodResolver(FormSchema) });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   const onSubmit = handleSubmit(async (data: FormValues) => {
     const formData = new FormData();
@@ -97,9 +102,31 @@ const RegisterPage = () => {
     }
   };
 
+  const avatarFile = watch("avatar");
+  const handleFileSelect = (file: File) => {
+    //  a FileList-like object for React Hook Form
+    const fileList = {
+      0: file,
+      length: 1,
+      item: (index: number) => (index === 0 ? file : null),
+      [Symbol.iterator]: function* () {
+        yield file;
+      },
+    } as FileList;
+
+    setValue("avatar", fileList);
+  };
+
   return (
     <>
       <Toast />
+      {showUploadModal && (
+        <UploadImage
+          onFileSelect={handleFileSelect}
+          onClose={() => setShowUploadModal(false)}
+        />
+      )}
+      {/* <UploadImage/> */}
       <div className="min-h-screen flex items-center justify-center  px-4">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
@@ -107,18 +134,20 @@ const RegisterPage = () => {
           <div className="absolute top-1/2 right-1/4 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative z-10">
+        <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative z-10">
           {/* Left Content */}
           <motion.div
             className="text-center md:text-left space-y-8 px-2 md:px-8"
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-          >
+          >  
+          <Link to="/">
             <div className="flex items-center justify-center md:justify-start space-x-2">
               <Code className="text-blue-500 w-8 h-8" />
               <h2 className="text-xl font-bold text-blue-400">CodeWarrior</h2>
             </div>
+            </Link>
 
             <h1 className="text-5xl font-extrabold text-white leading-tight">
               Level Up Your{" "}
@@ -169,7 +198,7 @@ const RegisterPage = () => {
             animate="visible"
             transition={{ delay: 0.2 }}
           >
-            <Card className="mx-auto w-full max-w-md bg-zinc-900/60 backdrop-blur-sm border border-zinc-800 shadow-xl rounded-xl py-6 px-8 text-zinc-200">
+            <Card className="mx-auto w-full max-w-lg bg-zinc-900/60 backdrop-blur-sm border border-zinc-800 shadow-xl rounded-xl py-6 px-8 text-zinc-200">
               <CardHeader>
                 <CardTitle className="text-3xl text-white">
                   Join the Arena
@@ -195,7 +224,7 @@ const RegisterPage = () => {
                         className="bg-zinc-800 border-zinc-700 focus:border-blue-500 text-white"
                       />
                       {errors?.username && (
-                        <p className="text-red-500">
+                        <p className="text-red-500 text-sm">
                           {errors.username.message}
                         </p>
                       )}
@@ -214,7 +243,7 @@ const RegisterPage = () => {
                         className="bg-zinc-800 border-zinc-700 focus:border-blue-500 text-white"
                       />
                       {errors?.fullName && (
-                        <p className="text-red-500">
+                        <p className="text-red-500 text-sm">
                           {errors.fullName.message}
                         </p>
                       )}
@@ -233,7 +262,9 @@ const RegisterPage = () => {
                         className="bg-zinc-800 border-zinc-700 focus:border-blue-500 text-white"
                       />
                       {errors?.email && (
-                        <p className="text-red-500">{errors.email.message}</p>
+                        <p className="text-red-500 text-sm">
+                          {errors.email.message}
+                        </p>
                       )}
                     </div>
 
@@ -272,18 +303,18 @@ const RegisterPage = () => {
                     </div>
 
                     <div className="flex flex-col space-y-1.5">
-                      <label
-                        htmlFor="password"
-                        className="font-medium text-zinc-300"
-                      >
-                        Avatar
-                      </label>
-                      <Input
-                        {...register("avatar")}
-                        type="file"
-                        placeholder="Choose avatar"
-                        className="bg-zinc-800 border-zinc-700 focus:border-blue-500 text-white"
-                      />
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Avatar</label>
+                        <button
+                          type="button"
+                          onClick={() => setShowUploadModal(true)}
+                          className="w-full bg-zinc-800 border border-zinc-700 focus:border-blue-500 text-white p-3 rounded-md text-left hover:bg-zinc-700 transition"
+                        >
+                          {avatarFile && avatarFile.length > 0
+                            ? avatarFile[0].name
+                            : "Choose avatar"}
+                        </button>
+                      </div>
                     </div>
 
                     <Button

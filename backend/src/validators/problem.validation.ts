@@ -44,7 +44,7 @@ const createProblemSchema = z.object({
 
 const updateProblemSchema = createProblemSchema.partial();
 const getTimeComplexity = z.object({
-  codeSnippets:z.string()
+  sourceCode:z.string()
 })
 
 type CreateProblem = z.infer<typeof createProblemSchema>;

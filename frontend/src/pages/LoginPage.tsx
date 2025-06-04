@@ -13,7 +13,7 @@ import { Code, Brain, Trophy, Zap, LogIn, EyeOff, Eye } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import type { LoginFormValues } from "@/utils/ZodResolver";
-import { LoginResolver } from "@/utils/ZodResolver";
+import { LoginSchema } from "@/utils/ZodResolver";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import { useState } from "react";
 import { BeatLoader } from "react-spinners";
@@ -21,6 +21,7 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/redux/store";
 import { googleAuthLoginUser, LoginUser } from "@/redux/slices/auth/authThunks";
 import { GoogleLogin } from "@react-oauth/google";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -50,7 +51,7 @@ const LoginPage = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<LoginFormValues>({ resolver: LoginResolver });
+  } = useForm<LoginFormValues>({ resolver: zodResolver(LoginSchema) });
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();

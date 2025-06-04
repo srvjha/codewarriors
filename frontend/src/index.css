@@ -1,10 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
+
 body {
-  background-color: #111010;
+  background: linear-gradient(to bottom right, #000000, #18181b);
+  opacity: 0.8;
   color: aliceblue;
-   pointer-events: auto !important;
+  pointer-events: auto !important;
+}
+
+.quantico-regular {
+  font-family: "Quantico", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -301,5 +311,9 @@ body {
   min-height: 50px !important;
 }
 
-
-
+@layer utilities {
+  .bg-dot-pattern {
+    background-image: radial-gradient(#fff 1px, transparent 1px);
+    background-size: 10px 10px;
+  }
+}

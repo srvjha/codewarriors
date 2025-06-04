@@ -1,26 +1,33 @@
 [
   {
     "title": "Structured DSA Practice",
-    "desc": "Solve curated problems across Arrays, Strings, DP, Trees, and more."
+    "icon": "Boxes",
+    "desc": "Master Data Structures and Algorithms through a well-organized collection of problems categorized by topic such as Arrays, Strings, Dynamic Programming, Trees, and Graphs. Filter problems based on difficulty level or company-specific patterns to align your preparation with your target job. Each problem is handpicked to ensure real-world relevance and to build confidence for coding interviews."
   },
   {
-    "title": "Real-Time Code Evaluation",
-    "desc": "Instant feedback on submissions with input/output and explanation."
+    "title": "Discuss with AlgoAI",
+    "icon": "Bot",
+    "desc": "Struggling with a problem? Instantly initiate a conversation with AlgoAI, your intelligent assistant designed to explain concepts, guide you through solution steps, and answer questions contextually. Whether you're stuck or just want to validate your approach, AlgoAI provides a collaborative problem-solving experience that mimics peer discussions and mentor guidance."
   },
   {
-    "title": "Company-Wise Questions",
-    "desc": "Master top tech interviews with problems asked by Google, Amazon, etc."
+    "title": "Daily Streak Feature",
+    "icon": "Flame",
+    "desc": "Stay consistent and motivated with a gamified daily streak system. Visualize your consistency, analyze day-wise performance, and push yourself to keep the momentum going. The system highlights your improvement over time, making it easier to spot weak areas and celebrate your growth."
   },
   {
-    "title": "Profile & Coding Graph",
-    "desc": "Track your daily progress, submission streaks, and improvement curve."
+    "title": "Discussion Forum",
+    "icon": "MessagesSquare",
+    "desc": "Engage with a vibrant community of coders. Ask doubts, discuss problem-solving techniques, and share your interview experiences. This space also serves as a platform for feedback and suggestions, making the learning experience more collaborative and interactive."
   },
   {
-    "title": "Progress Tracker",
-    "desc": "Visualize your topic-wise coverage and stay on top of your learning goals."
+    "title": "Practice Sheets",
+    "icon": "FileText",
+    "desc": "Access curated practice sheets for different topics and difficulty levels, or create your own personalized problem sets. Whether you're following a popular DSA roadmap or preparing for a specific company, these sheets help maintain structure in your preparation. Add notes, track completion, and revisit problems—all in one place."
   },
   {
-    "title": "Admin Panel for Problems",
-    "desc": "Easily add, update, and manage problem sets with rich metadata."
+    "title": "Code Editors",
+    "icon": "Code2",
+    "desc": "Write, test, and run code in a feature-rich environment built for competitive programming and interview preparation. The editor supports multiple languages, intelligent autocompletion, and real-time feedback. One standout feature is AI-powered complexity estimation—after successful submissions, the platform predicts and displays the time and space complexity of your solution."
   }
+  
 ]

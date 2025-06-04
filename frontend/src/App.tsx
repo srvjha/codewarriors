@@ -20,6 +20,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import PlaylistPage from "./pages/PlaylistPage";
 import ForgotPasswordPage from "./pages/ForgotPassword";
 import ResetPasswordPage from "./pages/ResetPassword";
+import ResetForgotPassword from "./pages/ResetForgotPassword";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import DiscussCreatePage from "./pages/DiscussCreatePage";
 import DiscussUpdatePage from "./pages/DiscussUpdatePage";
@@ -129,9 +130,9 @@ const App = () => {
         <Route
           path="/forgot-password"
           element={
-            <PrivateRoute>
+           
               <ForgotPasswordPage />
-            </PrivateRoute>
+         
           }
         />
 
@@ -147,9 +148,18 @@ const App = () => {
         <Route
           path="/verify/:token"
           element={
-            <PrivateRoute>
+            
               <VerifyEmail />
-            </PrivateRoute>
+           
+          }
+        />
+
+        <Route
+          path="/forgot/password/:token"
+          element={
+            
+              <ResetForgotPassword/>
+           
           }
         />
 

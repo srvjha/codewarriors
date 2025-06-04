@@ -74,13 +74,25 @@ const register = asyncHandler(async (req, res) => {
     throw new ApiError("Email already registered", 500);
   }
 
+  const existingUsername = await db.user.findUnique({
+    where: {
+      username,
+    },
+  });
+
+  if (existingUsername) {
+    throw new ApiError("username already taken", 500);
+  }
+
   const hashedPassword = await hashPassword(password);
   const { hashedToken, tokenExpiry, unHashedToken } = generateToken();
 
   let avatarURL;
   const avatarLocalPath = req.file?.path;
+   console.log("avatarlocalPath: ",avatarLocalPath)
   if (avatarLocalPath) {
     const cloudinaryResult = await uploadOnCloudinary(avatarLocalPath);
+    console.log("cloudinary: ",cloudinaryResult)
     avatarURL = cloudinaryResult?.secure_url;
   }
 
@@ -308,10 +320,16 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
 
   const { hashedToken, tokenExpiry, unHashedToken } = generateToken();
 
-  user.forgotPasswordToken = hashedToken;
-  user.forgotPasswordExpiry = tokenExpiry;
 
-  const verificationUrl = `${env.BASE_URI}/api/v1/auth/password/reset/${unHashedToken}`;
+   await db.user.update({
+    where: { id: user.id },
+    data: {
+      forgotPasswordToken: hashedToken,
+      forgotPasswordExpiry: tokenExpiry,
+    },
+  });
+
+  const verificationUrl = `${env.BASE_URI}/forgot/password/${unHashedToken}`;
 
   await sendEmail(
     user.email,
@@ -374,6 +392,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 const forgotPasswordRequest = asyncHandler(async (req, res) => {
   const { token } = req.params;
+  console.log("token: ",token)
   const { newPassword } = handleZodError(validateResetPassword(req.body));
 
   if (!token) {
@@ -392,7 +411,7 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError("Invalid User or token expired", 400);
   }
-  const hashedPassword = newPassword;
+  const hashedPassword = await hashPassword(newPassword);
 
   await db.user.update({
     where: { id: user.id },

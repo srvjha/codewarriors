@@ -4,12 +4,13 @@ import { Input } from "./Input";
 import { Button } from "./button";
 import { useForm } from "react-hook-form";
 import {
-  PasswordResolver,
+  PasswordSchema,
   type PasswordFormValues,
 } from "@/utils/ZodResolver";
 import { BeatLoader } from "react-spinners";
 import { useState } from "react";
 import API from "@/utils/AxiosInstance";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const PasswordChangeModal = ({ onClose }: { onClose: () => void }) => {
   const {
@@ -17,7 +18,7 @@ const PasswordChangeModal = ({ onClose }: { onClose: () => void }) => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<PasswordFormValues>({ resolver: PasswordResolver });
+  } = useForm<PasswordFormValues>({ resolver: zodResolver(PasswordSchema) });
 
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState({

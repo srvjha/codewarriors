@@ -22,7 +22,7 @@ import {
 import Playlist from "@/components/ui/Playlist";
 import { difficultyColor } from "@/helper/Problem.helper";
 import API from "@/utils/AxiosInstance";
-
+// import {useCollapse} from "react-collapsed"
 type Problem = {
   id: string;
   title: string;
@@ -44,6 +44,8 @@ const ProblemsetPage = () => {
   const { userData } = useSelector((state: RootState) => state.auth);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [addProblem, setAddProblem] = useState("");
+  // const [isExpanded, setExpanded] = useState(false);
+  // const { getCollapseProps, getToggleProps } = useCollapse({ isExpanded });
   const searchRef =
     useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
 

@@ -28,7 +28,7 @@ import type {
   Languages,
   ToggleLangFn,
 } from "@/types/createProblem/createProblemTypes";
-import { CreateProblemResolver } from "@/utils/ZodResolver";
+import { CreateProblemSchema } from "@/utils/ZodResolver";
 import API from "@/utils/AxiosInstance";
 
 const CreateProblemForm = () => {
@@ -43,7 +43,7 @@ const CreateProblemForm = () => {
     reset,
     formState: { errors },
   } = useForm<CreateProblemFormValues>({
-    resolver: CreateProblemResolver,
+    resolver: CreateProblemSchema,
   });
 
   const {

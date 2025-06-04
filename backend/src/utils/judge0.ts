@@ -63,8 +63,7 @@ export const pollBatchResults = async(tokens:Token[])=>{
                  base64_encoded:false
              },
             
-         })
- 
+         }) 
 
          const results = data.submissions as Statuses[];
          const isAllDone = results.every((result)=> result.status.id !== 1 && result.status.id !== 2)

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/Input";
 import type { RootState } from "@/redux/store";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
-import { DiscussResolver, type DiscussFormValues } from "@/utils/ZodResolver";
+import { DiscussSchema, type DiscussFormValues } from "@/utils/ZodResolver";
 import MDEditor from "@uiw/react-md-editor";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,7 @@ import { marked } from "marked";
 import API from "@/utils/AxiosInstance";
 import { useNavigate, useParams } from "react-router-dom";
 import TurndownService from 'turndown';
+import { zodResolver } from "@hookform/resolvers/zod";
 
 
 const DiscussUpdatePage = () => {
@@ -23,7 +24,7 @@ const DiscussUpdatePage = () => {
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<DiscussFormValues>({ resolver: DiscussResolver });
+  } = useForm<DiscussFormValues>({ resolver: zodResolver(DiscussSchema) });
   const [content, setContent] = useState<string>("");
   const navigate = useNavigate();
   const turndownService = new TurndownService();
