@@ -11,7 +11,7 @@ import FeatureDash from './FeatureDash';
 
 const Features = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-6 gap-2 auto-rows-[320px] md:auto-rows-[240px] items-start">
+    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 auto-rows-[320px] md:auto-rows-[240px] items-start">
 
       <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10 hover:shadow-md hover:shadow-neutral-500/40 col-span-2 row-span-1">
         <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />

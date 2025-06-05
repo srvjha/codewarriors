@@ -290,7 +290,6 @@ const ProblemPage = () => {
 
   const handleDiscuss = () => {
     setAiChatOpen(true);
-    // You can also trigger a chat modal or send code to AI for explanation
   };
 
   return (
