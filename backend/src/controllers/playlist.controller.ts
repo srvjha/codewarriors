@@ -9,11 +9,12 @@ import {
   createPlaylistValidation,
 } from "../validators/playlist.validation";
 
-const getAllPlaylistDetails = asyncHandler(async (req, res) => {
+const getAllPrivatePlaylistDetails = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const playlists = await db.playlist.findMany({
     where: {
       userId,
+      visibilty:false
     },
     include: {
       problems: {
@@ -33,6 +34,33 @@ const getAllPlaylistDetails = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, playlists, "All Playlist Fetched Successfully"));
 });
+
+
+const getAllPublicPlaylistDetails = asyncHandler(async (req, res) => {
+  const playlists = await db.playlist.findMany({
+    where: {
+     visibilty:true,
+    },
+    include: {
+      problems: {
+        include: {
+          problem: true,
+        },
+      },
+      user:{
+        select:{
+          fullName:true
+        }
+      }
+    },
+  });
+  
+  res
+    .status(200)
+    .json(new ApiResponse(200, playlists, "All Playlist Fetched Successfully"));
+});
+
+
 
 const getPlaylistDetails = asyncHandler(async (req, res) => {
   const { plid } = req.params;
@@ -92,8 +120,6 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 
 const addProblemToPlaylist = asyncHandler(async (req, res) => {
   const { plid, pid } = req.params;
-  console.log("plid: ",plid);
-  console.log("pid: ",pid);
   validId(plid, "Playlist");
   validId(pid, "Problem");
 
@@ -178,7 +204,8 @@ const removeProblemFromPlaylist = asyncHandler(async (req, res) => {
 });
 
 export {
-  getAllPlaylistDetails,
+  getAllPublicPlaylistDetails,
+  getAllPrivatePlaylistDetails,
   getPlaylistDetails,
   createPlaylist,
   deletePlaylist,

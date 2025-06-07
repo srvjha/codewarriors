@@ -5,21 +5,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TbFlameFilled } from "react-icons/tb";
 import { ListTodo, User } from "lucide-react";
 import API from "@/utils/AxiosInstance";
+import type { UserData } from "@/redux/slices/auth/authTypes";
 
-type User = {
-  id: string;
-  fullName: string;
-  username: string;
-  avatar: string;
-  email: string;
-  isEmailVerified: boolean;
-  isStreakMaintained: boolean;
-  lastSubmissionDate: string | null;
-  dailyProblemStreak: number;
-};
+
 
 const Dashboard = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
   const [totalProblems, setTotalProblems] = useState<number>(0);
 
   useEffect(() => {

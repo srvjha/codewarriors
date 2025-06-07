@@ -5,15 +5,8 @@ import { Calendar } from "lucide-react";
 import API from "@/utils/AxiosInstance";
 import ContestTimer from "@/components/ui/ContestTimer";
 import { BeatLoader } from "react-spinners";
+import type { Contest } from "@/types/contest/contest.Types";
 
-interface Contest {
-  id: string;
-  title: string;
-  description?: string;
-  startTime: string;
-  endTime: string;
-  status: "LIVE" | "UPCOMING" |  "ENDED";
-}
 
 export default function ContestListPage() {
   const [contests, setContests] = useState<Contest[]>([]);

@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { verifyUser } from "../middleware/auth.middleware";
-import { addProblemToPlaylist, createPlaylist, deletePlaylist, getAllPlaylistDetails, getPlaylistDetails, removeProblemFromPlaylist } from "../controllers/playlist.controller";
+import { addProblemToPlaylist, createPlaylist, deletePlaylist, getAllPrivatePlaylistDetails, getAllPublicPlaylistDetails, getPlaylistDetails, removeProblemFromPlaylist } from "../controllers/playlist.controller";
 
 const router = Router();
 
-router.get("/all",verifyUser,getAllPlaylistDetails);
+router.get("/all/private",verifyUser,getAllPrivatePlaylistDetails);
+router.get("/all/public",verifyUser,getAllPublicPlaylistDetails);
 router.get("/:plid",verifyUser,getPlaylistDetails);
 router.post("/create",verifyUser,createPlaylist);
 router.delete("/:plid",verifyUser,deletePlaylist);
