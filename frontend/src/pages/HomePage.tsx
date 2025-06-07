@@ -10,22 +10,16 @@ import {
 } from "@/components/ui/accordion";
 
 import faqs from "../constants/faqs.json";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/redux/store";
 import CoderDesc from "@/components/ui/CoderDesc";
 import Features from "@/components/ui/Features";
 
-
-
 const HomePage = () => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-
   return (
     <div className="relative flex flex-col min-h-screen  text-white overflow-hidden">
       <div className="relative z-10   px-6 py-20 md:py-32 min-h-screen flex-row items-center justify-center">
         <div className=" flex justify-center items-center -mt-10">
           <div className=" px-6 py-2 flex  text-sm font-semibold rounded-full text-white bg-gradient-to-r from-neutral-600 via-neutral-800 to-neutral-900 shadow-md ring-1 ring-white/10 backdrop-blur-sm">
-            ✨ Join AI Assisted coding platform built for real-world problem solvers
+            ✨ Join CodeWarriors built for real-world problem solvers
           </div>
         </div>
         <div className="max-w-5xl mx-auto mt-5 flex flex-col items-center text-center gap-12">
@@ -55,9 +49,9 @@ const HomePage = () => {
                   Start Solving
                 </Button>
               </Link>
-              <Link to={isAuthenticated ? "/" : "/login"}>
+              <Link to="/my-list">
                 <Button className="text-lg px-6 py-6 cursor-pointer bg-transparent border border-white hover:bg-white hover:text-black text-white rounded-xl shadow-inner">
-                  Join Codewarrior
+                  Explore Sheets
                 </Button>
               </Link>
             </div>
@@ -88,8 +82,7 @@ const HomePage = () => {
             >
               <h2 className="text-4xl font-medium mb-6 text-zinc-50">
                 What is{" "}
-                 <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text">
-           
+                <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text">
                   CodeWarrior
                 </span>
                 <span className="ml-1">?</span>
@@ -109,23 +102,21 @@ const HomePage = () => {
             </div>
 
             <div className="flex-1 max-w-lg w-full ">
-             <CoderDesc/>
+              <CoderDesc />
             </div>
           </div>
         </div>
 
         <div className="max-w-7xl mx-auto mt-40 px-4">
           <h2 className="text-5xl font-bold mb-12 text-center text-white">
-            Key Features of Our {" "}
-             <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text">
-            Coding Platform
+            Key Features of Our{" "}
+            <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text">
+              Coding Platform
             </span>
           </h2>
 
-         <Features/>
+          <Features />
         </div>
-
-         
 
         <div className="max-w-4xl mx-auto mt-42 px-4">
           <h2 className="text-5xl font-bold text-center text-white mb-8">
