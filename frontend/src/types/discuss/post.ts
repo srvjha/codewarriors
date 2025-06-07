@@ -6,6 +6,7 @@ export type Post = {
   views: number;
   upvotes: number;
   createdAt: string;
+  tags:string[];
   user: {
     username: string;
     fullName: string;

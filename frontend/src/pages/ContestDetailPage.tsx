@@ -30,15 +30,14 @@ export default function ContestDetailPage() {
   const [contest, setContest] = useState<Contest | null>(null);
   const [serverOffset, setServerOffset] = useState(0);
   const [registered, setRegistered] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchContest = async () => {
       try {
         const res = await API.get(`/contests/${id}`);
         setContest(res.data.data);
-      } catch (err) {
-        console.error("Failed to fetch contest details:", err);
-      }
+      } catch (err) {}
     };
 
     const fetchServerTime = async () => {
@@ -47,16 +46,32 @@ export default function ContestDetailPage() {
         const serverNow = new Date(res.data.data.serverTime).getTime();
         const clientNow = Date.now();
         setServerOffset(serverNow - clientNow);
-      } catch (err) {
-        console.error("Failed to fetch server time:", err);
-      }
+      } catch (err) {}
     };
 
     fetchServerTime();
     fetchContest();
   }, [id]);
 
+  useEffect(() => {
+    const fetchRegistrationStatus = async () => {
+      try {
+        const res = await API.get(`/contests/${id}/registration-status`);
+        if (res.data.message === "User is registered") {
+          setRegistered(true);
+        } else {
+          setRegistered(false);
+        }
+      } catch (error: any) {
+        ToastError(error.response.data.error);
+      }
+    };
+
+    fetchRegistrationStatus();
+  }, [id]);
+
   const handleRegister = async () => {
+    setLoading(true);
     try {
       const res = await API.get(`/contests/${id}/register/user`, {
         withCredentials: true,
@@ -66,7 +81,16 @@ export default function ContestDetailPage() {
         setRegistered(true);
       }
     } catch (error: any) {
-      ToastError(error?.response?.data?.message || "Registration failed");
+      if (
+        error?.response?.data?.error === "Already registered for this contest"
+      ) {
+        ToastError("You are already registered for this contest.");
+        setRegistered(true);
+      } else {
+        ToastError(error?.response?.data?.error || "Registration failed");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -126,10 +150,11 @@ export default function ContestDetailPage() {
           <>
             {!registered ? (
               <Button
+                disabled={loading}
                 className="bg-green-100 text-green-800 hover:bg-green-200 w-32 h-10 rounded-full text-base"
                 onClick={handleRegister}
               >
-                Register
+                {loading ? "Registering..." : "Register"}
               </Button>
             ) : (
               <UnregisterDialog
@@ -145,12 +170,9 @@ export default function ContestDetailPage() {
             <div className="bg-transparent p-3 space-y-4 mt-3">
               <h2 className="text-xl font-semibold">Contest Guidelines</h2>
               <ul className="list-disc list-inside text-slate-300 space-y-2">
+                <li>The contest will start at the scheduled time. Be punctual.</li>
                 <li>
-                  The contest will start at the scheduled time. Be punctual.
-                </li>
-                <li>
-                  Each problem carries specific points. Solve as many as you
-                  can.
+                  Each problem carries specific points. Solve as many as you can.
                 </li>
                 <li>
                   You can submit multiple times — only the best score is

@@ -184,6 +184,7 @@ model Discussion {
   userId        String
   title         String
   description   String
+  tags          String[] @default([])
   commentsCount Int      @default(0)
   upvotes       Int?     @default(0)
   views         Int?     @default(0)

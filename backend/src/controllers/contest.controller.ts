@@ -28,6 +28,7 @@ const getContestById = asyncHandler(async (req, res) => {
     },
   });
 
+
   if (!contest) throw new ApiError("Contest not found", 404);
 
   res
@@ -78,7 +79,7 @@ const createContest = asyncHandler(async (req, res) => {
 
 const registerUserToContest = asyncHandler(async (req, res) => {
   const {contestId} = req.params;
-  console.log("contest id: ",contestId)
+  // console.log("contest id: ",contestId)
   const userId = req.user.id;
 
   const alreadyRegistered = await db.contestant.findUnique({
@@ -241,6 +242,29 @@ const createContestSubmission = asyncHandler(async (req, res) => {
   });
 });
 
+const checkUserRegistration = asyncHandler(async (req, res) => {
+  const { contestId } = req.params;
+  const userId = req.user.id;
+
+  const registration = await db.contestant.findUnique({
+    where: {
+      userId_contestId: {
+        userId,
+        contestId,
+      },
+    },
+  });
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      { registered: Boolean(registration) },
+      registration ? "User is registered" : "User is not registered"
+    )
+  );
+});
+
+
 
 export {
   createContest,
@@ -250,5 +274,6 @@ export {
   getAllContests,
   registerUserToContest,
   unregisterUserFromContest,
-  contestCron
+  contestCron,
+  checkUserRegistration
 };

@@ -7,6 +7,7 @@ import {
   SquarePen,
   ChartNoAxesCombined,
   Ellipsis,
+  Compass,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -33,8 +34,6 @@ import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import type { Post } from "@/types/discuss/post";
-
-
 
 const DiscussPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -68,8 +67,8 @@ const DiscussPage = () => {
       const res = await API.get("/discuss/post/all", { withCredentials: true });
       console.log("post details: ", res.data.data);
       if (res.status) {
-         setOriginalPosts(res.data.data);
-      setPosts(res.data.data);
+        setOriginalPosts(res.data.data);
+        setPosts(res.data.data);
       }
     };
     fetchAllPost();
@@ -132,24 +131,32 @@ const DiscussPage = () => {
     handleDialogClose(false);
   };
 
+  const handleFilter = (type: "mv" | "lt") => {
+    if (activeFilter === type) {
+      setActiveFilter(null);
+      setPosts(originalPosts);
+    } else {
+      setActiveFilter(type);
+      const sorted =
+        type === "mv"
+          ? [...originalPosts].sort((a, b) => b.upvotes - a.upvotes)
+          : [...originalPosts].sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            );
+      setPosts(sorted);
+    }
+  };
 
-   const handleFilter = (type: "mv" | "lt") => {
-  if (activeFilter === type) {
-    setActiveFilter(null);
-    setPosts(originalPosts);
-  } else {
-    setActiveFilter(type);
-    const sorted =
-      type === "mv"
-        ? [...originalPosts].sort((a, b) => b.upvotes - a.upvotes)
-        : [...originalPosts].sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
-    setPosts(sorted);
-  }
-};
+  const tagMap = originalPosts.reduce<Record<string, Post[]>>((acc, post) => {
+    const tag = post.tags?.[0] || "Other";
+    if (!acc[tag]) acc[tag] = [];
+    acc[tag].push(post);
+    return acc;
+  }, {});
 
+  console.log({tagMap})
 
   return (
     <>
@@ -192,129 +199,164 @@ const DiscussPage = () => {
           </Button>
         </div>
         <div className="flex gap-2 mb-6 px-4">
-          <div 
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-900 border ${activeFilter === "mv"?"border-blue-500" :"border-neutral-800"}   hover:border-blue-500 hover:from-blue-900/20 hover:to-blue-800/20 cursor-pointer transition-all duration-300 group`}
-          onClick={() => handleFilter("mv")}
+          <div
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-900 border ${
+              activeFilter === "mv" ? "border-blue-500" : "border-neutral-800"
+            }   hover:border-blue-500 hover:from-blue-900/20 hover:to-blue-800/20 cursor-pointer transition-all duration-300 group`}
+            onClick={() => handleFilter("mv")}
           >
             <ThumbsUp
               size={16}
               className="text-gray-400 group-hover:text-blue-400 transition-colors duration-300"
             />
-            <span
-              className="text-sm font-medium text-gray-300 group-hover:text-blue-300 transition-colors duration-300"
-              
-            >
+            <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300 transition-colors duration-300">
               Most Votes
             </span>
           </div>
 
-          <div 
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-900 border ${activeFilter === "lt"?"border-blue-500" :"border-neutral-800"}   hover:border-blue-500 hover:from-blue-900/20 hover:to-blue-800/20 cursor-pointer transition-all duration-300 group`}
-           onClick={() => handleFilter("lt")}
+          <div
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-900 border ${
+              activeFilter === "lt" ? "border-blue-500" : "border-neutral-800"
+            }   hover:border-blue-500 hover:from-blue-900/20 hover:to-blue-800/20 cursor-pointer transition-all duration-300 group`}
+            onClick={() => handleFilter("lt")}
           >
             <ChartNoAxesCombined
               size={16}
               className="text-gray-400 group-hover:text-blue-400 transition-colors duration-300"
             />
-            <span
-              className="text-sm font-medium text-gray-300 group-hover:text-blue-300 transition-colors duration-300"
-             
-            >
+            <span className="text-sm font-medium text-gray-300 group-hover:text-blue-300 transition-colors duration-300">
               Latest
             </span>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 w-[80%] sm:grid-cols-2 lg:grid-cols-1 gap-6 px-4">
-          {posts.map((post) => (
-            <Card
-              key={post.id}
-              className="w-full max-w-full border-0 border-b border-b-neutral-700 bg-zinc-950 shadow-md hover:shadow-neutral-500/20 transition-all duration-300 rounded-xl"
-            >
-              <CardContent className="p-4">
-                <Link to={`/discuss/${post.id}`}>
-                  <div className="flex items-center gap-3 mb-2">
-                    <Avatar className="h-10 w-10 flex-shrink-0">
-                      <AvatarImage src={post.user.avatar} />
-                      <AvatarFallback className="text-sm">
-                        {post.user.username[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400">
-                      <span className="font-medium text-white">
-                        {post.user.fullName} (@{post.user.username})
-                      </span>
-                      <span className="text-gray-500">•</span>
-                      <span className="text-gray-500">
-                        {formatTime(post.createdAt)}
-                      </span>
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 px-4 flex-2 ">
+            {posts.map((post) => (
+              <Card
+                key={post.id}
+                className="w-full max-w-full  border border-neutral-700 bg-neutral-900/20 hover:shadow-neutral-500/20 transition-all duration-300 rounded-xl"
+              >
+                <CardContent className="p-4">
+                  <Link to={`/discuss/${post.id}`}>
+                    <div className="flex justify-between">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Avatar className="h-10 w-10 flex-shrink-0">
+                          <AvatarImage src={post.user.avatar} />
+                          <AvatarFallback className="text-sm">
+                            {post.user.username[0].toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+
+                        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-400">
+                          <span className="font-medium text-white">
+                            {post.user.fullName} (@{post.user.username})
+                          </span>
+                          <span className="text-gray-500">•</span>
+                          <span className="text-gray-500">
+                            {formatTime(post.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-row gap-2">
+                        {post.tags.map((tag) => {
+                          return (
+                            <div className="bg-zinc-900 border-1 border-neutral-700 px-2.5 py-0.5 text-sm  h-7 rounded-full text-center">{`# ${tag}`}</div>
+                          );
+                        })}
+                      </div>
                     </div>
+
+                    <h2 className="text-xl font-semibold text-white mb-2 line-clamp-2 hover:underline transition-colors">
+                      {post.title}
+                    </h2>
+
+                    <p className="text-gray-300 text-base line-clamp-2">
+                      {post.description.replace(/<[^>]+>/g, "")}
+                    </p>
+                  </Link>
+
+                  <div className=" flex justify-between">
+                    <div className="flex items-center gap-4 mt-6 text-sm text-gray-400">
+                      <div
+                        className="flex items-center gap-1 cursor-pointer hover:text-pink-500"
+                        onClick={() => handleUpvote(post.id)}
+                      >
+                        <ThumbsUp
+                          size={16}
+                          className={`${
+                            post.upvotes > 0
+                              ? "text-pink-600 fill-pink-600"
+                              : "text-gray-400"
+                          }`}
+                        />
+                        <span>{post.upvotes}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Eye size={16} className="text-gray-400" />
+                        <span>{post.views}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MessageSquare size={16} className="text-gray-400" />
+                        <span>{post.commentsCount}</span>
+                      </div>
+                    </div>
+                    {post.user.username === userData?.username ? (
+                      <div className="mt-6 cursor-pointer">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Ellipsis className="mt-6" size={16} />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-16 text-left px-2  bg-zinc-800 text-zinc-100 border-none">
+                            <DropdownMenuItem
+                              onClick={() =>
+                                navigate(`/discuss/edit/${post.id}`)
+                              }
+                            >
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className=" border border-neutral-700" />
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => {
+                                setSelectedPostId(post.id);
+                                setDeleteDialogOpen(true);
+                              }}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    ) : null}
                   </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
-                  <h2 className="text-xl font-semibold text-white mb-2 line-clamp-2 hover:underline transition-colors">
-                    {post.title}
-                  </h2>
+           <div className="flex-1 h-[70vh] w-full overflow-y-auto">
+      <div className="h-full w-[90%] border p-5 border-neutral-700 bg-neutral-900/20 hover:shadow-neutral-500/20 transition-all duration-300 rounded-xl">
+        <div className="p-1 flex gap-2 items-center mb-4">
+          <span className="text-xl font-semibold text-white">Explore</span>
+          <Compass className="text-white" size={20} />
+        </div>
 
-                  <p className="text-gray-300 text-base line-clamp-2">
-                    {post.description.replace(/<[^>]+>/g, "")}
-                  </p>
-                </Link>
-
-                <div className=" flex justify-between">
-                  <div className="flex items-center gap-4 mt-6 text-sm text-gray-400">
-                    <div
-                      className="flex items-center gap-1 cursor-pointer hover:text-pink-500"
-                      onClick={() => handleUpvote(post.id)}
-                    >
-                      <ThumbsUp
-                        size={16}
-                        className={`${
-                          post.upvotes > 0
-                            ? "text-pink-600 fill-pink-600"
-                            : "text-gray-400"
-                        }`}
-                      />
-                      <span>{post.upvotes}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Eye size={16} className="text-gray-400" />
-                      <span>{post.views}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <MessageSquare size={16} className="text-gray-400" />
-                      <span>{post.commentsCount}</span>
-                    </div>
-                  </div>
-                  {post.user.username === userData?.username ? (
-                    <div className="mt-6 cursor-pointer">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Ellipsis className="mt-6" size={16} />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-16 text-left px-2  bg-zinc-800 text-zinc-100 border-none">
-                          <DropdownMenuItem
-                            onClick={() => navigate(`/discuss/edit/${post.id}`)}
-                          >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator className=" border border-neutral-700" />
-                          <DropdownMenuItem
-                            variant="destructive"
-                            onClick={() => {
-                              setSelectedPostId(post.id);
-                              setDeleteDialogOpen(true);
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  ) : null}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {Object.entries(tagMap).map(([tag, posts], idx) => (
+          <div key={idx} className="mb-4">
+            <p className="text-zinc-400 font-medium mb-1">#{tag}</p>
+            {posts.map((post) => (
+              <p
+                key={post.id}
+                className="text-zinc-200 text-sm hover:underline cursor-pointer truncate"
+              >
+                {post.title}
+              </p>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
         </div>
       </div>
     </>

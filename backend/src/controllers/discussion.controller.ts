@@ -21,6 +21,7 @@ const getAllPost = asyncHandler(async (req, res) => {
       commentsCount: true,
       upvotes: true,
       views: true,
+      tags:true,
       user: {
         select: {
           username: true,
@@ -29,7 +30,7 @@ const getAllPost = asyncHandler(async (req, res) => {
         },
       },
     },
-    orderBy:{createdAt:'desc'}
+    orderBy: { createdAt: "desc" },
   });
 
   return res
@@ -66,15 +67,14 @@ const getPostById = asyncHandler(async (req, res) => {
           upvote: true,
           createdAt: true,
           updatedAt: true,
-          user:{
-            select:{
-                username:true,
-                fullName:true,
-                avatar:true,
-                createdAt:true,
-                
-            }
-          }
+          user: {
+            select: {
+              username: true,
+              fullName: true,
+              avatar: true,
+              createdAt: true,
+            },
+          },
         },
       },
     },
@@ -85,7 +85,7 @@ const getPostById = asyncHandler(async (req, res) => {
 });
 
 const addPost = asyncHandler(async (req, res) => {
-  const { title, description } = handleZodError(
+  const { title, description, tags=[] } = handleZodError(
     createDiscussionPostValidation(req.body)
   );
   const userId = req.user.id;
@@ -114,6 +114,7 @@ const addPost = asyncHandler(async (req, res) => {
       userId,
       title,
       description,
+      tags,
     },
   });
 
@@ -125,12 +126,11 @@ const addPost = asyncHandler(async (req, res) => {
 });
 
 const updatePost = asyncHandler(async (req, res) => {
-  const { title, description } = handleZodError(
+  const { title, description, tags } = handleZodError(
     updateDiscussionPostValidation(req.body)
   );
   const { postid } = req.params;
   validId(postid, "Post");
-  const userId = req.user.id;
   const post = await db.discussion.findUnique({
     where: {
       id: postid,
@@ -146,10 +146,12 @@ const updatePost = asyncHandler(async (req, res) => {
   const updatePayload: Partial<{
     title: string;
     description: string;
+    tags: string[];
   }> = {};
 
   if (title !== undefined) updatePayload.title = title;
   if (description !== undefined) updatePayload.description = description;
+  if (tags !== undefined) updatePayload.tags = tags;
 
   if (Object.keys(updatePayload).length === 0) {
     throw new ApiError("At least one field is required to update", 400);
@@ -215,16 +217,18 @@ const addUpvotes = asyncHandler(async (req, res) => {
 
   if (alreadyUpvoted) {
     await db.discussionUpvote.delete({
-    where: { id: alreadyUpvoted.id },
-  });
+      where: { id: alreadyUpvoted.id },
+    });
 
     await db.discussion.updateMany({
-    where: { id: postid,upvotes:{gt:0} },
-    data: { upvotes: { decrement: 1 } },
-  });
-   return res
-    .status(200)
-    .json(new ApiResponse(200, {voted:false}, "Upvoted Removed Successfully"));
+      where: { id: postid, upvotes: { gt: 0 } },
+      data: { upvotes: { decrement: 1 } },
+    });
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, { voted: false }, "Upvoted Removed Successfully")
+      );
   }
 
   await db.discussionUpvote.create({
@@ -241,7 +245,7 @@ const addUpvotes = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {voted:true}, "Upvoted Successfully"));
+    .json(new ApiResponse(200, { voted: true }, "Upvoted Successfully"));
 });
 
 const addCommentToPost = asyncHandler(async (req, res) => {
@@ -343,5 +347,5 @@ export {
   deleteComment,
   addUpvotes,
   getAllPost,
-  getPostById
+  getPostById,
 };

@@ -4,6 +4,7 @@ import { z } from "zod";
 const createDiscussionPostSchema = z.object({
   title: z.string().nonempty({ message: "Title is required" }),
   description: z.string().nonempty({ message: "Description is required" }),
+  tags:z.array(z.string()).optional()
   
 });
 

@@ -32,6 +32,7 @@ export type PasswordFormValues = z.infer<typeof PasswordSchema>;
 export const DiscussSchema = z.object({
   title: z.string().nonempty("Title is required."),
   content: z.string().nonempty("Content is required."),
+   topics: z.array(z.string()).optional(),
 });
 
 export type DiscussFormValues = z.infer<typeof DiscussSchema>;
