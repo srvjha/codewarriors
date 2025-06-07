@@ -100,12 +100,14 @@ const PlaylistPage = () => {
   };
 
   const getDynamicRecommendedSheets = () => {
-    // Filter out the "Favourite" playlist from recommendations
     const filteredRecommended = recommended.filter(
-      (playlist) => playlist.name !== "Favourite"
+      (playlist) =>
+        playlist.name !== "Favourite" &&
+        playlist.name !== "Google Interview Questions" &&
+        playlist.name !== "Microsoft Interview Questions" &&
+        playlist.name !== "Amazon Interview Questions"
     );
 
-    // Define styling based on difficulty or index
     const styleOptions = [
       {
         difficulty: "Easy",
@@ -143,7 +145,7 @@ const PlaylistPage = () => {
       badgeColor: styleOptions[index % styleOptions.length].badgeColor,
       cardColor: styleOptions[index % styleOptions.length].cardColor,
       buttonColor: styleOptions[index % styleOptions.length].buttonColor,
-      playlist: playlist, // Store original playlist data for navigation
+      playlist: playlist,
     }));
   };
 
