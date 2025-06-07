@@ -39,6 +39,7 @@ type Problem = {
   description: string;
   difficulty: "EASY" | "MEDIUM" | "HARD";
   tags: string[];
+  demo:boolean;
   isSolved: boolean;
 };
 
@@ -250,7 +251,7 @@ useEffect(() => {
 
 
   return (
-    <div className="max-w-7xl mx-auto p-6 grid grid-cols-4">
+    <div className="max-w-7xl mx-auto p-6 grid grid-cols-4 z-10">
       <div className="col-span-1 p-2">
         <div className=" w-full h-screen sticky top-0 rounded-lg p-4 overflow-y-auto">
           <h2 className="text-white font-semibold text-xl flex">
@@ -261,7 +262,7 @@ useEffect(() => {
 
           {/* Companies Filter */}
           <div>
-            <h3 className="text-white font-semibold mb-2 text-base">
+            <h3 className="text-white font-semibold mb-2 text-xl">
               Companies
             </h3>
             {uniqueCompanies.slice(0, 5).map((company, index) => (
@@ -269,13 +270,13 @@ useEffect(() => {
                 <input
                   type="checkbox"
                   id={`company-${company}`}
-                  className="accent-blue-500"
+                  className="accent-blue-500 size-3.5"
                   checked={filter.companyTags.includes(company)}
                   onChange={()=>toggleCheckBox(company,"companyTags")}
                 />
                 <label
                   htmlFor={`company-${company}`}
-                  className="text-base text-zinc-300 flex items-center gap-1"
+                  className="text-[17px] text-zinc-300 flex items-center gap-1"
                 >
                   <img
                     src={`https://logo.clearbit.com/${company.toLowerCase()}.com`}
@@ -345,7 +346,7 @@ useEffect(() => {
             {["Solved", "Unsolved"].map((status) => (
               <label
                 key={status}
-                className="text-base text-zinc-300 flex items-center gap-2 mb-1"
+                className="text-[17px] text-zinc-300 flex items-center gap-2 mb-1"
               >
                 <input
                   type="checkbox"
@@ -363,7 +364,7 @@ useEffect(() => {
             {["Easy", "Medium", "Hard"].map((level) => (
               <label
                 key={level}
-                className="text-base text-zinc-300 flex items-center gap-2 mb-1"
+                className="text-[17px] text-zinc-300 flex items-center gap-2 mb-1"
               >
                 <input
                   type="checkbox"
@@ -555,7 +556,11 @@ useEffect(() => {
                       <div className="text-white font-medium flex flex-col">
                         <span className="problemtitle">
                           {index + 1}. {problem.title}
+                           <span>
+                        {problem.demo &&  <Badge className="ml-2 bg-zinc-200 text-black">Demo</Badge>}
                         </span>
+                        </span>
+                       
                         <span className="text-sm text-gray-400">
                           {problem.description.length > 80
                             ? problem.description.slice(0, 80) + "..."

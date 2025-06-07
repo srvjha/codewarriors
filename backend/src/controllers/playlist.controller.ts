@@ -21,8 +21,14 @@ const getAllPlaylistDetails = asyncHandler(async (req, res) => {
           problem: true,
         },
       },
+      user:{
+        select:{
+          fullName:true
+        }
+      }
     },
   });
+  
   res
     .status(200)
     .json(new ApiResponse(200, playlists, "All Playlist Fetched Successfully"));
@@ -86,6 +92,8 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 
 const addProblemToPlaylist = asyncHandler(async (req, res) => {
   const { plid, pid } = req.params;
+  console.log("plid: ",plid);
+  console.log("pid: ",pid);
   validId(plid, "Playlist");
   validId(pid, "Problem");
 

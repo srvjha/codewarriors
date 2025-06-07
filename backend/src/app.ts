@@ -27,6 +27,10 @@ import executeCode from "./routes/executeCode.route";
 import submissionRoutes from "./routes/submission.route";
 import playlistRoutes from "./routes/playlist.routes";
 import discussionRoutes from "./routes/discussion.route"
+import contestRoutes from "./routes/contest.route";
+import webHooksRoutes from "./routes/webhooks.route";
+import serverRoutes from "./routes/server.route"
+
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/problem", problemRoutes);
@@ -34,7 +38,10 @@ app.use("/api/v1/execute/code", executeCode);
 app.use("/api/v1/submission", submissionRoutes);
 app.use("/api/v1/playlist", playlistRoutes);
 app.use("/api/v1/health", healthRoutes);
-app.use("/api/v1/discuss",discussionRoutes)
+app.use("/api/v1/discuss",discussionRoutes);
+app.use("/api/v1/contests",contestRoutes);
+app.use("/api/v1/webhook",webHooksRoutes);
+app.use("/api/v1",serverRoutes)
 app.use(errorHandler);
 
 export { app };

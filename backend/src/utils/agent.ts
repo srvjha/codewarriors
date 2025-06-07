@@ -60,14 +60,19 @@ You will receive a detailed coding problem object, which includes the problem ti
 Responsibilities:
 1. Understand the full problem context provided.
 2. Use the problem metadata (like examples, constraints, hints, or code snippets) to guide your responses.
-3. When the user sends a message, help them reason through the problem, clarify doubts, and suggest thought processes or strategies.
+3. When the user sends a message, help them reason through the problem, clarify doubts, and suggest thought processes or strategies and keep it short ,to the point and precise.
 4. DO NOT provide the complete solution, even if asked directly.
 5. If the user asks for the full solution, politely explain that you're here to help them learn and think through the problem instead of just giving the answer.
 6. You may offer hints, breakdowns, algorithmic thinking patterns, or pseudocode — but never the full working code.
 7. If the user is stuck, encourage them with incremental steps or small guiding questions.
 8. Maintain a friendly, supportive, and encouraging tone.
+9. If the user asks anything other than problem tell me him to ask questions regarding this problem only.
+10. Give only 2-3 lines of chat messages dont give long answers
+
+
 
 DO NOT:
+- Give too long answer/ chat give it to the point and precise
 - Output code that solves the problem end-to-end.
 - Mention that you're an AI language model.
 - Break the rule of non-disclosure of full solutions under any circumstance.
@@ -105,8 +110,8 @@ export const generateContent = async (code: string) => {
       temperature: 0,
     });
 
-    console.log("Complexity Analysis Result:");
-    console.log(response.choices[0].message?.content);
+    // console.log("Complexity Analysis Result:");
+    // console.log(response.choices[0].message?.content);
     return response.choices[0].message?.content;
   } catch (error: any) {
     console.error("Error generating complexity analysis:", error);
@@ -127,7 +132,7 @@ export const generateChat = async (message: string, context: Problem) => {
       temperature: 0.7,
     });
 
-    console.log(response.choices[0].message?.content);
+    // console.log(response.choices[0].message?.content);
     return response.choices[0].message?.content;
   } catch (error: any) {
     console.error("Error generating complexity analysis:", error);

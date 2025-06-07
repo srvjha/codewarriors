@@ -60,7 +60,7 @@ const ProgressChart = ({ progressData }: P) => {
                 progressData.medProblems,
                 progressData.hardProblems,
               ],
-              backgroundColor: ["#00bfa6", "#f9a825", "#c62828"],
+              backgroundColor: ["#0cebcd", "#faae32", "#c62828"],
               borderWidth: 0,
               cutout: "90%",
               radius: "90%",
@@ -101,22 +101,22 @@ const ProgressChart = ({ progressData }: P) => {
   };
 
   return (
-    <div className="flex items-center bg-neutral-900  justify-between mb-4  rounded-xl px-6 py-4 w-[400px] text-white ">
-      <div className="relative w-[200px] h-[200px]">
+    <div className="flex items-center bg-transparent border-none border-neutral-800 relative h-[360px]   shadow-none shadow-neutral-500/40 justify-center  rounded-xl px-2 py-8  text-white col-span-1 row-span-1 ">
+      <div className="relative w-[250px] h-[250px]">
         <Doughnut data={data} options={options} />
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <div className="text-3xl font-semibold">
+          <div className="text-4xl font-semibold">
             {totalSolved}
-            <span className="text-sm text-gray-400">
+            <span className="text-lg text-gray-400">
               /{progressData.totalProblems}
             </span>
           </div>
-          <div className="text-green-400 text-sm">✓ Solved</div>
+          <div className="text-green-400 text-lg">✓ Solved</div>
         </div>
       </div>
 
       {/* Labels */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 ">
         <div className="bg-neutral-900 px-4 py-2 rounded-md text-[#00bfa6] text-sm font-medium flex justify-between">
           <span>Easy</span>
           <span className="ml-2 text-white font-bold">

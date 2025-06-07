@@ -1,23 +1,57 @@
-import { Card } from "@/components/ui/Card";
-import { difficultyColor } from "@/helper/Problem.helper";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/Card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/button";
 import type { Playlist } from "@/types/problem/problemTypes";
 import API from "@/utils/AxiosInstance";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
-import { List, Target, Trash } from "lucide-react";
+import {
+  Search,
+  BookOpen,
+  Target,
+  TrendingUp,
+  Star,
+  Users,
+  Clock,
+  Play,
+  Code2,
+  Zap,
+  Plus,
+  PlusCircle,
+  Trash,
+} from "lucide-react";
 import { useEffect, useState } from "react";
+// import { Link } from "react-router-dom";
+import CreatePlaylistModal from "@/components/ui/CreatePlaylistModal";
+import { formatDistanceToNow } from "date-fns";
+import AddProblemsModal from "@/components/ui/AddProblemModal";
 import { Link } from "react-router-dom";
 
 const PlaylistPage = () => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [selectedPlaylistIndex, setSelectedPlaylistIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [favourites, setFavourites] = useState<Playlist>();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedPlaylist, setSelectedPlaylist] = useState({
+    playlistName: "",
+    playlistId: "",
+  });
 
   const allPlaylistsDetails = async () => {
     try {
-      const response = await API.get(
-        "/playlist/all",
-        { withCredentials: true }
-      );
-      setPlaylists(response.data.data || []);
+      const response = await API.get("/playlist/all", {
+        withCredentials: true,
+      });
+      console.log("Resppnse: ", response.data.data);
+      setFavourites(response.data.data[0]);
+      setPlaylists(response.data.data.slice(1) || []);
     } catch (err) {
       console.error("Failed to fetch playlists", err);
     }
@@ -25,19 +59,13 @@ const PlaylistPage = () => {
 
   useEffect(() => {
     allPlaylistsDetails();
-  }, []);
+  }, [showAddModal]);
 
-  const selectedPlaylist = playlists[selectedPlaylistIndex];
-
-  const handleRemoveFromPlaylist = async (
-    playlistId: string,
-    problemId: string
-  ) => {
+  const handleRemovePlaylist = async (playListId: string) => {
     try {
-      const res = await API.delete(
-        `/playlist/${playlistId}/problem/${problemId}/remove`,
-        { withCredentials: true }
-      );
+      const res = await API.delete(`/playlist/${playListId}`, {
+        withCredentials: true,
+      });
       if (res.data.success) {
         ToastSuccess(res.data.message);
         await allPlaylistsDetails();
@@ -47,98 +75,399 @@ const PlaylistPage = () => {
     }
   };
 
-  const handleRemovePlaylist = async(playListId:string) => {
-    try{
-    const res = await API.delete(`/playlist/${playListId}`,{
-        withCredentials:true
-    })
-    if (res.data.success) {
-        ToastSuccess(res.data.message);
-        await allPlaylistsDetails();
-      }
-    } catch (err: any) {
-      ToastError(err.response.data.error);
-    }
+  const recommendedSheets = [
+    {
+      id: "beginner",
+      title: "Beginner's Foundation",
+      description: "Essential problems to build your DSA fundamentals",
+      problems: 50,
+      difficulty: "Easy",
+      icon: <BookOpen className="w-5 h-5" />,
+      badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+      cardColor:
+        "bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40",
+      buttonColor: "bg-emerald-600 hover:bg-emerald-700 text-white",
+    },
+    {
+      id: "intermediate",
+      title: "Intermediate Mastery",
+      description: "Level up with medium complexity challenges",
+      problems: 75,
+      difficulty: "Medium",
+      icon: <Target className="w-5 h-5" />,
+      badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+      cardColor: "bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40",
+      buttonColor: "bg-amber-600 hover:bg-amber-700 text-white",
+    },
+    {
+      id: "advanced",
+      title: "Advanced Conquest",
+      description: "Master the most challenging algorithmic problems",
+      problems: 100,
+      difficulty: "Hard",
+      icon: <TrendingUp className="w-5 h-5" />,
+      badgeColor: "bg-red-500/20 text-red-400 border-red-500/30",
+      cardColor: "bg-red-500/5 border-red-500/20 hover:border-red-500/40",
+      buttonColor: "bg-red-600 hover:bg-red-700 text-white",
+    },
+  ];
+
+  const companySheets = [
+    {
+      id: "google",
+      name: "Google",
+      problems: 120,
+      description: "Curated problems from Google interviews",
+      logo: "G",
+      color: "from-blue-500 to-blue-600",
+    },
+    {
+      id: "amazon",
+      name: "Amazon",
+      problems: 95,
+      description: "Amazon's most asked coding questions",
+      logo: "A",
+      color: "from-orange-500 to-orange-600",
+    },
+    {
+      id: "microsoft",
+      name: "Microsoft",
+      problems: 80,
+      description: "Microsoft interview preparation sheet",
+      logo: "M",
+      color: "from-cyan-500 to-cyan-600",
+    },
+    // {
+    //   id: "meta",
+    //   name: "Meta",
+    //   problems: 85,
+    //   description: "Facebook/Meta coding interview questions",
+    //   logo: "M",
+    //   color: "from-purple-500 to-purple-600"
+    // }
+  ];
+
+  const handleCreatePlayList = () => {
+    setShowCreateModal(true);
   };
 
+  const handleAddProblemToPlaylist = (name: string, id: string) => {
+    setShowAddModal(true);
+    setSelectedPlaylist({ playlistName: name, playlistId: id });
+  };
   return (
     <>
       <Toast />
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        <div className=" min-h-[calc(100vh-100px)] flex gap-4">
-          {/* Left: List Deatils */}
-          <div className="w-[350px] bg-neutral-900  px-4 py-3 rounded-lg shadow-sm shadow-neutral-900 border border-neutral-800 ">
-            <p className="text-xl font-semibold text-neutral-100 mb-4 flex items-center">
-              <List className="mr-2" />
-              Playlists
+      {showCreateModal && (
+        <CreatePlaylistModal onClose={() => setShowCreateModal(false)} />
+      )}
+
+      <AddProblemsModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        playlistName={selectedPlaylist.playlistName}
+        playlistId={selectedPlaylist.playlistId}
+      />
+
+      <div className="min-h-screen ">
+        <div className="max-w-7xl mx-auto p-6 space-y-10">
+          <div className="text-center space-y-6 pt-8">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="p-4 bg-neutral-900 rounded-2xl shadow-lg">
+                <Code2 className="w-8 h-8 text-white" />
+              </div>
+              <h1 className="text-5xl font-bold ">DSA Sheets</h1>
+            </div>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+              Master Data Structures & Algorithms with curated problem sets.
+              From beginner-friendly challenges to advanced company-specific
+              questions.
             </p>
-            <div className="space-y-3">
-              {playlists.map((playlist, index) => (
+          </div>
+
+          <div className="flex justify-center">
+            <div className="relative w-full max-w-2xl">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="Search sheets by name, topic, or company..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-6 py-4 text-lg bg-gray-900/50 border-gray-800 focus:border-blue-500 rounded-2xl backdrop-blur-sm text-gray-100 placeholder:text-gray-400 shadow-xl"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <h2 className="text-3xl font-bold text-gray-100">Your Sheets</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              <Card className="group hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/30 hover:border-yellow-400/50 backdrop-blur-sm">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-yellow-500/20 rounded-xl">
+                        <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                      </div>
+                      <CardTitle className="text-xl text-gray-100">
+                        {favourites?.name}
+                      </CardTitle>
+                    </div>
+                  </div>
+                  <CardDescription className="text-gray-300 h-8">
+                    {favourites?.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex flex-col gap-2 ">
+                    <div className="flex  flex-col  gap-1 text-sm text-gray-400">
+                      <span className="flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        {favourites?.problems.length}{" "}
+                        {favourites?.problems.length === 1
+                          ? "problem"
+                          : "problems"}
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-gray-400">
+                        <Clock size={14} />{" "}
+                        {favourites?.updatedAt
+                          ? formatDistanceToNow(
+                              new Date(favourites.updatedAt),
+                              {
+                                addSuffix: true,
+                              }
+                            )
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 mt-1 mb-2">
+                      <Button
+                        size="sm"
+                        className="bg-yellow-500 flex-1 cursor-pointer hover:bg-yellow-600 text-gray-900 font-medium"
+                      >
+                        <PlusCircle className="w-4 h-4 mt-1" />
+                        Add Problems
+                      </Button>
+                      <Link to={`/${favourites?.name}/${favourites?.id}`}>
+                      <Button
+                        size="sm"
+                        className="bg-yellow-500 flex-1 cursor-pointer hover:bg-yellow-600 text-gray-900 font-medium"
+                      >
+                        <Play className="w-4 h-4 " />
+                        Solve
+                      </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {playlists.map((playlist) => (
                 <Card
                   key={playlist.id}
-                  onClick={() => setSelectedPlaylistIndex(index)}
-                  className={`p-4 w-full border-none rounded-lg flex justify-between cursor-pointer text-neutral-100 shadow-lg shadow-neutral-950 bg-zinc-800 font-semibold ${
-                    selectedPlaylistIndex === index
-                      ? "bg-zinc-700 "
-                      : "hover:bg-zinc-800 "
-                  }`}
+                  className="group hover:shadow-2xl transition-all duration-300 bg-gray-900/50 border border-gray-700 hover:border-gray-600 backdrop-blur-sm"
                 >
-                  {playlist.name}
-                  <Trash
-                    size={16}
-                    className="cursor-pointer mt-0.5 text-red-400 hover:text-red-900"
-                    onClick={() => handleRemovePlaylist(playlist.id)}
-                  />
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg text-gray-100">
+                        {playlist.name}
+                      </CardTitle>
+                      <Trash
+                        className="w-4 h-4 text-red-400 cursor-pointer hover:text-red-300"
+                        onClick={() => handleRemovePlaylist(playlist.id)}
+                      />
+                    </div>
+                    <CardDescription className="text-sm text-gray-400 mt-1  h-10">
+                      {playlist.description || "No description provided."}
+                    </CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="text-sm text-gray-400 space-y-2">
+                    <span className="text-sm text-gray-400 flex gap-2">
+                      <Target className="w-4 h-4" />
+                      <span className="-mt-1">
+                        {playlist.problems.length}{" "}
+                        {playlist.problems.length === 1
+                          ? "problem"
+                          : "problems"}
+                      </span>
+                    </span>
+                    <div className="flex justify-between items-center -mt-1">
+                      <span>
+                        👤{" "}
+                        <span className="font-medium text-gray-300">
+                          {playlist.user.fullName}
+                        </span>
+                      </span>
+                      <span className="flex items-center gap-1 text-xs text-gray-500">
+                        <Clock size={14} />{" "}
+                        {formatDistanceToNow(new Date(playlist.updatedAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-2 mt-1 mb-2">
+                      <Button
+                        variant="outline"
+                        className="w-full flex-1 cursor-pointer border border-dashed border-gray-600 hover:border-blue-500 text-gray-300 hover:text-blue-400 bg-transparent"
+                        onClick={() =>
+                          handleAddProblemToPlaylist(playlist.name, playlist.id)
+                        }
+                      >
+                        <PlusCircle className="w-4 h-4 mt-1" />
+                        Add Problems
+                      </Button>
+                       
+                       <Link to={`/${playlist?.name}/${playlist?.id}`}>
+                      <Button
+                        variant="outline"
+                        className="w-full flex-1 cursor-pointer border border-dashed border-gray-600 hover:border-blue-500 text-gray-300 hover:text-blue-400 bg-transparent"
+                      >
+                        <Play className="w-4 h-4 " />
+                        Solve
+                      </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              <Card className="group flex-row  justify-end hover:shadow-2xl transition-all duration-300 bg-gray-900/50 border-gray-700 hover:border-gray-600 border-dashed backdrop-blur-sm">
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-gray-700/50 rounded-xl">
+                        <Plus className="w-5 h-5 text-gray-400" />
+                      </div>
+                      <CardTitle className="text-xl text-gray-300">
+                        Create New Sheet
+                      </CardTitle>
+                    </div>
+                  </div>
+                  <CardDescription className="text-gray-400">
+                    Build your custom problem collection
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="pt-0 mt-17">
+                  <Button
+                    variant="outline"
+                    className="w-full cursor-pointer border-dashed border-2 border-gray-600 hover:border-blue-500 hover:text-blue-400 text-gray-300 bg-transparent"
+                    onClick={handleCreatePlayList}
+                  >
+                    <Zap className="w-4 h-4" />
+                    Get Started
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <h2 className="text-3xl font-bold text-gray-100">
+                Recommended by Difficulty
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recommendedSheets.map((sheet) => (
+                <Card
+                  key={sheet.id}
+                  className={`group hover:shadow-2xl transition-all duration-300 ${sheet.cardColor} backdrop-blur-sm`}
+                >
+                  <CardHeader className="pb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="p-3 bg-gray-800/50 rounded-xl text-gray-300">
+                        {sheet.icon}
+                      </div>
+                      <Badge className={sheet.badgeColor}>
+                        {sheet.difficulty}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-xl text-gray-100 group-hover:text-white transition-colors">
+                      {sheet.title}
+                    </CardTitle>
+                    <CardDescription className="text-gray-300">
+                      {sheet.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <span className="flex items-center gap-2">
+                          <Target className="w-4 h-4" />
+                          {sheet.problems} problems
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <Users className="w-4 h-4" />
+                          2.4k users
+                        </span>
+                      </div>
+                      <Button size="sm" className={sheet.buttonColor}>
+                        <Play className="w-4 h-4" />
+                        Solve
+                      </Button>
+                    </div>
+                  </CardContent>
                 </Card>
               ))}
             </div>
           </div>
 
-          {/* Right: Problems in List*/}
-          <div className="flex-1 bg-neutral-900  px-6 py-4 rounded-lg  shadow-sm shadow-neutral-900 border border-neutral-800 ">
-            <p className="text-xl font-semibold text-white mb-4 flex">
-              {selectedPlaylist?.name} Problems{" "}
-              <Target className="mt-1.5 ml-2" size={18} />
-            </p>
-            {selectedPlaylist?.problems?.length > 0 ? (
-              <div className="space-y-4">
-                {selectedPlaylist.problems.map((item) => (
-                  <Card
-                    key={item.id}
-                    className="p-4 w-full cursor-pointer border-none shadow-lg shadow-neutral-950 bg-zinc-800 rounded-md flex justify-between items-center text-white"
-                  >
-                    <Link to={`/problem/${item.problem.id}`}>
-                      <span>{item.problem.title}</span>
-                    </Link>
-                    <div className="flex items-center gap-4 px-1 py-1 mr-4">
-                      <span
-                        className={`text-sm font-semibold ${
-                          difficultyColor[item.problem.difficulty]
-                        }`}
-                      >
-                        {item.problem.difficulty.length > 4
-                          ? `${item.problem.difficulty.slice(0, 3)}.`
-                          : item.problem.difficulty}
-                      </span>
-                      <span>
-                        <Trash
-                          size={16}
-                          className="cursor-pointer text-red-400 hover:text-red-900"
-                          onClick={() =>
-                            handleRemoveFromPlaylist(
-                              item.playListId,
-                              item.problem.id
-                            )
-                          }
-                        />
-                      </span>
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <h2 className="text-3xl font-bold text-gray-100">
+                Company Based Sheets
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {companySheets.map((company) => (
+                <Card
+                  key={company.id}
+                  className={`group hover:shadow-2xl transition-all duration-300 bg-blue-500/5 border-blue-500/20 hover:border-blue-500/40 backdrop-blur-sm`}
+                >
+                  <CardHeader className="pb-4">
+                    <div className="flex mb-4">
+                      <img
+                        src={`https://logo.clearbit.com/${company.name.toLowerCase()}.com`}
+                        className="w-7 h-7 object-contain mt-2"
+                        alt="logo"
+                      />
                     </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-400">No problems in this playlist yet.</p>
-            )}
+                    <CardTitle className="text-lg font-semibold text-white group-hover:text-gray-100 transition">
+                      {company.name} Interview Questions
+                    </CardTitle>
+                    <CardDescription className="text-gray-400 text-sm mt-1">
+                      {company.description}
+                    </CardDescription>
+                  </CardHeader>
+
+                  <CardContent className="pt-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                        <span className="flex items-center gap-2">
+                          <Target className="w-4 h-4" />
+                          {company.problems} problems
+                        </span>
+                        <span className="flex items-center gap-2">
+                          <Users className="w-4 h-4" />
+                          2.4k users
+                        </span>
+                      </div>
+                      <Button size="sm" className="bg-emerald-500">
+                        <Play className="w-4 h-4" />
+                        Solve
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </div>
       </div>

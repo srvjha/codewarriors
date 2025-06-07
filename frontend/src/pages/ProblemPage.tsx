@@ -250,7 +250,7 @@ const ProblemPage = () => {
       <div className="flex flex-wrap gap-2 mb-2">
         {tagObj.companies.map((company: string, idx: number) => (
           <div
-            className="flex bg-zinc-900  px-2 py-1 text-[12px] rounded-lg"
+            className="flex bg-neutral-900  px-2 py-1 text-[12px] rounded-lg"
             key={idx}
           >
             <img
@@ -439,7 +439,7 @@ const ProblemPage = () => {
                     {problem.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="bg-zinc-900 text-gray-300 px-2 py-1 text-xs rounded-md mr-2"
+                        className="bg-neutral-900 text-gray-300 px-2 py-1 text-xs rounded-md -mr-1"
                       >
                         {" "}
                         {tag}{" "}

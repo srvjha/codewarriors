@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { UserData } from "@/redux/slices/auth/authTypes";
 import type { Problem } from "@/types/problem/problemTypes";
 import API from "@/utils/AxiosInstance";
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown from "react-markdown";
 
 interface AiChatModalProps {
   aiChatOpen: boolean;
   setAiChatOpen: (open: boolean) => void;
   userData: UserData;
-  context:Problem
+  context: Problem;
 }
 
 interface Message {
@@ -16,14 +16,28 @@ interface Message {
   text: string;
 }
 
-const AiChatModal = ({ aiChatOpen, setAiChatOpen, userData,context }: AiChatModalProps) => {
-  const [messages, setMessages] = useState<Message[]>([{role:"bot",text:"Hey How Could i help you"}]); 
+const AiChatModal = ({
+  aiChatOpen,
+  setAiChatOpen,
+  userData,
+  context,
+}: AiChatModalProps) => {
+  const [messages, setMessages] = useState<Message[]>([
+    { role: "bot", text: "Hey How Could i help you" },
+  ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-interface HandleSendMessageEvent extends React.FormEvent<HTMLFormElement> {}
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-const handleSendMessage = async (e: HandleSendMessageEvent): Promise<void> => {
+  interface HandleSendMessageEvent extends React.FormEvent<HTMLFormElement> {}
+
+  const handleSendMessage = async (
+    e: HandleSendMessageEvent
+  ): Promise<void> => {
     e.preventDefault();
     if (!input.trim()) return;
 
@@ -33,27 +47,30 @@ const handleSendMessage = async (e: HandleSendMessageEvent): Promise<void> => {
     setLoading(true);
 
     try {
-        const response: { data?: { data?: string } } = await API.post("/auth/ai/ask/question", {
-            context:context,
-            message: input,
-        });
-        console.log("response: ",response)
+      const response: { data?: { data?: string } } = await API.post(
+        "/auth/ai/ask/question",
+        {
+          context: context,
+          message: input,
+        }
+      );
+      console.log("response: ", response);
 
-        const botReply: Message = {
-            role: "bot",
-            text: response?.data?.data || "Sorry, I couldn't understand that.",
-        };
+      const botReply: Message = {
+        role: "bot",
+        text: response?.data?.data || "Sorry, I couldn't understand that.",
+      };
 
-        setMessages((prev: Message[]) => [...prev, botReply]);
+      setMessages((prev: Message[]) => [...prev, botReply]);
     } catch (error) {
-        setMessages((prev: Message[]) => [
-            ...prev,
-            { role: "bot", text: "Error: Failed to get AI response." },
-        ]);
+      setMessages((prev: Message[]) => [
+        ...prev,
+        { role: "bot", text: "Error: Failed to get AI response." },
+      ]);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
+  };
 
   return (
     aiChatOpen && (
@@ -84,29 +101,34 @@ const handleSendMessage = async (e: HandleSendMessageEvent): Promise<void> => {
                 />
               )}
               <div
-                className={`p-3 rounded-lg text-sm max-w-[80%] ${
+                className={`px-3 py-2 rounded-lg text-sm max-w-[80%] break-words whitespace-pre-wrap ${
                   msg.role === "user"
-                    ? "bg-blue-100 text-gray-800"
-                    : "bg-gray-100 text-gray-800"
+                    ? "bg-blue-100 text-zinc-800"
+                    : "bg-zinc-100 text-zinc-800"
                 }`}
               >
-                 <ReactMarkdown>{msg.text}</ReactMarkdown>
+                <ReactMarkdown>{msg.text}</ReactMarkdown>
               </div>
+
               {msg.role === "user" && (
                 <img
                   src={userData?.avatar}
                   alt="You"
-                  className="w-8 h-8 rounded-full bg-gray-200"
+                  className="w-8 h-8 rounded-full bg-zinc-200 object-cover"
                 />
               )}
             </div>
           ))}
           {loading && (
-            <div className="text-sm text-gray-400">AI is typing...</div>
+            <div className="text-sm text-zinc-400">AI is typing...</div>
           )}
+          <div ref={messagesEndRef} />
         </div>
         <div className="border-t border-t-neutral-600 p-4">
-          <form onSubmit={handleSendMessage} className="flex items-center space-x-2">
+          <form
+            onSubmit={handleSendMessage}
+            className="flex items-center space-x-2"
+          >
             <input
               type="text"
               value={input}

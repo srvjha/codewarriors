@@ -77,6 +77,7 @@ const createProblem = asyncHandler(async (req, res) => {
       data: {
         title,
         description,
+        demo:false,
         difficulty: difficulty.toUpperCase() as Difficulty,
         tags,
         examples,
@@ -103,9 +104,13 @@ const getAllProblems = asyncHandler(async (req, res) => {
       description: true,
       difficulty: true,
       tags: true,
+      demo:true,
       createdAt: true,
       updatedAt: true,
     },
+    orderBy: {
+    demo: 'desc'
+  }
   });
   if (!problems) {
     throw new ApiError("No problems found", 404);

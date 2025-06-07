@@ -46,6 +46,9 @@ export interface Playlist{
   name: string;
   description: string;
   userId: string;
+  user:{
+    fullName:string
+  };
   problems: {
     problem: Problem;
     id: string;

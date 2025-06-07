@@ -1,57 +1,37 @@
-import { useEffect, useState } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
-import type { SubmissionType } from "@/types/submit/SubmissionTypes";
-import API from "@/utils/AxiosInstance";
+import type {
+  Submission
+} from "@/types/submit/SubmissionTypes";
 
-type Calendar = {
-  date: string;
-  count: number;
-};
 
-const ContributionCalendar = () => {
-  const [heatmapData, setHeatmapData] = useState<Calendar[]>([]);
+type SubmissionProps = {
+  submissions:Submission[]
+}
 
-  useEffect(() => {
-    const fetchSubmissions = async () => {
-      try {
-        const res = await API.get("/submission/all", {
-          withCredentials: true,
-        });
+const ContributionCalendar = ({ submissions }:SubmissionProps) => {
+  const dateMap = submissions.reduce(
+    (acc: { [key: string]: number }, submission: Submission) => {
+      const date = new Date(submission?.createdAt).toLocaleDateString();
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    },
+    {}
+  );
 
-        const submissions = res.data.data;
-
-        const dateMap = submissions.reduce(
-          (acc: { [key: string]: number }, submission: SubmissionType) => {
-            const date = new Date(submission?.createdAt).toLocaleDateString();
-            acc[date] = (acc[date] || 0) + 1;
-            return acc;
-          },
-          {}
-        );
-
-        const formatted = Object.entries(dateMap).map(([date, count]) => ({
-          date,
-          count: Number(count),
-        }));
-
-        setHeatmapData(formatted);
-      } catch (error) {
-        console.error("Failed to fetch submissions", error);
-      }
-    };
-
-    fetchSubmissions();
-  }, []);
+  const heatmapData = Object.entries(dateMap).map(([date, count]) => ({
+    date,
+    count: Number(count),
+  }));
 
   const endDate = new Date();
   const rawStartDate = new Date(
     new Date().setFullYear(endDate.getFullYear() - 1)
   );
   const startDate = new Date(rawStartDate);
-  startDate.setDate(startDate.getDate() + ((6 - startDate.getDay()) % 7)); 
+  startDate.setDate(startDate.getDate() + ((6 - startDate.getDay()) % 7));
 
   return (
     <div className="px-4 py-4  rounded shadow w-[970px] h-[100px]">

@@ -25,6 +25,9 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 import DiscussCreatePage from "./pages/DiscussCreatePage";
 import DiscussUpdatePage from "./pages/DiscussUpdatePage";
 import PostPage from "./pages/PostPage";
+import SheetPage from "./pages/SheetPage";
+import ContestPage from "./pages/ContestPage";
+import ContestDetailPage from "./pages/ContestDetailPage";
 
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -87,7 +90,7 @@ const App = () => {
           path="/discuss/:postid"
           element={
             <PrivateRoute>
-             <PostPage/>
+              <PostPage />
             </PrivateRoute>
           }
         />
@@ -95,7 +98,7 @@ const App = () => {
           path="/discuss/edit/:postid"
           element={
             <PrivateRoute>
-             <DiscussUpdatePage/>
+              <DiscussUpdatePage />
             </PrivateRoute>
           }
         />
@@ -127,14 +130,7 @@ const App = () => {
           }
         />
 
-        <Route
-          path="/forgot-password"
-          element={
-           
-              <ForgotPasswordPage />
-         
-          }
-        />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         <Route
           path="/reset-password/:token"
@@ -145,25 +141,28 @@ const App = () => {
           }
         />
 
-        <Route
-          path="/verify/:token"
-          element={
-            
-              <VerifyEmail />
-           
-          }
-        />
+        <Route path="/verify/:token" element={<VerifyEmail />} />
 
         <Route
           path="/forgot/password/:token"
-          element={
-            
-              <ResetForgotPassword/>
-           
-          }
+          element={<ResetForgotPassword />}
+        />
+        <Route
+        path="/:sheetname/:id"
+        element={<SheetPage/>}
         />
 
-          <Route path="/about" element={<About />} />
+        <Route
+        path="/contest"
+        element={<ContestPage/>}
+        />
+
+         <Route
+        path="/contest/:contestId"
+        element={<ContestDetailPage/>}
+        />
+
+        <Route path="/about" element={<About />} />
       </Route>
 
       <Route path="/login" element={<LoginPage />} />

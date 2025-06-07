@@ -193,7 +193,7 @@ const DiscussPage = () => {
         </div>
         <div className="flex gap-2 mb-6 px-4">
           <div 
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 border ${activeFilter === "mv"?"border-blue-500" :"border-neutral-800"}   hover:border-blue-500 hover:from-blue-900/20 hover:to-blue-800/20 cursor-pointer transition-all duration-300 group`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-900 border ${activeFilter === "mv"?"border-blue-500" :"border-neutral-800"}   hover:border-blue-500 hover:from-blue-900/20 hover:to-blue-800/20 cursor-pointer transition-all duration-300 group`}
           onClick={() => handleFilter("mv")}
           >
             <ThumbsUp
@@ -209,7 +209,7 @@ const DiscussPage = () => {
           </div>
 
           <div 
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-800 border ${activeFilter === "lt"?"border-blue-500" :"border-neutral-800"}   hover:border-blue-500 hover:from-blue-900/20 hover:to-blue-800/20 cursor-pointer transition-all duration-300 group`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-900 border ${activeFilter === "lt"?"border-blue-500" :"border-neutral-800"}   hover:border-blue-500 hover:from-blue-900/20 hover:to-blue-800/20 cursor-pointer transition-all duration-300 group`}
            onClick={() => handleFilter("lt")}
           >
             <ChartNoAxesCombined
@@ -229,7 +229,7 @@ const DiscussPage = () => {
           {posts.map((post) => (
             <Card
               key={post.id}
-              className="w-full max-w-full border-0 border-b border-b-neutral-700 bg-[#151414] shadow-md hover:shadow-blue-900/20 transition-all duration-300 rounded-xl"
+              className="w-full max-w-full border-0 border-b border-b-neutral-700 bg-zinc-950 shadow-md hover:shadow-neutral-500/20 transition-all duration-300 rounded-xl"
             >
               <CardContent className="p-4">
                 <Link to={`/discuss/${post.id}`}>

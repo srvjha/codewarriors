@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/redux/store";
 import { LogoutUser } from "@/redux/slices/auth/authThunks";
 import { ToastError, ToastSuccess } from "@/utils/ToastContainers";
-import { List, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClipLoader } from "react-spinners";
 import { TbFlame, TbFlameFilled } from "react-icons/tb";
@@ -105,9 +105,14 @@ export const Header = ({ children }: React.PropsWithChildren) => {
               Discuss
             </Link>
 
-            <Link to="/about" className="hover:text-blue-400 transition-colors">
-              About
+            <Link to="/my-list" className="hover:text-blue-400 transition-colors">
+              Sheets
             </Link>
+
+            <Link to="/contest" className="hover:text-blue-400 transition-colors">
+              Contests
+            </Link>
+
             {/*  <Link
               to="/pricing"
               className="hover:text-blue-400 transition-colors"
@@ -142,6 +147,10 @@ export const Header = ({ children }: React.PropsWithChildren) => {
             </Tooltip>
           )}
 
+            <Link to="/about" className="hover:text-blue-400 transition-colors">
+              About
+            </Link>
+
           {userData?.role === "ADMIN" && (
             <Link
               to="/admin/dashboard"
@@ -156,34 +165,44 @@ export const Header = ({ children }: React.PropsWithChildren) => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="ring-0 border-0 focus-visible:ring-offset-0 focus-visible:ring-0 border-none">
-                  <Avatar className=" h-10 w-10 ">
+                  <Avatar className="h-10 w-10">
                     <AvatarImage src={userData.avatar} />
                     <AvatarFallback className="text-black font-semibold text-xl bg-white">
-                      {userData?.fullName.split("")[0].toUpperCase()}
+                      {userData?.fullName?.[0]?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-zinc-900 text-white border-none shadow-sm shadow-neutral-800 z-50">
+
+              <DropdownMenuContent className="bg-black/80 text-white border border-neutral-800 z-50 mt-3 mr-5 w-64 p-3 rounded-lg shadow-lg">
+                <div className="mb-3 border-b border-neutral-700 pb-3">
+                  <p className="text-white font-semibold text-base truncate">
+                    {userData.fullName}
+                  </p>
+                  <p className="text-gray-400 text-sm truncate">
+                    {userData.email}
+                  </p>
+                </div>
                 <Link to="/profile">
-                  <DropdownMenuItem className="cursor-pointer">
-                    <User />
+                  <DropdownMenuItem className="cursor-pointer gap-2">
+                    <User className="w-4 h-4" />
                     Profile
                   </DropdownMenuItem>
                 </Link>
-                <Link to="/my-list">
-                  <DropdownMenuItem className="cursor-pointer">
-                    <List />
+
+                {/* <Link to="/my-list">
+                  <DropdownMenuItem className="cursor-pointer gap-2">
+                    <List className="w-4 h-4" />
                     My List
                   </DropdownMenuItem>
-                </Link>
+                </Link> */}
+
                 <DropdownMenuItem
-                  variant="destructive"
                   onClick={() => logout()}
-                  className="cursor-pointer"
+                  className="cursor-pointer gap-2 text-red-500 hover:text-red-600"
                 >
-                  <LogOut />
-                  <div>Logout</div>
+                  <LogOut className="w-4 h-4" />
+                  Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
