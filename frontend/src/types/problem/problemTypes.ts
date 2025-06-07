@@ -12,6 +12,11 @@ export interface Problem {
   }[];
   constraints: string;
   hints: string | null;
+  isSolved:boolean;
+  ProblemInPlaylist:{
+    problemId:string
+  }[];
+  demo:boolean;
   editorial: string | null;
   testcases: {
     input: string;

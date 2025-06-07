@@ -107,6 +107,11 @@ const getAllProblems = asyncHandler(async (req, res) => {
       demo:true,
       createdAt: true,
       updatedAt: true,
+      ProblemInPlaylist:{
+        select:{
+          problemId:true
+        }
+      }
     },
     orderBy: {
     demo: 'desc'

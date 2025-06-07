@@ -61,6 +61,7 @@ model User {
   DiscussionUpvote  DiscussionUpvote[]
   Contestant        Contestant[]
   ContestSubmission ContestSubmission[]
+  CommentUpvote     CommentUpvote[]
 }
 
 model Problem {
@@ -207,8 +208,19 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  discuss Discussion @relation(fields: [discussId], references: [id], onDelete: Cascade)
-  user    User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  discuss       Discussion      @relation(fields: [discussId], references: [id], onDelete: Cascade)
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  CommentUpvote CommentUpvote[]
+}
+
+model CommentUpvote {
+  id        String  @id @default(uuid())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String
+  comment   Comment @relation(fields: [commentId], references: [id])
+  commentId String
+
+  @@unique([userId, commentId])
 }
 
 model DiscussionUpvote {

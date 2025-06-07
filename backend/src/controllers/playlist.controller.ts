@@ -89,7 +89,7 @@ const getPlaylistDetails = asyncHandler(async (req, res) => {
 });
 
 const createPlaylist = asyncHandler(async (req, res) => {
-  const { name, description } = handleZodError(
+  const { name, description,visibilty } = handleZodError(
     createPlaylistValidation(req.body)
   );
   const userId = req.user.id;
@@ -98,6 +98,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
       name,
       description,
       userId,
+      visibilty
     },
   });
   res

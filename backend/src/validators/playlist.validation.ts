@@ -3,6 +3,7 @@ import { z } from "zod";
  const createPlaylistSchema = z.object({
    name:z.string().nonempty("Missing required fields"),
    description:z.string().optional(),
+   visibilty:z.boolean().optional()
 });
 
 

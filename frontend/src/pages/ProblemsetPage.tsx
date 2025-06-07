@@ -11,6 +11,7 @@ import {
   Star,
   ChevronsDown,
   ChevronsUp,
+  StarIcon,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -27,21 +28,13 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
-import Playlist from "@/components/ui/Playlist";
+
 import { difficultyColor } from "@/helper/Problem.helper";
 import API from "@/utils/AxiosInstance";
 import { useCollapse } from "react-collapsed";
 import tags from "../../companyTags.json";
-
-type Problem = {
-  id: string;
-  title: string;
-  description: string;
-  difficulty: "EASY" | "MEDIUM" | "HARD";
-  tags: string[];
-  demo:boolean;
-  isSolved: boolean;
-};
+import PlaylistSheet from "@/components/ui/PlaylistSheet";
+import type { Problem } from "@/types/problem/problemTypes";
 
 const problemsPerPage = 10;
 
@@ -74,7 +67,6 @@ const ProblemsetPage = () => {
     execType: [],
   });
 
-  
   const searchRef =
     useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
 
@@ -207,48 +199,48 @@ const ProblemsetPage = () => {
   };
 
   const toggleCheckBox = (value: string, type: keyof FilterCheckBox) => {
-  setFilter((prev) => {
-    const current = prev[type];
-    const updated = current.includes(value)   // logic if its there then remove otherwise include
-      ? current.filter((item) => item !== value)
-      : [...current, value];
-      console.log({updated})
-    return { ...prev, [type]: updated };
-  });
-};
+    setFilter((prev) => {
+      const current = prev[type];
+      const updated = current.includes(value) // logic if its there then remove otherwise include
+        ? current.filter((item) => item !== value)
+        : [...current, value];
+      console.log({ updated });
+      return { ...prev, [type]: updated };
+    });
+  };
 
-useEffect(() => {
-  let filtered = [...allProblems];
+  useEffect(() => {
+    let filtered = [...allProblems];
 
-  if (filter.companyTags.length > 0) {
-    const getProblemName = tags.filter((tag) =>
-      filter.companyTags.some((company) => tag.companies.includes(company))
-    );
-    console.log({getProblemName})
-    filtered = filtered.filter(problem =>
-      getProblemName.some(tag => problem.title.includes(tag.problem))
-    );
-  }
+    if (filter.companyTags.length > 0) {
+      const getProblemName = tags.filter((tag) =>
+        filter.companyTags.some((company) => tag.companies.includes(company))
+      );
+      console.log({ getProblemName });
+      filtered = filtered.filter((problem) =>
+        getProblemName.some((tag) => problem.title.includes(tag.problem))
+      );
+    }
 
-  if (filter.execType.length > 0) {
-    filtered = filtered.filter(problem =>
-      filter.execType.includes(problem.isSolved ? "Solved" : "Unsolved")
-    );
-  }
+    if (filter.execType.length > 0) {
+      filtered = filtered.filter((problem) =>
+        filter.execType.includes(problem.isSolved ? "Solved" : "Unsolved")
+      );
+    }
 
-  if (filter.difficulty.length > 0) {
-    let levels = filter.difficulty.map((level)=>level.toLowerCase())
-    filtered = filtered.filter(problem =>
-     levels.includes(problem.difficulty.toLowerCase())
-    );
-  }
+    if (filter.difficulty.length > 0) {
+      let levels = filter.difficulty.map((level) => level.toLowerCase());
+      filtered = filtered.filter((problem) =>
+        levels.includes(problem.difficulty.toLowerCase())
+      );
+    }
 
-  setFilteredProblems(filtered);
-  setVisibleProblems(filtered.slice(0, problemsPerPage));
-  setHasMore(filtered.length > problemsPerPage);
-}, [filter, allProblems]);
+    setFilteredProblems(filtered);
+    setVisibleProblems(filtered.slice(0, problemsPerPage));
+    setHasMore(filtered.length > problemsPerPage);
+  }, [filter, allProblems]);
 
-
+  
 
   return (
     <div className="max-w-7xl mx-auto p-6 grid grid-cols-4 z-10">
@@ -257,14 +249,12 @@ useEffect(() => {
           <h2 className="text-white font-semibold text-xl flex">
             <Filter className="mt-1.5 mr-1 text-neutral-400" size={18} />
             <span>Filters</span>
-            </h2>
+          </h2>
           <hr className="border border-neutral-600 mb-4 mt-1" />
 
           {/* Companies Filter */}
           <div>
-            <h3 className="text-white font-semibold mb-2 text-xl">
-              Companies
-            </h3>
+            <h3 className="text-white font-semibold mb-2 text-xl">Companies</h3>
             {uniqueCompanies.slice(0, 5).map((company, index) => (
               <div key={index} className="flex items-center gap-2 mb-1">
                 <input
@@ -272,7 +262,7 @@ useEffect(() => {
                   id={`company-${company}`}
                   className="accent-blue-500 size-3.5"
                   checked={filter.companyTags.includes(company)}
-                  onChange={()=>toggleCheckBox(company,"companyTags")}
+                  onChange={() => toggleCheckBox(company, "companyTags")}
                 />
                 <label
                   htmlFor={`company-${company}`}
@@ -312,7 +302,7 @@ useEffect(() => {
                     id={`company-${company}`}
                     className="accent-blue-500"
                     checked={filter.companyTags.includes(company)}
-                      onChange={()=>toggleCheckBox(company,"companyTags")}
+                    onChange={() => toggleCheckBox(company, "companyTags")}
                   />
                   <label
                     htmlFor={`company-${company}`}
@@ -351,7 +341,7 @@ useEffect(() => {
                 <input
                   type="checkbox"
                   checked={filter.execType.includes(status)}
-                    onChange={()=>toggleCheckBox(status,"execType")}
+                  onChange={() => toggleCheckBox(status, "execType")}
                 />
                 {status}
               </label>
@@ -369,7 +359,7 @@ useEffect(() => {
                 <input
                   type="checkbox"
                   checked={filter.difficulty.includes(level)}
-                    onChange={()=>toggleCheckBox(level,"difficulty")}
+                  onChange={() => toggleCheckBox(level, "difficulty")}
                 />
                 {level}
               </label>
@@ -532,7 +522,7 @@ useEffect(() => {
           >
             <div className="space-y-2">
               {showPlaylist && (
-                <Playlist
+                <PlaylistSheet
                   problemId={addProblem}
                   onClose={() => {
                     setShowPlaylist(false);
@@ -541,52 +531,67 @@ useEffect(() => {
                 />
               )}
 
-              {visibleProblems.map((problem, index) => (
-                <Card
-                  key={problem.id}
-                  className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
-                >
-                  <Link to={`/problem/${problem.id}`}>
-                    <div className="flex flex-row">
-                      {problem.isSolved ? (
-                        <CheckCircle className="mt-2 mr-3 text-green-500" />
-                      ) : (
-                        <div className="mr-9"></div>
-                      )}
-                      <div className="text-white font-medium flex flex-col">
-                        <span className="problemtitle">
-                          {index + 1}. {problem.title}
-                           <span>
-                        {problem.demo &&  <Badge className="ml-2 bg-zinc-200 text-black">Demo</Badge>}
-                        </span>
-                        </span>
-                       
-                        <span className="text-sm text-gray-400">
-                          {problem.description.length > 80
-                            ? problem.description.slice(0, 80) + "..."
-                            : problem.description}
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                  <div className="flex items-center gap-4 px-1 py-1 mr-4">
-                    <Star
-                      size={22}
-                      className="mt-1 text-zinc-600 hover:text-yellow-600"
-                      onClick={() => handleAddPlaylist(problem.id)}
-                    />
-                    <span
-                      className={`text-sm font-semibold ${
-                        difficultyColor[problem.difficulty]
-                      }`}
-                    >
-                      {problem.difficulty.length > 4
-                        ? `${problem.difficulty.slice(0, 3)}.`
-                        : problem.difficulty}
-                    </span>
-                  </div>
-                </Card>
-              ))}
+              {visibleProblems.map((problem, index) => {
+  const isInPlaylist = problem.ProblemInPlaylist.some(
+    (prob) => prob.problemId === problem.id
+  );
+
+  return (
+    <Card
+      key={problem.id}
+      className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
+    >
+      <Link to={`/problem/${problem.id}`}>
+        <div className="flex flex-row">
+          {problem.isSolved ? (
+            <CheckCircle className="mt-2 mr-3 text-green-500" />
+          ) : (
+            <div className="mr-9"></div>
+          )}
+          <div className="text-white font-medium flex flex-col">
+            <span className="problemtitle">
+              {index + 1}. {problem.title}
+              {problem.demo && (
+                <Badge className="ml-2 bg-zinc-200 text-black">Demo</Badge>
+              )}
+            </span>
+            <span className="text-sm text-gray-400">
+              {problem.description.length > 80
+                ? problem.description.slice(0, 80) + "..."
+                : problem.description}
+            </span>
+          </div>
+        </div>
+      </Link>
+
+      <div className="flex items-center gap-4 px-1 py-1 mr-4">
+        {isInPlaylist ? (
+          <StarIcon
+            size={22}
+            className="mt-1 text-yellow-600 cursor-pointer"
+            onClick={() => handleAddPlaylist(problem.id)}
+          />
+        ) : (
+          <Star
+            size={22}
+            className="mt-1 text-zinc-600 hover:text-yellow-600 cursor-pointer"
+            onClick={() => handleAddPlaylist(problem.id)}
+          />
+        )}
+        <span
+          className={`text-sm font-semibold ${
+            difficultyColor[problem.difficulty]
+          }`}
+        >
+          {problem.difficulty.length > 4
+            ? `${problem.difficulty.slice(0, 3)}.`
+            : problem.difficulty}
+        </span>
+      </div>
+    </Card>
+  );
+})}
+
             </div>
           </InfiniteScroll>
         )}

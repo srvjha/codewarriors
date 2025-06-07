@@ -2,23 +2,30 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "@/utils/AxiosInstance";
 // import TurndownService from "turndown";
-import type { Post } from "@/types/discuss/post";
+import type { Comment, Post } from "@/types/discuss/post";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { Eye, MessageSquare, ThumbsUp } from "lucide-react";
 import { ToastError } from "@/utils/ToastContainers";
 import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import CommentInput from "@/components/CommentInput";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 const PostPage = () => {
   const { postid } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [editingComment, setEditingComment] = useState<Comment | null>(null);
+  const { userData } = useSelector((state: RootState) => state.auth);
+  console.log({userData})
   //   const turndownService = new TurndownService();
 
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const res = await API.get(`/discuss/post/${postid}`);
-        console.log("Res: ", res);
         setPost(res.data.data);
       } catch (err) {
         console.error("Failed to fetch post", err);
@@ -29,6 +36,31 @@ const PostPage = () => {
 
     fetchPost();
   }, [postid]);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await API.get(`/discuss/comments/all`);
+        console.log("comments: ", res.data.data);
+        setComments(res.data.data);
+      } catch (err) {
+        console.error("Failed to fetch post", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchComments();
+  }, []);
+
+  const handleRefetchComments = async () => {
+    try {
+      const res = await API.get(`/discuss/comments/all`);
+      setComments(res.data.data);
+    } catch (err) {
+      console.error("Failed to fetch comments", err);
+    }
+  };
 
   if (loading) {
     return <div className="text-center py-10 text-white">Loading...</div>;
@@ -66,10 +98,32 @@ const PostPage = () => {
     }
   };
 
+  const handleCommentUpvote = async (commentId: string) => {
+    try {
+      const res = await API.patch(`/discuss/comment/${commentId}/upvote`, {
+        withCredentials: true,
+      });
+      if (res.data.data.voted) {
+        setComments((prev) =>
+          prev.map((c) =>
+            c.id === commentId ? { ...c, upvote: c.upvote + 1 } : c
+          )
+        );
+      } else {
+        setComments((prev) =>
+          prev.map((c) =>
+            c.id === commentId ? { ...c, upvote: c.upvote - 1 } : c
+          )
+        );
+      }
+    } catch (error: any) {
+      ToastError(error?.response?.data?.error || "Something went wrong");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 text-white">
       <div className="bg-transparent rounded-xl shadow-xl p-6 space-y-4">
-        {/* Author Info */}
         <div className="flex items-center gap-4">
           <img
             src={user.avatar}
@@ -121,6 +175,75 @@ const PostPage = () => {
             <MessageSquare size={16} className="text-gray-400" />
             <span>{commentsCount}</span>
           </div>
+        </div>
+
+        <CommentInput
+          postId={postid ?? ""}
+          editComment={
+            editingComment
+              ? { id: editingComment.id, text: editingComment.comment }
+              : undefined
+          }
+          onSuccess={() => {
+            handleRefetchComments();
+            setEditingComment(null);
+          }}
+          onCancelEdit={() => setEditingComment(null)}
+        />
+        <div className="space-y-6 mt-7">
+          {comments.map((comment) => (
+            <div key={comment.id} className="flex gap-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage
+                  src={comment.user.avatar}
+                  alt={comment.user.fullName}
+                />
+                <AvatarFallback className="text-black font-semibold text-lg">
+                  {comment.user.fullName?.[0].toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold text-white">
+                    {comment.user.fullName}
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {new Date(comment.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </div>
+                </div>
+                <div className="text-gray-300 mt-1">{comment.comment}</div>
+
+                <div
+                  className="flex items-center gap-4 text-gray-400 cursor-pointer text-sm mt-2"
+                  onClick={() => handleCommentUpvote(comment.id)}
+                >
+                  <div className="flex items-center gap-1">
+                    <svg
+                      className="w-4 h-4 fill-gray-400"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 3l6 6H4l6-6zm0 14l-6-6h12l-6 6z" />
+                    </svg>
+                    <div> {comment.upvote}</div>
+                  </div>
+                </div>
+                {comment.user.username === userData?.username && (
+                  <span
+                    onClick={() => setEditingComment(comment)}
+                    className="cursor-pointer text-blue-400"
+                  >
+                    Edit
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

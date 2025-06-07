@@ -21,7 +21,7 @@ const getAllPost = asyncHandler(async (req, res) => {
       commentsCount: true,
       upvotes: true,
       views: true,
-      tags:true,
+      tags: true,
       user: {
         select: {
           username: true,
@@ -36,6 +36,37 @@ const getAllPost = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, allPosts, "All Posts Fetched Successfully"));
+});
+
+const getAllComments = asyncHandler(async (req, res) => {
+  const allComments = await db.comment.findMany({
+    select: {
+      id: true,
+      comment: true,
+      upvote: true,
+      discuss: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          fullName: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, allComments, "All Comments Fetched Successfully")
+    );
 });
 
 const getPostById = asyncHandler(async (req, res) => {
@@ -85,9 +116,11 @@ const getPostById = asyncHandler(async (req, res) => {
 });
 
 const addPost = asyncHandler(async (req, res) => {
-  const { title, description, tags=[] } = handleZodError(
-    createDiscussionPostValidation(req.body)
-  );
+  const {
+    title,
+    description,
+    tags = [],
+  } = handleZodError(createDiscussionPostValidation(req.body));
   const userId = req.user.id;
   const user = await db.user.findUnique({
     where: {
@@ -248,6 +281,54 @@ const addUpvotes = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, { voted: true }, "Upvoted Successfully"));
 });
 
+const addCommentUpvote = asyncHandler(async (req, res) => {
+  const { commentid } = req.params;
+  const userId = req.user.id;
+
+  const comment = await db.comment.findUnique({ where: { id: commentid } });
+  if (!comment) throw new ApiError("Comment not found", 400);
+
+  const alreadyUpvoted = await db.commentUpvote.findUnique({
+    where: {
+      userId_commentId: {
+        userId,
+        commentId: commentid,
+      },
+    },
+  });
+
+  if (alreadyUpvoted) {
+    await db.commentUpvote.delete({
+      where: { id: alreadyUpvoted.id },
+    });
+
+    await db.comment.updateMany({
+      where: { id: commentid, upvote: { gt: 0 } },
+      data: { upvote: { decrement: 1 } },
+    });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { voted: false }, "Comment upvote removed"));
+  }
+
+  await db.commentUpvote.create({
+    data: {
+      userId,
+      commentId: commentid,
+    },
+  });
+
+  await db.comment.update({
+    where: { id: commentid },
+    data: { upvote: { increment: 1 } },
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { voted: true }, "Comment upvoted"));
+});
+
 const addCommentToPost = asyncHandler(async (req, res) => {
   const { comment } = handleZodError(addCommentsValidation(req.body));
   const { postid } = req.params;
@@ -348,4 +429,6 @@ export {
   addUpvotes,
   getAllPost,
   getPostById,
+  getAllComments,
+  addCommentUpvote,
 };

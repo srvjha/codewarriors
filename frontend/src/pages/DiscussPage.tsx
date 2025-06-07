@@ -296,10 +296,12 @@ const DiscussPage = () => {
                         <Eye size={16} className="text-gray-400" />
                         <span>{post.views}</span>
                       </div>
-                      <div className="flex items-center gap-1">
+                      <Link to={`/discuss/${post.id}`}>
+                      <div className="flex items-center gap-1 cursor-pointer">
                         <MessageSquare size={16} className="text-gray-400" />
                         <span>{post.commentsCount}</span>
                       </div>
+                      </Link>
                     </div>
                     {post.user.username === userData?.username ? (
                       <div className="mt-6 cursor-pointer">
