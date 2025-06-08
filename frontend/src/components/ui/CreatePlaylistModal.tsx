@@ -8,14 +8,18 @@ import API from "@/utils/AxiosInstance";
 const CreatePlaylistModal = ({ onClose }: { onClose: () => void }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-
+   const [visibility, setVisibility] = useState<"public" | "private">("private");
   const handleCreatePlaylist = async () => {
     if (!name.trim()) return ToastError("Playlist name is required");
 
     try {
       const res = await API.post(
         "/playlist/create",
-        { name, description },
+        {
+          name,
+          description,
+          visibilty: visibility === "public" ? true : false,
+        },
         { withCredentials: true }
       );
       if (res.data.success) {
@@ -57,6 +61,19 @@ const CreatePlaylistModal = ({ onClose }: { onClose: () => void }) => {
               className="bg-zinc-800 text-white border-zinc-700 resize-none"
               rows={3}
             />
+            <div className="flex items-center gap-3">
+                <label className="text-sm text-white">Visibility:</label>
+                <select
+                  value={visibility}
+                  onChange={(e) =>
+                    setVisibility(e.target.value as "public" | "private")
+                  }
+                  className="bg-zinc-800 text-white px-3 py-1 rounded-md border border-zinc-700"
+                >
+                  <option value="public">Public</option>
+                  <option value="private">Private</option>
+                </select>
+              </div>
             <button
               onClick={handleCreatePlaylist}
               className="bg-zinc-100 text-black flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-zinc-200 transition"
