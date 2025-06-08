@@ -24,9 +24,7 @@ import {
   Play,
   SendHorizontal,
   Lock,
-  Eye,
-  Settings,
-  Share2,
+  Eye
 } from "lucide-react";
 
 import {
@@ -547,7 +545,7 @@ const ProblemPage = () => {
 
               {activeTab === "solution" && (
                 <div className="flex flex-col  h-full text-gray-400">
-                  {executionType === "SUBMIT" ? (
+                  {executionType === "SUBMIT" && results?.status==="Accepted" ? (
                     <pre className="bg-transparent p-4 rounded-md overflow-x-auto hide-scrollbar">
                       <p className="text-cyan-100">{selectedLang}:</p>
                       <div className="flex relative bg-[#2f2f2f] rounded-lg">
@@ -780,15 +778,7 @@ const ProblemPage = () => {
                   <CodeXml size={16} className="mr-1.5 text-green-500" />
                   Code
                 </button>
-              </div>
-              <div className="flex items-center">
-                <button className="p-1.5 text-gray-400 hover:text-white hover:bg-[#3e3e3e] rounded-md">
-                  <Settings size={16} />
-                </button>
-                <button className="p-1.5 text-gray-400 hover:text-white hover:bg-[#3e3e3e] rounded-md">
-                  <Share2 size={16} />
-                </button>
-              </div>
+              </div>             
             </div>
 
             <div className="flex justify-between items-center p-2 ">
@@ -900,9 +890,6 @@ const ProblemPage = () => {
                             Case {index + 1}
                           </button>
                         ))}
-                        <button className="px-2 py-1 text-gray-400 hover:bg-[#3e3e3e] rounded-md">
-                          +
-                        </button>
                       </div>
 
                       {testCases.length > 0 && (

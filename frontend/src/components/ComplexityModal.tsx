@@ -1,6 +1,6 @@
 import API from "@/utils/AxiosInstance";
 import { Cpu, Gauge, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const ComplexityModal = ({
   onCancel,
@@ -16,6 +16,7 @@ const ComplexityModal = ({
   } | null>(null);
 
   const [error, setError] = useState<string | null>(null);
+   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const calculateComplexity = async () => {
@@ -37,8 +38,17 @@ const ComplexityModal = ({
     calculateComplexity();
   }, []);
 
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
+      onCancel();
+    }
+  };
+
   return (
-    <div className="bg-black/50 fixed inset-0 z-50 w-1/2 flex justify-center items-center backdrop-blur-sm p-4">
+    <div 
+    className="bg-black/50 fixed inset-0 z-50 w-1/2 flex justify-center items-center backdrop-blur-sm p-4"
+    onClick={handleOverlayClick}
+    >
       <button
         className="absolute top-2 right-2 text-white hover:text-red-500 transition"
         onClick={onCancel}
@@ -47,7 +57,10 @@ const ComplexityModal = ({
         <X />
       </button>
 
-      <div className="bg-neutral-900 w-72 p-5 rounded-xl shadow-lg text-white flex flex-col space-y-4">
+      <div 
+      className="bg-neutral-900 w-72 p-5 rounded-xl shadow-lg text-white flex flex-col space-y-4"
+       ref={modalRef} 
+      >
         <h3 className="text-lg font-semibold border-b border-neutral-700 pb-2 flex items-center gap-2">
           <Cpu className="w-5 h-5 text-blue-400" />
           Complexity Result

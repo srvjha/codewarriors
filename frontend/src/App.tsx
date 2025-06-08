@@ -29,6 +29,7 @@ import SheetPage from "./pages/SheetPage";
 import ContestPage from "./pages/ContestPage";
 import ContestDetailPage from "./pages/ContestDetailPage";
 
+
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
@@ -156,6 +157,8 @@ const App = () => {
         path="/contest"
         element={<ContestPage/>}
         />
+
+         
 
          <Route
         path="/contest/:contestId"

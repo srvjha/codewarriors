@@ -28,7 +28,12 @@ const PlaylistSheet = ({
       if (res.data.success) {
         const playlistData = res.data.data;
         const favouriteSection = playlistData.filter(
-          (data: Playlist) => data.name === "Favourite"
+          (data: Playlist) => (data.name !== "Beginner's Foundation" 
+          && data.name !== "Intermediate Mastery"
+          && data.name !== "Advanced Conquest"
+          && data.name !== "Google Interview Questions"
+          && data.name !== "Amazon Interview Questions"
+          && data.name !== "Microsoft Interview Questions")
         );
         if (tab === "public") {
           setPlaylists(favouriteSection);
@@ -98,7 +103,7 @@ const PlaylistSheet = ({
     <>
       <Toast />
       <div className="fixed inset-0 bg-neutral-900/40 z-50 flex items-center justify-center">
-        <div className="bg-neutral-950 p-5 rounded-xl w-[500px] max-h-[90vh] overflow-auto relative">
+        <div className="bg-neutral-950 p-5 rounded-xl w-[450px] max-h-[90vh] overflow-auto relative">
           <button
             className="absolute top-3 right-3 text-zinc-400 hover:text-white"
             onClick={onClose}

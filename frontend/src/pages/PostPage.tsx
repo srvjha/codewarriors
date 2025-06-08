@@ -40,8 +40,7 @@ const PostPage = () => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await API.get(`/discuss/comments/all`);
-        console.log("comments: ", res.data.data);
+        const res = await API.get(`/discuss/comments/${postid}`);
         setComments(res.data.data);
       } catch (err) {
         console.error("Failed to fetch post", err);

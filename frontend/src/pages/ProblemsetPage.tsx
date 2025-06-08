@@ -35,6 +35,7 @@ import { useCollapse } from "react-collapsed";
 import tags from "../../companyTags.json";
 import PlaylistSheet from "@/components/ui/PlaylistSheet";
 import type { Problem } from "@/types/problem/problemTypes";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const problemsPerPage = 10;
 
@@ -257,12 +258,12 @@ const ProblemsetPage = () => {
             <h3 className="text-white font-semibold mb-2 text-xl">Companies</h3>
             {uniqueCompanies.slice(0, 5).map((company, index) => (
               <div key={index} className="flex items-center gap-2 mb-1">
-                <input
-                  type="checkbox"
+                <Checkbox
+                  
                   id={`company-${company}`}
-                  className="accent-blue-500 size-3.5"
+                   className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
                   checked={filter.companyTags.includes(company)}
-                  onChange={() => toggleCheckBox(company, "companyTags")}
+                  onCheckedChange={() => toggleCheckBox(company, "companyTags")}
                 />
                 <label
                   htmlFor={`company-${company}`}
@@ -338,10 +339,9 @@ const ProblemsetPage = () => {
                 key={status}
                 className="text-[17px] text-zinc-300 flex items-center gap-2 mb-1"
               >
-                <input
-                  type="checkbox"
+                <Checkbox                  
                   checked={filter.execType.includes(status)}
-                  onChange={() => toggleCheckBox(status, "execType")}
+                  onCheckedChange={() => toggleCheckBox(status, "execType")}
                 />
                 {status}
               </label>
@@ -356,10 +356,9 @@ const ProblemsetPage = () => {
                 key={level}
                 className="text-[17px] text-zinc-300 flex items-center gap-2 mb-1"
               >
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={filter.difficulty.includes(level)}
-                  onChange={() => toggleCheckBox(level, "difficulty")}
+                  onCheckedChange={() => toggleCheckBox(level, "difficulty")}
                 />
                 {level}
               </label>

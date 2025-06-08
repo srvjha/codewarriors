@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyUser } from "../middleware/auth.middleware";
-import { addCommentToPost, addCommentUpvote, addPost, addUpvotes, deleteComment, deletePost, getAllComments, getAllPost, getPostById, updateCommentToPost, updatePost } from "../controllers/discussion.controller";
+import { addCommentToPost, addCommentUpvote, addPost, addUpvotes, deleteComment, deletePost, getAllComments, getAllCommentsById, getAllPost, getPostById, updateCommentToPost, updatePost } from "../controllers/discussion.controller";
 
 const router = Router();
 
@@ -14,6 +14,7 @@ router.delete("/delete/comment/:cid",verifyUser,deleteComment)
 router.get("/post/all",verifyUser,getAllPost)
 router.get("/post/:postid",verifyUser,getPostById)
 router.get("/comments/all",verifyUser,getAllComments)
+router.get("/comments/:id",verifyUser,getAllCommentsById)
 router.patch("/comment/:commentid/upvote", verifyUser, addCommentUpvote);
 
 

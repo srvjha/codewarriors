@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { X, Search, Plus, CheckCircle } from "lucide-react";
+import { X, Search, Plus } from "lucide-react";
 import type { Playlist, Problem } from "@/types/problem/problemTypes";
 import API from "@/utils/AxiosInstance";
 import { Input } from "./Input";
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 import { Button } from "./button";
+import { ToastError, ToastSuccess } from "@/utils/ToastContainers";
 
 interface AddProblemsModalProps {
   isOpen: boolean;
@@ -76,13 +77,19 @@ const AddProblemsModal: React.FC<AddProblemsModalProps> = ({
 
   const handleAddProblem = async (problemId: string) => {
     try {
-      await API.post(
+      const res = await API.post(
         `/playlist/${playlistId}/problem/${problemId}/add`,
         {},
         { withCredentials: true }
       );
-    } catch (err) {
+      console.log("res: ", res);
+      if (res.status) {
+        isProblemAdded(problemId);
+        ToastSuccess(res.data.message);
+      }
+    } catch (err: any) {
       console.error("Failed to add problem:", err);
+      ToastError(err.response.data.error);
     }
   };
 
@@ -98,8 +105,33 @@ const AddProblemsModal: React.FC<AddProblemsModalProps> = ({
 
   if (!isOpen) return null;
 
+  const handleRemoveProblem = async (problemId: string) => {
+    try {
+      const res = await API.delete(
+        `/playlist/${playlistId}/problem/${problemId}/remove`,
+        { withCredentials: true }
+      );
+      if (res.status) {
+        setPlaylistProblems((prev) =>
+          prev
+            ? {
+                ...prev,
+                problems: prev.problems.filter(
+                  (p) => p.problem.id !== problemId
+                ),
+              }
+            : prev
+        );
+        ToastSuccess("Problem removed from playlist");
+      }
+    } catch (err: any) {
+      console.error("Failed to remove problem:", err);
+      ToastError(err.response?.data?.error || "Failed to remove problem.");
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/20 bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-neutral-900 rounded-lg w-full max-w-4xl max-h-[90vh] flex flex-col border border-zinc-800">
         <div className="flex items-center justify-between p-6 border-b border-zinc-800">
           <div>
@@ -201,27 +233,27 @@ const AddProblemsModal: React.FC<AddProblemsModalProps> = ({
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleAddProblem(problem.id)}
-                    disabled={added}
-                    className={`mt-2 px-4 py-2 rounded-lg text-white font-medium transition ${
-                      added
-                        ? "bg-green-600 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
-                    }`}
-                  >
-                    {added ? (
-                      <div className="flex items-center gap-2">
-                        <CheckCircle size={16} />
-                        Added
+                  {added ? (
+                    <button
+                      onClick={() => handleRemoveProblem(problem.id)}
+                      className="mt-2 px-2 py-2 rounded-lg bg-red-600/60 hover:bg-red-600/70 cursor-pointer text-white font-medium transition"
+                    >
+                      <div className="flex items-center gap-1">
+                        <X size={16} />
+                        Remove
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2">
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleAddProblem(problem.id)}
+                      className="mt-2 px-4 py-2 rounded-lg cursor-pointer bg-blue-600/70 hover:bg-blue-600/80 text-white font-medium transition"
+                    >
+                      <div className="flex items-center gap-1">
                         <Plus size={16} />
                         Add
                       </div>
-                    )}
-                  </button>
+                    </button>
+                  )}
                 </div>
               );
             })}

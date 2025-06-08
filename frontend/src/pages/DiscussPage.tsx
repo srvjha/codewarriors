@@ -65,7 +65,6 @@ const DiscussPage = () => {
   useEffect(() => {
     const fetchAllPost = async () => {
       const res = await API.get("/discuss/post/all", { withCredentials: true });
-      console.log("post details: ", res.data.data);
       if (res.status) {
         setOriginalPosts(res.data.data);
         setPosts(res.data.data);
@@ -190,7 +189,7 @@ const DiscussPage = () => {
       </AlertDialog>
 
       <div className="p-6 max-w-7xl mx-auto">
-        <div className="flex justify-end  px-4 max-w-[80%]">
+        <div className="flex justify-end  px-4 max-w-[67%]">
           <Button
             className="text-base sm:text-base font-semibold mb-4 bg-blue-600 hover:bg-blue-700 cursor-pointer"
             onClick={() => navigate("/discuss/create")}

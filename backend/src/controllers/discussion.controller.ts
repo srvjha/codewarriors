@@ -69,6 +69,42 @@ const getAllComments = asyncHandler(async (req, res) => {
     );
 });
 
+const getAllCommentsById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const allComments = await db.comment.findMany({
+    where: {
+      discussId: id,
+    },
+    select: {
+      id: true,
+      comment: true,
+      upvote: true,
+      discuss: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          username: true,
+          fullName: true,
+          avatar: true,
+        },
+      },
+    },
+  });
+ 
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, allComments, "All Comments Fetched Successfully")
+    );
+});
+
 const getPostById = asyncHandler(async (req, res) => {
   const { postid } = req.params;
   validId(postid, "Post");
@@ -431,4 +467,5 @@ export {
   getPostById,
   getAllComments,
   addCommentUpvote,
+  getAllCommentsById
 };

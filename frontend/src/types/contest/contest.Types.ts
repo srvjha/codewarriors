@@ -6,4 +6,7 @@ export interface Contest {
   startTime: string;
   endTime: string;
   status: "LIVE" | "UPCOMING" |  "ENDED";
+  problem:{
+    id: string;
+  }[]
 }
