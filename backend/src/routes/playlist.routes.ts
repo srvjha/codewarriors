@@ -6,7 +6,7 @@ const router = Router();
 
 router.get("/all/private",verifyUser,getAllPrivatePlaylistDetails);
 router.get("/all/public",verifyUser,getAllPublicPlaylistDetails);
-router.get("/:plid",verifyUser,getPlaylistDetails);
+router.get("/:plid",getPlaylistDetails);
 router.post("/create",verifyUser,createPlaylist);
 router.delete("/:plid",verifyUser,deletePlaylist);
 router.post("/:plid/problem/:pid/add",verifyUser,addProblemToPlaylist)
