@@ -64,12 +64,12 @@ const getAllPublicPlaylistDetails = asyncHandler(async (req, res) => {
 
 const getPlaylistDetails = asyncHandler(async (req, res) => {
   const { plid } = req.params;
-  console.log({plid})
    validId(plid, "Playlist");
-
+  const userId = req.user.id;
   const playlist = await db.playlist.findUnique({
     where: {
-      id: plid
+      id: plid,
+      userId,
     },
     include: {
       problems: {

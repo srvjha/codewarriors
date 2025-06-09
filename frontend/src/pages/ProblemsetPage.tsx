@@ -342,6 +342,8 @@ const ProblemsetPage = () => {
                 <Checkbox                  
                   checked={filter.execType.includes(status)}
                   onCheckedChange={() => toggleCheckBox(status, "execType")}
+                   className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
+                 
                 />
                 {status}
               </label>
@@ -359,6 +361,8 @@ const ProblemsetPage = () => {
                 <Checkbox
                   checked={filter.difficulty.includes(level)}
                   onCheckedChange={() => toggleCheckBox(level, "difficulty")}
+                   className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
+                 
                 />
                 {level}
               </label>
