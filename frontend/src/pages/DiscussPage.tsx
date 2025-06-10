@@ -78,28 +78,38 @@ const DiscussPage = () => {
       const res = await API.patch(`/discuss/upvote/post/${postid}`, {
         withCredentials: true,
       });
-      console.log("upvote: ", res.data);
+      // console.log("upvote: ", res.data);
       if (res.data.data.voted) {
         setPosts((prev) =>
           prev.map((post) =>
-            post.id === postid ? { ...post, upvotes: post.upvotes + 1 } : post
+            post.id === postid && userData?.id
+              ? {
+                  ...post,
+                  upvotes: post.upvotes + 1,
+                  DiscussionUpvote: [
+                    ...post.DiscussionUpvote,
+                    { userId: userData.id },
+                  ],
+                }
+              : post
           )
         );
       } else {
         setPosts((prev) =>
           prev.map((post) =>
-            post.id === postid ? { ...post, upvotes: post.upvotes - 1 } : post
+            post.id === postid
+              ? {
+                  ...post,
+                  upvotes: post.upvotes - 1,
+                  DiscussionUpvote: post.DiscussionUpvote.filter(
+                    (upvote) => upvote.userId !== userData?.id
+                  ),
+                }
+              : post
           )
         );
       }
     } catch (error: any) {
-      setPosts((prevPosts) =>
-        prevPosts.map((post) =>
-          post.id === postid
-            ? { ...post, upvotes: post.upvotes + 1 } // in case of any error then will make it 0
-            : post
-        )
-      );
       ToastError(error?.response?.data?.error || "Something went wrong");
     }
   };
@@ -155,13 +165,13 @@ const DiscussPage = () => {
     return acc;
   }, {});
 
-  const hasUserUpvoted = (discuss:{userId:string}[])=>{
-    if(userData){
-    return discuss.some((post) =>
-      post.userId?.includes(userData.id)
-    );
-  }
-  }
+  const hasUserUpvoted = (discuss: { userId: string }[]) => {
+   
+      return userData ?
+       discuss.some((post) => post.userId?.includes(userData.id))
+       : false
+    
+  };
 
   return (
     <>
@@ -264,9 +274,12 @@ const DiscussPage = () => {
                         </div>
                       </div>
                       <div className="flex flex-row gap-2">
-                        {post.tags.map((tag,index) => {
+                        {post.tags.map((tag, index) => {
                           return (
-                            <div key={index} className="bg-zinc-900 border-1 border-neutral-700 px-2.5 py-0.5 text-sm  h-7 rounded-full text-center">{`# ${tag}`}</div>
+                            <div
+                              key={index}
+                              className="bg-zinc-900 border-1 border-neutral-700 px-2.5 py-0.5 text-sm  h-7 rounded-full text-center"
+                            >{`# ${tag}`}</div>
                           );
                         })}
                       </div>
@@ -293,8 +306,9 @@ const DiscussPage = () => {
                             // post.upvotes > 0
                             //   ? "text-pink-600 fill-pink-600"
                             //   : "text-gray-400"
-                           hasUserUpvoted(post.DiscussionUpvote) ? "text-pink-600 fill-pink-600"
-                            : "text-gray-400"
+                            hasUserUpvoted(post.DiscussionUpvote)
+                              ? "text-pink-600 fill-pink-600"
+                              : "text-gray-400"
                           }`}
                         />
                         <span>{post.upvotes}</span>
@@ -304,10 +318,10 @@ const DiscussPage = () => {
                         <span>{post.views}</span>
                       </div>
                       <Link to={`/discuss/${post.id}`}>
-                      <div className="flex items-center gap-1 cursor-pointer">
-                        <MessageSquare size={16} className="text-gray-400" />
-                        <span>{post.commentsCount}</span>
-                      </div>
+                        <div className="flex items-center gap-1 cursor-pointer">
+                          <MessageSquare size={16} className="text-gray-400" />
+                          <span>{post.commentsCount}</span>
+                        </div>
                       </Link>
                     </div>
                     {post.user.username === userData?.username ? (
@@ -344,30 +358,32 @@ const DiscussPage = () => {
             ))}
           </div>
 
-           <div className="flex-1 h-[70vh] w-full overflow-y-auto">
-      <div className="h-full w-[90%] border p-5 border-neutral-700 bg-neutral-900/20 hover:shadow-neutral-500/20 transition-all duration-300 rounded-xl">
-        <div className="p-1 flex gap-2 items-center mb-4">
-          <span className="text-xl font-semibold text-white">Explore</span>
-          <Compass className="text-white" size={20} />
-        </div>
+          <div className="flex-1 h-[70vh] w-full overflow-y-auto">
+            <div className="h-full w-[90%] border p-5 border-neutral-700 bg-neutral-900/20 hover:shadow-neutral-500/20 transition-all duration-300 rounded-xl">
+              <div className="p-1 flex gap-2 items-center mb-4">
+                <span className="text-xl font-semibold text-white">
+                  Explore
+                </span>
+                <Compass className="text-white" size={20} />
+              </div>
 
-        {Object.entries(tagMap).map(([tag, posts], idx) => (
-          <div key={idx} className="mb-4">
-            <p className="text-zinc-400 font-medium mb-1">#{tag}</p>
-            {posts.map((post) => (
-               <Link to={`/discuss/${post.id}`}>
-              <p
-                key={post.id}
-                className="text-zinc-200 text-sm hover:underline cursor-pointer truncate"
-              >
-                {post.title}
-              </p>
-              </Link>
-            ))}
+              {Object.entries(tagMap).map(([tag, posts], idx) => (
+                <div key={idx} className="mb-4">
+                  <p className="text-zinc-400 font-medium mb-1">#{tag}</p>
+                  {posts.map((post) => (
+                    <Link to={`/discuss/${post.id}`}>
+                      <p
+                        key={post.id}
+                        className="text-zinc-200 text-sm hover:underline cursor-pointer truncate"
+                      >
+                        {post.title}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
         </div>
       </div>
     </>
