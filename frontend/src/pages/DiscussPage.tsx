@@ -71,7 +71,7 @@ const DiscussPage = () => {
       }
     };
     fetchAllPost();
-  }, [posts]);
+  }, []);
 
   const handleUpvote = async (postid: string) => {
     try {
