@@ -485,6 +485,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   const userInfo = await db.user.findUnique({
     where: { id: userId },
     select: {
+      id: true,
       fullName: true,
       username: true,
       email: true,

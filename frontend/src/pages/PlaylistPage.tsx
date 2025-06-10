@@ -51,7 +51,7 @@ const PlaylistPage = () => {
       const response = await API.get("/playlist/all/private", {
         withCredentials: true,
       });
-      console.log("private: ", response.data.data);
+      // console.log("private: ", response.data.data);
       setPrivatePlaylists(response.data.data || []);
     } catch (err) {
       console.error("Failed to fetch playlists", err);

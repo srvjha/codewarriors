@@ -71,7 +71,7 @@ const DiscussPage = () => {
       }
     };
     fetchAllPost();
-  }, []);
+  }, [posts]);
 
   const handleUpvote = async (postid: string) => {
     try {
@@ -155,7 +155,13 @@ const DiscussPage = () => {
     return acc;
   }, {});
 
-  console.log({tagMap})
+  const hasUserUpvoted = (discuss:{userId:string}[])=>{
+    if(userData){
+    return discuss.some((post) =>
+      post.userId?.includes(userData.id)
+    );
+  }
+  }
 
   return (
     <>
@@ -258,9 +264,9 @@ const DiscussPage = () => {
                         </div>
                       </div>
                       <div className="flex flex-row gap-2">
-                        {post.tags.map((tag) => {
+                        {post.tags.map((tag,index) => {
                           return (
-                            <div className="bg-zinc-900 border-1 border-neutral-700 px-2.5 py-0.5 text-sm  h-7 rounded-full text-center">{`# ${tag}`}</div>
+                            <div key={index} className="bg-zinc-900 border-1 border-neutral-700 px-2.5 py-0.5 text-sm  h-7 rounded-full text-center">{`# ${tag}`}</div>
                           );
                         })}
                       </div>
@@ -284,9 +290,11 @@ const DiscussPage = () => {
                         <ThumbsUp
                           size={16}
                           className={`${
-                            post.upvotes > 0
-                              ? "text-pink-600 fill-pink-600"
-                              : "text-gray-400"
+                            // post.upvotes > 0
+                            //   ? "text-pink-600 fill-pink-600"
+                            //   : "text-gray-400"
+                           hasUserUpvoted(post.DiscussionUpvote) ? "text-pink-600 fill-pink-600"
+                            : "text-gray-400"
                           }`}
                         />
                         <span>{post.upvotes}</span>

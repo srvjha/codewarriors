@@ -82,7 +82,7 @@ const AddProblemsModal: React.FC<AddProblemsModalProps> = ({
         {},
         { withCredentials: true }
       );
-      console.log("res: ", res);
+      // console.log("res: ", res);
       if (res.status) {
         isProblemAdded(problemId);
         ToastSuccess(res.data.message);

@@ -205,7 +205,7 @@ const ProblemsetPage = () => {
       const updated = current.includes(value) // logic if its there then remove otherwise include
         ? current.filter((item) => item !== value)
         : [...current, value];
-      console.log({ updated });
+      // console.log({ updated });
       return { ...prev, [type]: updated };
     });
   };
@@ -217,7 +217,7 @@ const ProblemsetPage = () => {
       const getProblemName = tags.filter((tag) =>
         filter.companyTags.some((company) => tag.companies.includes(company))
       );
-      console.log({ getProblemName });
+      // console.log({ getProblemName });
       filtered = filtered.filter((problem) =>
         getProblemName.some((tag) => problem.title.includes(tag.problem))
       );

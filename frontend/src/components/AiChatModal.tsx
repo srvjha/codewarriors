@@ -54,7 +54,7 @@ const AiChatModal = ({
           message: input,
         }
       );
-      console.log("response: ", response);
+      // console.log("response: ", response);
 
       const botReply: Message = {
         role: "bot",

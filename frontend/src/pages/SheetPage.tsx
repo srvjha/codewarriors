@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 
 const SheetPage = () => {
   const { id: playlistId } = useParams();
-  console.log("playlist: ", playlistId);
+  // console.log("playlist: ", playlistId);
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
 
   const fetchPlaylist = async () => {
@@ -16,7 +16,7 @@ const SheetPage = () => {
       const res = await API.get(`/playlist/${playlistId}`, {
         withCredentials: true,
       });
-      console.log("res: ", res);
+      // console.log("res: ", res);
       setPlaylist(res.data?.data);
     } catch (err) {
       console.error("Failed to fetch playlist:", err);

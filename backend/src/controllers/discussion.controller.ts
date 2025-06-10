@@ -29,6 +29,11 @@ const getAllPost = asyncHandler(async (req, res) => {
           avatar: true,
         },
       },
+      DiscussionUpvote:{
+        select:{
+          userId:true
+        }
+      }
     },
     orderBy: { createdAt: "desc" },
   });

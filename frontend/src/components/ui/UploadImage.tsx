@@ -89,12 +89,12 @@ const UploadImage = ({onFileSelect,onClose}:UploadImageProps) => {
   const handleUpload = () => {
     if (!selectedFile) return;
     
-    console.log('Selected file:', selectedFile);
-    console.log('File name:', selectedFile.name);
-    console.log('File size:', selectedFile.size);
-    console.log('File type:', selectedFile.type);
-    console.log('Crop settings:', crop);
-    console.log('Preview URL:', previewUrl);
+    // console.log('Selected file:', selectedFile);
+    // console.log('File name:', selectedFile.name);
+    // console.log('File size:', selectedFile.size);
+    // console.log('File type:', selectedFile.type);
+    // console.log('Crop settings:', crop);
+    // console.log('Preview URL:', previewUrl);
 
      onFileSelect(selectedFile);
     onClose();

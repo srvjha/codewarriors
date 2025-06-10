@@ -19,7 +19,7 @@ const PostPage = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
   const { userData } = useSelector((state: RootState) => state.auth);
-  console.log({userData})
+  // console.log({userData})
   //   const turndownService = new TurndownService();
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const PostPage = () => {
       const res = await API.patch(`/discuss/upvote/post/${postid}`, {
         withCredentials: true,
       });
-      console.log("upvote: ", res.data);
+      // console.log("upvote: ", res.data);
       if (res.data.data.voted) {
         setPost((prev) =>
           prev?.id === postid ? { ...post, upvotes: post.upvotes + 1 } : post

@@ -30,7 +30,7 @@ const ResetForgotPassword = () => {
     const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: ResetForgotPasswordFormValues) => {
-    console.log("data: ",data)
+    // console.log("data: ",data)
     setIsLoading(true);
     try {
       const res = await API.post(`/auth/password/reset/${token}`, {

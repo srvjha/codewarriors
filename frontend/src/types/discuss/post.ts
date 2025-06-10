@@ -12,6 +12,9 @@ export type Post = {
     fullName: string;
     avatar?: string;
   };
+  DiscussionUpvote:{
+    userId:string
+  }[]
 };
 
 export type Comment = {

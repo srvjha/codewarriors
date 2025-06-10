@@ -32,7 +32,7 @@ const DiscussUpdatePage = () => {
   useEffect(()=>{
     const getPost = async()=>{
         const res = await API.get(`/discuss/post/${postid}`);
-        console.log("Res: ",res)
+        // console.log("Res: ",res)
         setValue("title", res.data.data.title);
         setContent(turndownService.turndown(res.data.data.description));
         }
@@ -51,21 +51,21 @@ const DiscussUpdatePage = () => {
       ToastError("Missing Field Required");
     }
     const contentHtml = marked(content);
-    console.log("content: ", contentHtml);
+    // console.log("content: ", contentHtml);
     let payload = {
       title,
       contentHtml,
     };
-    console.log("data: ", payload);
+    // console.log("data: ", payload);
     try {
       const res = await API.post(
         `/discuss/update/post/${postid}`,
         { title:payload.title,description:payload.contentHtml},
         { withCredentials: true }
       );
-      console.log("Res:  ",res)
+      // console.log("Res:  ",res)
       if (res.data.success) {
-        console.log("post: ",res.data)
+        // console.log("post: ",res.data)
         ToastSuccess(res.data.message);
         reset()
         handleContentChange("")
@@ -76,7 +76,7 @@ const DiscussUpdatePage = () => {
        
     }
   };
-  console.log("content: ",content)
+  // console.log("content: ",content)
 
   return (
     <>
