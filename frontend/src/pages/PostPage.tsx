@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "@/utils/AxiosInstance";
 // import TurndownService from "turndown";
-import type { Comment, Post } from "@/types/discuss/post";
+import type { Comment, PostComment } from "@/types/discuss/post";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { Eye, MessageSquare, ThumbsUp } from "lucide-react";
 import { ToastError } from "@/utils/ToastContainers";
@@ -14,7 +14,7 @@ import type { RootState } from "@/redux/store";
 
 const PostPage = () => {
   const { postid } = useParams();
-  const [post, setPost] = useState<Post | null>(null);
+  const [post, setPost] = useState<PostComment | null>(null);
   const [loading, setLoading] = useState(true);
   const [comments, setComments] = useState<Comment[]>([]);
   const [editingComment, setEditingComment] = useState<Comment | null>(null);
@@ -22,43 +22,35 @@ const PostPage = () => {
   // console.log({userData})
   //   const turndownService = new TurndownService();
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const res = await API.get(`/discuss/post/${postid}`);
-        setPost(res.data.data);
-      } catch (err) {
-        console.error("Failed to fetch post", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [postid]);
-
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const res = await API.get(`/discuss/comments/${postid}`);
-        setComments(res.data.data);
-      } catch (err) {
-        console.error("Failed to fetch post", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchComments();
-  }, []);
-
-  const handleRefetchComments = async () => {
+  const fetchPost = async () => {
     try {
-      const res = await API.get(`/discuss/comments/all`);
+      const res = await API.get(`/discuss/post/${postid}`);
+      setPost(res.data.data);
+    } catch (err) {
+      console.error("Failed to fetch post", err);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const res = await API.get(`/discuss/comments/${postid}`);
       setComments(res.data.data);
     } catch (err) {
       console.error("Failed to fetch comments", err);
     }
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      await Promise.all([fetchPost(), fetchComments()]);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [postid]);
+
+  const handleRefetchComments = async () => {
+    await Promise.all([fetchPost(), fetchComments()]);
   };
 
   if (loading) {
@@ -82,11 +74,28 @@ const PostPage = () => {
       // console.log("upvote: ", res.data);
       if (res.data.data.voted) {
         setPost((prev) =>
-          prev?.id === postid ? { ...post, upvotes: post.upvotes + 1 } : post
+          prev?.id === postid && userData?.id
+            ? {
+                ...post,
+                upvotes: post.upvotes + 1,
+                DiscussionUpvote: [
+                  ...post.DiscussionUpvote,
+                  { userId: userData.id },
+                ],
+              }
+            : post
         );
       } else {
         setPost((prev) =>
-          prev?.id === postid ? { ...post, upvotes: post.upvotes - 1 } : post
+          prev?.id === postid && userData?.id
+            ? {
+                ...post,
+                upvotes: post.upvotes - 1,
+                DiscussionUpvote: post.DiscussionUpvote.filter(
+                  (upvote) => upvote.userId !== userData?.id
+                ),
+              }
+            : post
         );
       }
     } catch (error: any) {
@@ -105,19 +114,44 @@ const PostPage = () => {
       if (res.data.data.voted) {
         setComments((prev) =>
           prev.map((c) =>
-            c.id === commentId ? { ...c, upvote: c.upvote + 1 } : c
+            c.id === commentId && userData?.id
+              ? {
+                  ...c,
+                  upvote: c.upvote + 1,
+                  CommentUpvote: [...c.CommentUpvote, { userId: userData.id }],
+                }
+              : c
           )
         );
       } else {
         setComments((prev) =>
           prev.map((c) =>
-            c.id === commentId ? { ...c, upvote: c.upvote - 1 } : c
+            c.id === commentId && userData?.id
+              ? {
+                  ...c,
+                  upvote: c.upvote - 1,
+                  CommentUpvote: c.CommentUpvote.filter(
+                    (upvote) => upvote.userId !== userData?.id
+                  ),
+                }
+              : c
           )
         );
       }
     } catch (error: any) {
       ToastError(error?.response?.data?.error || "Something went wrong");
     }
+  };
+  const hasUserUpvoted = (discuss: { userId: string }[]) => {
+    return userData
+      ? discuss.some((post) => post.userId?.includes(userData.id))
+      : false;
+  };
+
+  const hasUserCommented = (comments: { userId: string }[]) => {
+    return userData
+      ? comments.some((comment) => comment.userId?.includes(userData.id))
+      : false;
   };
 
   return (
@@ -151,7 +185,10 @@ const PostPage = () => {
             <ThumbsUp
               size={16}
               className={`${
-                post.upvotes > 0
+                // post.upvotes > 0
+                //   ? "text-pink-600 fill-pink-600"
+                //   : "text-gray-400"
+                hasUserUpvoted(post.DiscussionUpvote)
                   ? "text-pink-600 fill-pink-600"
                   : "text-gray-400"
               }`}
@@ -222,13 +259,17 @@ const PostPage = () => {
                   onClick={() => handleCommentUpvote(comment.id)}
                 >
                   <div className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4 fill-gray-400"
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M10 3l6 6H4l6-6zm0 14l-6-6h12l-6 6z" />
-                    </svg>
+                    <ThumbsUp
+                      size={16}
+                      className={`${
+                        // post.upvotes > 0
+                        //   ? "text-pink-600 fill-pink-600"
+                        //   : "text-gray-400"
+                        hasUserCommented(comment.CommentUpvote)
+                          ? "text-pink-600 fill-pink-600"
+                          : "text-gray-400"
+                      }`}
+                    />
                     <div> {comment.upvote}</div>
                   </div>
                 </div>

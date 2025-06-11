@@ -123,7 +123,8 @@ export const Header = ({ children }: React.PropsWithChildren) => {
         </div>
         {children && <div className="mr-36 -mt-2">{children}</div>}
 
-        <div className="flex flex-row items-center gap-5 mr-3">
+        <div  className="flex flex-row items-center gap-5 mr-3">
+           <Link to="/profile" className="flex flex-row items-center gap-5">
           {userData && userData?.dailyProblemStreak > 0 ? (
             <div className="flex gap-1">
               <TbFlameFilled
@@ -146,6 +147,7 @@ export const Header = ({ children }: React.PropsWithChildren) => {
               </TooltipContent>
             </Tooltip>
           )}
+          </Link>
 
             <Link to="/about" className="hover:text-blue-400 transition-colors">
               About

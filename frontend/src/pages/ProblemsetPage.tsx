@@ -298,13 +298,13 @@ const ProblemsetPage = () => {
             <div className=" gap-2 mt-0">
               {uniqueCompanies.slice(5).map((company, index) => (
                 <div key={index} className="flex items-center gap-2 mb-1">
-                  <input
-                    type="checkbox"
-                    id={`company-${company}`}
-                    className="accent-blue-500"
-                    checked={filter.companyTags.includes(company)}
-                    onChange={() => toggleCheckBox(company, "companyTags")}
-                  />
+                 <Checkbox
+                  
+                  id={`company-${company}`}
+                   className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
+                  checked={filter.companyTags.includes(company)}
+                  onCheckedChange={() => toggleCheckBox(company, "companyTags")}
+                />
                   <label
                     htmlFor={`company-${company}`}
                     className="text-base text-zinc-300 flex items-center gap-1"

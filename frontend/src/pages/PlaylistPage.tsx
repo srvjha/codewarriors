@@ -26,17 +26,17 @@ import {
   PlusCircle,
   Trash,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // import { Link } from "react-router-dom";
 import CreatePlaylistModal from "@/components/ui/CreatePlaylistModal";
 import { formatDistanceToNow } from "date-fns";
 import AddProblemsModal from "@/components/ui/AddProblemModal";
 import { Link } from "react-router-dom";
+import { debounce } from "@/utils/debounce";
 
 const PlaylistPage = () => {
   const [privatePlaylists, setPrivatePlaylists] = useState<Playlist[]>([]);
   const [publicPlaylists, setPublicPlaylists] = useState<Playlist[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [recommended, setRecommend] = useState<Playlist[]>([]);
@@ -45,6 +45,9 @@ const PlaylistPage = () => {
     playlistName: "",
     playlistId: "",
   });
+  
+  const searchRef =
+      useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
 
   const allPrivatePlaylistsDetails = async () => {
     try {
@@ -115,7 +118,7 @@ const PlaylistPage = () => {
         badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
         cardColor:
           "bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40",
-        buttonColor: "bg-emerald-600 hover:bg-emerald-700 text-white",
+        buttonColor: "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer",
       },
       {
         difficulty: "Medium",
@@ -123,14 +126,14 @@ const PlaylistPage = () => {
         badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
         cardColor:
           "bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40",
-        buttonColor: "bg-amber-600 hover:bg-amber-700 text-white",
+        buttonColor: "bg-amber-600 hover:bg-amber-700 text-white cursor-pointer",
       },
       {
         difficulty: "Hard",
         icon: <TrendingUp className="w-5 h-5" />,
         badgeColor: "bg-red-500/20 text-red-400 border-red-500/30",
         cardColor: "bg-red-500/5 border-red-500/20 hover:border-red-500/40",
-        buttonColor: "bg-red-600 hover:bg-red-700 text-white",
+        buttonColor: "bg-red-600 hover:bg-red-700 text-white cursor-pointer",
       },
     ];
 
@@ -157,6 +160,79 @@ const PlaylistPage = () => {
     setShowAddModal(true);
     setSelectedPlaylist({ playlistName: name, playlistId: id });
   };
+
+
+  const handleSheetSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (searchRef.current) {
+      searchRef.current(event);
+    }
+  };
+
+  useEffect(() => {
+  searchRef.current = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const query = event.target.value.toLowerCase().trim();
+      
+      if (!query) {
+        allPrivatePlaylistsDetails();
+        allPublicPlaylistsDetails();
+        return;
+      }
+
+      const filteredPrivate = privatePlaylists.filter((playlist) => {
+        return (
+          playlist.name.toLowerCase().includes(query)
+        );
+      });
+
+      // Filter public playlists 
+      const filteredPublic = publicPlaylists.filter((playlist) => {
+        return (
+          playlist.name.toLowerCase().includes(query))
+      });
+
+      const filteredRecommended = recommended.filter((playlist) => {
+        const difficultyKeywords = ['beginner', 'intermediate', 'advanced'];
+        const matchesDifficulty = difficultyKeywords.some(keyword => 
+          query.includes(keyword) && 
+          (playlist.name.toLowerCase().includes('easy') && keyword === 'easy' ||
+           playlist.name.toLowerCase().includes('medium') && (keyword === 'medium' || keyword === 'intermediate') ||
+           playlist.name.toLowerCase().includes('hard') && (keyword === 'hard' || keyword === 'advanced') ||
+           keyword === 'beginner' && playlist.name.toLowerCase().includes('easy'))
+        );
+
+        return (
+          playlist.name.toLowerCase().includes(query) ||
+          (playlist.description && playlist.description.toLowerCase().includes(query)) ||
+          matchesDifficulty
+        );
+      });
+
+
+      const filteredCompanyBased = companyBased.filter((playlist) => {
+        const companyNames = ['google', 'amazon', 'microsoft', 'meta', 'apple', 'netflix', 'uber', 'airbnb'];
+        const matchesCompany = companyNames.some(company => 
+          query.includes(company) && playlist.name.toLowerCase().includes(company)
+        );
+
+        return (
+          playlist.name.toLowerCase().includes(query) ||
+          (playlist.description && playlist.description.toLowerCase().includes(query)) ||
+          matchesCompany ||
+          query.includes('company') ||
+          query.includes('interview')
+        );
+      });
+
+      // Update state with filtered results
+      setPrivatePlaylists(filteredPrivate);
+      setPublicPlaylists(filteredPublic);
+      setRecommend(filteredRecommended);
+      setCompanyBased(filteredCompanyBased);
+    },
+    1000
+  );
+}, [privatePlaylists, publicPlaylists, recommended, companyBased]);
   return (
     <>
       <Toast />
@@ -193,8 +269,7 @@ const PlaylistPage = () => {
               <Input
                 type="text"
                 placeholder="Search sheets by name, topic, or company..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSheetSearch}
                 className="pl-12 pr-6 py-4 text-lg bg-gray-900/50 border-gray-800 focus:border-blue-500 rounded-2xl backdrop-blur-sm text-gray-100 placeholder:text-gray-400 shadow-xl"
               />
             </div>
@@ -469,7 +544,7 @@ const PlaylistPage = () => {
                           2.4k users
                         </span>
                       </div>
-                      <Button size="sm" className="bg-emerald-500">
+                      <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer">
                         <Play className="w-4 h-4" />
                         Solve
                       </Button>

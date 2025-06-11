@@ -8,13 +8,45 @@ export type Post = {
   createdAt: string;
   tags: string[];
   user: {
+    id: string;
     username: string;
     fullName: string;
     avatar?: string;
   };
-  DiscussionUpvote:{
-    userId:string
-  }[]
+  DiscussionUpvote: {
+    userId: string;
+  }[];
+};
+
+export type PostComment = {
+  id: string;
+  title: string;
+  description: string;
+  commentsCount: number;
+  views: number;
+  upvotes: number;
+  createdAt: string;
+  user: {
+    id: string;
+    username: string;
+    fullName: string;
+    avatar?: string;
+  };
+  comments: {
+    comment: string;
+    upvote: number;
+    createdAt: string;
+    updatedAt: string;
+    user: {
+      id: string;
+      username: string;
+      fullName: string;
+      avatar: string;
+    };
+  }[];
+   DiscussionUpvote: {
+    userId: string;
+  }[];
 };
 
 export type Comment = {
@@ -33,4 +65,7 @@ export type Comment = {
     fullName: string;
     avatar: string;
   };
+  CommentUpvote:{
+    userId:string;
+  }[]
 };

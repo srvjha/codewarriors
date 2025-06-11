@@ -97,7 +97,7 @@ const DiscussPage = () => {
       } else {
         setPosts((prev) =>
           prev.map((post) =>
-            post.id === postid
+            post.id === postid && userData
               ? {
                   ...post,
                   upvotes: post.upvotes - 1,
@@ -166,11 +166,9 @@ const DiscussPage = () => {
   }, {});
 
   const hasUserUpvoted = (discuss: { userId: string }[]) => {
-   
-      return userData ?
-       discuss.some((post) => post.userId?.includes(userData.id))
-       : false
-    
+    return userData
+      ? discuss.some((post) => post.userId?.includes(userData.id))
+      : false;
   };
 
   return (
@@ -204,8 +202,8 @@ const DiscussPage = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <div className="p-6 max-w-7xl mx-auto">
-        <div className="flex justify-end  px-4 max-w-[67%]">
+      <div className="p-6 max-w-7xl mx-auto relative">
+        <div className="flex justify-end  px-4 max-w-[97%]">
           <Button
             className="text-base sm:text-base font-semibold mb-4 bg-blue-600 hover:bg-blue-700 cursor-pointer"
             onClick={() => navigate("/discuss/create")}
@@ -250,7 +248,7 @@ const DiscussPage = () => {
             {posts.map((post) => (
               <Card
                 key={post.id}
-                className="w-full max-w-full  border border-neutral-700 bg-neutral-900/20 hover:shadow-neutral-500/20 transition-all duration-300 rounded-xl"
+                className="w-full max-w-full border-0  shadow shadow-neutral-700  hover:shadow-neutral-500 transition-all duration-300 rounded-xl"
               >
                 <CardContent className="p-4">
                   <Link to={`/discuss/${post.id}`}>
@@ -358,8 +356,8 @@ const DiscussPage = () => {
             ))}
           </div>
 
-          <div className="flex-1 h-[70vh] w-full overflow-y-auto">
-            <div className="h-full w-[90%] border p-5 border-neutral-700 bg-neutral-900/20 hover:shadow-neutral-500/20 transition-all duration-300 rounded-xl">
+          <div className="flex-1 h-[70vh] w-full overflow-y-auto sticky self-start top-[100px]">
+            <div className="h-full w-[90%] border p-5 border-neutral-700 bg-neutral-950/20 hover:shadow-neutral-500 transition-all duration-300 rounded-xl ">
               <div className="p-1 flex gap-2 items-center mb-4">
                 <span className="text-xl font-semibold text-white">
                   Explore

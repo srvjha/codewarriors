@@ -12,7 +12,7 @@ router.post("/create/comment/post/:postid",verifyUser,addCommentToPost);
 router.post("/update/comment/:cid",verifyUser,updateCommentToPost);
 router.delete("/delete/comment/:cid",verifyUser,deleteComment)
 router.get("/post/all",verifyUser,getAllPost)
-router.get("/post/:postid",verifyUser,getPostById)
+router.get("/post/:postid",getPostById)
 router.get("/comments/all",verifyUser,getAllComments)
 router.get("/comments/:id",verifyUser,getAllCommentsById)
 router.patch("/comment/:commentid/upvote", verifyUser, addCommentUpvote);

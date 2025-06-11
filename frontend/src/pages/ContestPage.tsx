@@ -181,7 +181,7 @@ export default function ContestListPage() {
                           {contest.status}
                         </span>
                       </div>
-                      <p className="text-sm text-slate-400 line-clamp-2">
+                      <p className="text-sm text-slate-400 line-clamp-2 h-10">
                         {contest.description || "No description provided."}
                       </p>
                       <div className="text-base flex flex-col gap-1 text-white">

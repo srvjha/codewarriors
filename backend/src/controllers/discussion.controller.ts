@@ -100,6 +100,11 @@ const getAllCommentsById = asyncHandler(async (req, res) => {
           avatar: true,
         },
       },
+      CommentUpvote:{
+        select:{
+          userId:true
+        }
+      }
     },
   });
  
@@ -128,6 +133,7 @@ const getPostById = asyncHandler(async (req, res) => {
       views: true,
       user: {
         select: {
+          id: true,
           username: true,
           fullName: true,
           avatar: true,
@@ -141,6 +147,7 @@ const getPostById = asyncHandler(async (req, res) => {
           updatedAt: true,
           user: {
             select: {
+              id: true,
               username: true,
               fullName: true,
               avatar: true,
@@ -149,6 +156,11 @@ const getPostById = asyncHandler(async (req, res) => {
           },
         },
       },
+       DiscussionUpvote:{
+        select:{
+          userId:true
+        }
+      }
     },
   });
   return res
