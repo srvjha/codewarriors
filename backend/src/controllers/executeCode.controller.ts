@@ -204,67 +204,30 @@ const executeCode = asyncHandler(async (req, res) => {
     },
   });
  
-   const today = new Date();
-today.setHours(0, 0, 0, 0);
+  // Check for current day's accepted submission
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-let user = await db.user.findUnique({
-  where: { id: userId },
-  select: {
-    dailyProblemStreak: true,
-    isStreakMaintained: true,
-    lastSubmissionDate: true,
-  },
-});
-
-if (!user) return; 
-
-const lastSubmissionDate = user.lastSubmissionDate
-  ? new Date(user.lastSubmissionDate)
-  : null;
-
-if (lastSubmissionDate) lastSubmissionDate.setHours(0, 0, 0, 0);
-
-const isNewDay =
-  !lastSubmissionDate || lastSubmissionDate.getTime() !== today.getTime();
-
-// Resetting streak maintenance if it's a new day
-if (isNewDay && user.isStreakMaintained) {
-  await db.user.update({
-    where: { id: userId },
-    data: {
-      isStreakMaintained: false,
+  const currentDaySubmission = await db.submission.findFirst({
+    where: {
+      userId,
+      status: "Accepted",
+      createdAt: {
+        gte: today,
+        lte: new Date(today.getTime() + 86399999),
+      },
     },
   });
-  user.isStreakMaintained = false; 
-}
 
-
-const currentDaySubmission = await db.submission.findFirst({
-  where: {
-    userId,
-    status: "Accepted",
-    createdAt: {
-      gte: new Date(today),
-      lte: new Date(new Date(today).setHours(23, 59, 59, 999)),
-    },
-  },
-});
-
-// If they submitted and the streak is not incremented yet
-if (currentDaySubmission && !user.isStreakMaintained) {
-  await db.user.update({
-    where: { id: userId },
-    data: {
-      dailyProblemStreak: user.dailyProblemStreak === 0
-        ? 1
-        : { increment: 1 },
-      isStreakMaintained: true,
-      lastSubmissionDate: new Date(),
-    },
-  });
-}
-
-
+  if (currentDaySubmission) {
+    await db.user.update({
+      where: { id: userId },
+      data: {
+        isStreakMaintained: true,
+        lastSubmissionDate: new Date(),
+      },
+    });
+  }
   res
     .status(200)
     .json(

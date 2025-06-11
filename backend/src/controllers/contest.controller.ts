@@ -195,52 +195,7 @@ const createContestSubmission = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, result, "Contest Submission Recorded"));
 });
 
- const contestCron = asyncHandler(async (req, res) => {
-  const now = new Date();
-  const upcomingContests = await db.contest.findMany({
-    where: {
-      startTime: {
-        lte: now,
-      },
-      endTime: {
-        gt: now,
-      },
-      status: "UPCOMING",
-    },
-  });
-
-  const liveUpdates = upcomingContests.map((contest) =>
-    db.contest.update({
-      where: { id: contest.id },
-      data: { status: "LIVE" },
-    })
-  );
-
-  const liveContests = await db.contest.findMany({
-    where: {
-      endTime: {
-        lte: now,
-      },
-      status: "LIVE",
-    },
-  });
-
-  const completedUpdates = liveContests.map((contest) =>
-    db.contest.update({
-      where: { id: contest.id },
-      data: { status: "ENDED" },
-    })
-  );
-
-
-  await Promise.all([...liveUpdates, ...completedUpdates]);
-
-  res.status(200).json({
-    message: "Contest statuses updated.",
-    liveStarted: liveUpdates.length,
-    liveEnded: completedUpdates.length,
-  });
-});
+ 
 
 const checkUserRegistration = asyncHandler(async (req, res) => {
   const { contestId } = req.params;
@@ -274,6 +229,5 @@ export {
   getAllContests,
   registerUserToContest,
   unregisterUserFromContest,
-  contestCron,
   checkUserRegistration
 };
