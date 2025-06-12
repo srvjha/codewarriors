@@ -5,10 +5,12 @@ import { Play, Trash } from "lucide-react";
 import type { Playlist } from "@/types/problem/problemTypes";
 import { difficultyColor } from "@/helper/Problem.helper";
 import { Badge } from "@/components/ui/badge";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
 
 const SheetPage = () => {
-  const { id: playlistId } = useParams();
-  // console.log("playlist: ", playlistId);
+  const { id: playlistId} = useParams();
+  const {userData} = useSelector((state:RootState)=>state.auth)
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
 
   const fetchPlaylist = async () => {
@@ -91,13 +93,16 @@ const SheetPage = () => {
                   >
                     <Play className="w-5 h-5" />
                   </Link>
-
-                  <button
+                 
+                 {userData?.role ==="ADMIN" && (
+                   <button
                     onClick={() => handleDelete(problem.id)}
                     className="text-red-400 hover:text-red-500"
                   >
                     <Trash className="w-5 h-5" />
                   </button>
+                 )}
+                 
                 </div>
               </div>
             </div>

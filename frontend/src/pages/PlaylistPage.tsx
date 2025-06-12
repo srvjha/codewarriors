@@ -25,6 +25,7 @@ import {
   Plus,
   PlusCircle,
   Trash,
+  Pencil,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 // import { Link } from "react-router-dom";
@@ -33,6 +34,9 @@ import { formatDistanceToNow } from "date-fns";
 import AddProblemsModal from "@/components/ui/AddProblemModal";
 import { Link } from "react-router-dom";
 import { debounce } from "@/utils/debounce";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/redux/store";
+
 
 const PlaylistPage = () => {
   const [privatePlaylists, setPrivatePlaylists] = useState<Playlist[]>([]);
@@ -41,15 +45,18 @@ const PlaylistPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [recommended, setRecommend] = useState<Playlist[]>([]);
   const [companyBased, setCompanyBased] = useState<Playlist[]>([]);
+   const [editingPlaylist, setEditingPlaylist] = useState<Playlist | null>(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState({
     playlistName: "",
     playlistId: "",
   });
-  
-  const searchRef =
-      useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
 
-  const allPrivatePlaylistsDetails = async () => {
+  const searchRef =
+    useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
+
+  const {userData} = useSelector((state:RootState)=>state.auth)
+
+   const allPrivatePlaylistsDetails = async () => {
     try {
       const response = await API.get("/playlist/all/private", {
         withCredentials: true,
@@ -68,12 +75,11 @@ const PlaylistPage = () => {
       });
       // for favourite
       const data = response.data.data.filter(
-        (d: Playlist) => d.name === "Favourite"
+        (d: Playlist) => d.type === "public"
       );
-      const companyBasedSheets = response.data.data.filter((d: Playlist) =>
-        ["google", "amazon", "microsoft"].some((company) =>
-          d.name.toLowerCase().includes(company)
-        )
+      console.log({public:data })
+      const companyBasedSheets = response.data.data.filter(
+        (d: Playlist) => d.type === "company"
       );
       setPublicPlaylists(data || []);
       setRecommend(response.data.data || []);
@@ -86,7 +92,7 @@ const PlaylistPage = () => {
   useEffect(() => {
     allPrivatePlaylistsDetails();
     allPublicPlaylistsDetails();
-  }, [showAddModal]);
+  }, [showAddModal,showCreateModal]);
 
   const handleRemovePlaylist = async (playListId: string) => {
     try {
@@ -96,6 +102,7 @@ const PlaylistPage = () => {
       if (res.data.success) {
         ToastSuccess(res.data.message);
         await allPrivatePlaylistsDetails();
+        await allPublicPlaylistsDetails();
       }
     } catch (err: any) {
       ToastError(err.response.data.error);
@@ -105,10 +112,9 @@ const PlaylistPage = () => {
   const getDynamicRecommendedSheets = () => {
     const filteredRecommended = recommended.filter(
       (playlist) =>
-        playlist.name !== "Favourite" &&
-        playlist.name !== "Google Interview Questions" &&
-        playlist.name !== "Microsoft Interview Questions" &&
-        playlist.name !== "Amazon Interview Questions"
+        playlist.name === "Beginner's Foundation" ||
+        playlist.name === "Intermediate Mastery" ||
+        playlist.name === "Advanced Conquest"
     );
 
     const styleOptions = [
@@ -118,7 +124,8 @@ const PlaylistPage = () => {
         badgeColor: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
         cardColor:
           "bg-emerald-500/5 border-emerald-500/20 hover:border-emerald-500/40",
-        buttonColor: "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer",
+        buttonColor:
+          "bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer",
       },
       {
         difficulty: "Medium",
@@ -126,7 +133,8 @@ const PlaylistPage = () => {
         badgeColor: "bg-amber-500/20 text-amber-400 border-amber-500/30",
         cardColor:
           "bg-amber-500/5 border-amber-500/20 hover:border-amber-500/40",
-        buttonColor: "bg-amber-600 hover:bg-amber-700 text-white cursor-pointer",
+        buttonColor:
+          "bg-amber-600 hover:bg-amber-700 text-white cursor-pointer",
       },
       {
         difficulty: "Hard",
@@ -155,12 +163,12 @@ const PlaylistPage = () => {
   const handleCreatePlayList = () => {
     setShowCreateModal(true);
   };
+  
 
   const handleAddProblemToPlaylist = (name: string, id: string) => {
     setShowAddModal(true);
     setSelectedPlaylist({ playlistName: name, playlistId: id });
   };
-
 
   const handleSheetSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (searchRef.current) {
@@ -169,77 +177,112 @@ const PlaylistPage = () => {
   };
 
   useEffect(() => {
-  searchRef.current = debounce(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const query = event.target.value.toLowerCase().trim();
-      
-      if (!query) {
-        allPrivatePlaylistsDetails();
-        allPublicPlaylistsDetails();
-        return;
-      }
+    searchRef.current = debounce(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        const query = event.target.value.toLowerCase().trim();
 
-      const filteredPrivate = privatePlaylists.filter((playlist) => {
-        return (
-          playlist.name.toLowerCase().includes(query)
-        );
-      });
+        if (!query) {
+          allPrivatePlaylistsDetails();
+          allPublicPlaylistsDetails();
+          return;
+        }
 
-      // Filter public playlists 
-      const filteredPublic = publicPlaylists.filter((playlist) => {
-        return (
-          playlist.name.toLowerCase().includes(query))
-      });
+        const filteredPrivate = privatePlaylists.filter((playlist) => {
+          return playlist.name.toLowerCase().includes(query);
+        });
 
-      const filteredRecommended = recommended.filter((playlist) => {
-        const difficultyKeywords = ['beginner', 'intermediate', 'advanced'];
-        const matchesDifficulty = difficultyKeywords.some(keyword => 
-          query.includes(keyword) && 
-          (playlist.name.toLowerCase().includes('easy') && keyword === 'easy' ||
-           playlist.name.toLowerCase().includes('medium') && (keyword === 'medium' || keyword === 'intermediate') ||
-           playlist.name.toLowerCase().includes('hard') && (keyword === 'hard' || keyword === 'advanced') ||
-           keyword === 'beginner' && playlist.name.toLowerCase().includes('easy'))
-        );
+        // Filter public playlists
+        const filteredPublic = publicPlaylists.filter((playlist) => {
+          return playlist.name.toLowerCase().includes(query);
+        });
 
-        return (
-          playlist.name.toLowerCase().includes(query) ||
-          (playlist.description && playlist.description.toLowerCase().includes(query)) ||
-          matchesDifficulty
-        );
-      });
+        const filteredRecommended = recommended.filter((playlist) => {
+          const difficultyKeywords = ["beginner", "intermediate", "advanced"];
+          const matchesDifficulty = difficultyKeywords.some(
+            (keyword) =>
+              query.includes(keyword) &&
+              ((playlist.name.toLowerCase().includes("easy") &&
+                keyword === "easy") ||
+                (playlist.name.toLowerCase().includes("medium") &&
+                  (keyword === "medium" || keyword === "intermediate")) ||
+                (playlist.name.toLowerCase().includes("hard") &&
+                  (keyword === "hard" || keyword === "advanced")) ||
+                (keyword === "beginner" &&
+                  playlist.name.toLowerCase().includes("easy")))
+          );
 
+          return (
+            playlist.name.toLowerCase().includes(query) ||
+            (playlist.description &&
+              playlist.description.toLowerCase().includes(query)) ||
+            matchesDifficulty
+          );
+        });
 
-      const filteredCompanyBased = companyBased.filter((playlist) => {
-        const companyNames = ['google', 'amazon', 'microsoft', 'meta', 'apple', 'netflix', 'uber', 'airbnb'];
-        const matchesCompany = companyNames.some(company => 
-          query.includes(company) && playlist.name.toLowerCase().includes(company)
-        );
+        const filteredCompanyBased = companyBased.filter((playlist) => {
+          const companyNames = [
+            "google",
+            "amazon",
+            "microsoft",
+            "meta",
+            "apple",
+            "netflix",
+            "uber",
+            "airbnb",
+          ];
+          const matchesCompany = companyNames.some(
+            (company) =>
+              query.includes(company) &&
+              playlist.name.toLowerCase().includes(company)
+          );
 
-        return (
-          playlist.name.toLowerCase().includes(query) ||
-          (playlist.description && playlist.description.toLowerCase().includes(query)) ||
-          matchesCompany ||
-          query.includes('company') ||
-          query.includes('interview')
-        );
-      });
+          return (
+            playlist.name.toLowerCase().includes(query) ||
+            (playlist.description &&
+              playlist.description.toLowerCase().includes(query)) ||
+            matchesCompany ||
+            query.includes("company") ||
+            query.includes("interview")
+          );
+        });
 
-      // Update state with filtered results
-      setPrivatePlaylists(filteredPrivate);
-      setPublicPlaylists(filteredPublic);
-      setRecommend(filteredRecommended);
-      setCompanyBased(filteredCompanyBased);
-    },
-    1000
-  );
-}, [privatePlaylists, publicPlaylists, recommended, companyBased]);
+        // Update state with filtered results
+        setPrivatePlaylists(filteredPrivate);
+        setPublicPlaylists(filteredPublic);
+        setRecommend(filteredRecommended);
+        setCompanyBased(filteredCompanyBased);
+      },
+      1000
+    );
+  }, [privatePlaylists, publicPlaylists, recommended, companyBased]);
+
+  const handleEditPlaylist = (id: string) => {
+    const playlistToEdit = [...publicPlaylists, ...privatePlaylists].find(
+      playlist => playlist.id === id
+    );
+    
+    if (playlistToEdit) {
+      setEditingPlaylist(playlistToEdit);
+      setShowCreateModal(true);
+    }
+  };
+   const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+    setEditingPlaylist(null); 
+  };
   return (
     <>
       <Toast />
       {showCreateModal && (
-        <CreatePlaylistModal onClose={() => setShowCreateModal(false)} />
+        <CreatePlaylistModal 
+          defaultName={editingPlaylist?.name || ""} 
+          defaultDescription={editingPlaylist?.description || ""} 
+          defaultVisibility={editingPlaylist?.type === "public" ? "public" : "private"}
+          playlistId={editingPlaylist?.id || null}
+          isEditing={!!editingPlaylist}
+          onClose={handleCloseCreateModal} 
+        />
       )}
-
       <AddProblemsModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
@@ -287,18 +330,28 @@ const PlaylistPage = () => {
                   className="group hover:shadow-2xl transition-all duration-300 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/30 hover:border-yellow-400/50 backdrop-blur-sm"
                 >
                   <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between w-full">
                       <div className="flex items-center gap-3">
                         <div className="p-2 bg-yellow-500/20 rounded-xl">
                           <Star className="w-5 h-5 text-yellow-400 fill-current" />
                         </div>
-                        <CardTitle className="text-xl text-gray-100">
+                        <CardTitle className="text-xl text-gray-100 flex items-center gap-2">
                           {playlist?.name}
+                          <Badge className="bg-amber-50 text-amber-800 text-xs">
+                            Public
+                          </Badge>
                         </CardTitle>
                       </div>
+                      {playlist.user.fullName === userData?.fullName && (
+                        <div className="flex mt-2 justify-center items-center gap-2">
+                       <Pencil className="w-4 h-4 text-neutral-400 hover:text-blue-400 cursor-pointer" onClick={()=>handleEditPlaylist(playlist.id)} />
+                        <Trash className="w-4 h-4 text-neutral-400 hover:text-red-400 cursor-pointer"  onClick={() => handleRemovePlaylist(playlist.id)} />
+                        </div>
+                      )}
+                      
                     </div>
-                    <CardDescription className="text-gray-300 h-8">
-                      {playlist?.description}
+                    <CardDescription className="text-gray-300 h-8 mt-2">
+                      {playlist?.description || "No Description"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
@@ -327,6 +380,9 @@ const PlaylistPage = () => {
                         <Button
                           size="sm"
                           className="bg-yellow-500 flex-1 cursor-pointer hover:bg-yellow-600 text-gray-900 font-medium"
+                          onClick={() =>
+                          handleAddProblemToPlaylist(playlist.name, playlist.id)
+                        }
                         >
                           <PlusCircle className="w-4 h-4 mt-1" />
                           Add Problems
@@ -345,7 +401,9 @@ const PlaylistPage = () => {
                   </CardContent>
                 </Card>
               ))}
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {privatePlaylists.map((playlist) => (
                 <Card
                   key={playlist.id}
@@ -356,10 +414,14 @@ const PlaylistPage = () => {
                       <CardTitle className="text-lg text-gray-100">
                         {playlist.name}
                       </CardTitle>
+                      <div className="flex justify-center items-center gap-2">
+                      <Pencil className="w-4 h-4 text-neutral-400 hover:text-blue-400 cursor-pointer" onClick={()=>handleEditPlaylist(playlist.id)} />
+                       
                       <Trash
-                        className="w-4 h-4 text-red-400 cursor-pointer hover:text-red-300"
+                        className="w-4 h-4 text-neutral-400 cursor-pointer hover:text-red-400"
                         onClick={() => handleRemovePlaylist(playlist.id)}
                       />
+                      </div>
                     </div>
                     <CardDescription className="text-sm text-gray-400 mt-1  h-10">
                       {playlist.description || "No description provided."}
@@ -489,7 +551,11 @@ const PlaylistPage = () => {
                         </span>
                       </div>
                       <Link to={`/${sheet.playlist.name}/${sheet.playlist.id}`}>
-                        <Button size="sm" className={sheet.buttonColor}>
+                        <Button
+                          size="sm"
+                          className={sheet.buttonColor}
+                          onClick={() => console.log("he")}
+                        >
                           <Play className="w-4 h-4" />
                           Solve
                         </Button>
@@ -544,10 +610,15 @@ const PlaylistPage = () => {
                           2.4k users
                         </span>
                       </div>
-                      <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer">
-                        <Play className="w-4 h-4" />
-                        Solve
-                      </Button>
+                      <Link to={`/${company.name}/${company.id}`}>
+                        <Button
+                          size="sm"
+                          className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer"
+                        >
+                          <Play className="w-4 h-4" />
+                          Solve
+                        </Button>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>

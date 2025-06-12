@@ -14,7 +14,8 @@ const getAllPrivatePlaylistDetails = asyncHandler(async (req, res) => {
   const playlists = await db.playlist.findMany({
     where: {
       userId,
-      visibilty:false
+      visibilty:false,
+      type:"private"
     },
     include: {
       problems: {
@@ -62,6 +63,8 @@ const getAllPublicPlaylistDetails = asyncHandler(async (req, res) => {
 
 
 
+
+
 const getPlaylistDetails = asyncHandler(async (req, res) => {
   const { plid } = req.params;
    validId(plid, "Playlist");
@@ -87,7 +90,7 @@ const getPlaylistDetails = asyncHandler(async (req, res) => {
 });
 
 const createPlaylist = asyncHandler(async (req, res) => {
-  const { name, description,visibilty } = handleZodError(
+  const { name, description,visibilty,type} = handleZodError(
     createPlaylistValidation(req.body)
   );
   const userId = req.user.id;
@@ -96,12 +99,38 @@ const createPlaylist = asyncHandler(async (req, res) => {
       name,
       description,
       userId,
-      visibilty
+      visibilty,
+      type
     },
   });
   res
     .status(200)
     .json(new ApiResponse(200, playlist, "Playlist created Successfully"));
+});
+
+const updatePlaylist = asyncHandler(async (req, res) => {
+  const {plid} = req.params;
+  validId(plid,"Playlist")
+  const { name, description,visibilty,type} = handleZodError(
+    createPlaylistValidation(req.body)
+  );
+  console.log({name,description})
+  const userId = req.user.id;
+  const playlist = await db.playlist.update({
+    where:{
+      id:plid
+    },
+    data: {
+      name,
+      description,
+      userId,
+      visibilty,
+      type
+    },
+  });
+  res
+    .status(200)
+    .json(new ApiResponse(200, playlist, "Playlist updated Successfully"));
 });
 
 const deletePlaylist = asyncHandler(async (req, res) => {
@@ -207,6 +236,7 @@ export {
   getAllPrivatePlaylistDetails,
   getPlaylistDetails,
   createPlaylist,
+  updatePlaylist,
   deletePlaylist,
   addProblemToPlaylist,
   removeProblemFromPlaylist,

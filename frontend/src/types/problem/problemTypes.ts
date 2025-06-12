@@ -51,6 +51,8 @@ export interface Playlist{
   name: string;
   description: string;
   userId: string;
+  visibility:boolean;
+  type:string;
   user:{
     fullName:string
   };

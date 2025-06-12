@@ -1,35 +1,86 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/textarea"; 
-import { X, Plus } from "lucide-react";
+import { X, Plus, Edit } from "lucide-react";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import API from "@/utils/AxiosInstance";
 
-const CreatePlaylistModal = ({ onClose }: { onClose: () => void }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-   const [visibility, setVisibility] = useState<"public" | "private">("private");
-  const handleCreatePlaylist = async () => {
+interface CreatePlaylistModalProps {
+  onClose: () => void;
+  defaultName?: string;
+  defaultDescription?: string;
+  defaultVisibility?: "public" | "private";
+  playlistId?: string | null;
+  isEditing?: boolean;
+}
+
+const CreatePlaylistModal = ({ 
+  onClose, 
+  defaultName = "", 
+  defaultDescription = "", 
+  defaultVisibility = "private",
+  playlistId = null,
+  isEditing = false
+}: CreatePlaylistModalProps) => {
+  const [name, setName] = useState(defaultName);
+  const [description, setDescription] = useState(defaultDescription);
+  const [visibility, setVisibility] = useState<"public" | "private">(defaultVisibility);
+
+
+  useEffect(() => {
+    setName(defaultName);
+    setDescription(defaultDescription);
+    setVisibility(defaultVisibility);
+  }, [defaultName, defaultDescription, defaultVisibility]);
+
+  const handleCreateOrUpdatePlaylist = async () => {
     if (!name.trim()) return ToastError("Playlist name is required");
 
     try {
-      const res = await API.post(
-        "/playlist/create",
-        {
-          name,
-          description,
-          visibilty: visibility === "public" ? true : false,
-        },
-        { withCredentials: true }
-      );
+      let res;
+      
+      if (isEditing && playlistId) {
+        // Update existing playlist
+        res = await API.put(
+          `/playlist/${playlistId}`,
+          {
+            name,
+            description,
+            visibility: visibility === "public" ? true : false,
+            type: visibility === "public" ? "public" : "private"
+          },
+          { withCredentials: true }
+        );
+      } else {
+        // Create new playlist
+        res = await API.post(
+          "/playlist/create",
+          {
+            name,
+            description,
+            visibilty: visibility === "public" ? true : false,
+            type: visibility === "public" ? "public" : "private"
+          },
+          { withCredentials: true }
+        );
+      }
+
       if (res.data.success) {
-        ToastSuccess("Playlist created successfully!");
+        ToastSuccess(
+          isEditing 
+            ? "Playlist updated successfully!" 
+            : "Playlist created successfully!"
+        );
         setName("");
         setDescription("");
+        setVisibility("private");
         setTimeout(() => onClose(), 1500);
       }
     } catch (err: any) {
-      ToastError(err.response?.data?.error || "Failed to create playlist");
+      ToastError(
+        err.response?.data?.error || 
+        `Failed to ${isEditing ? 'update' : 'create'} playlist`
+      );
     }
   };
 
@@ -45,7 +96,7 @@ const CreatePlaylistModal = ({ onClose }: { onClose: () => void }) => {
             <X />
           </button>
           <h2 className="text-lg font-semibold text-white text-center mb-4">
-            Create New Playlist
+            {isEditing ? "Edit Playlist" : "Create New Playlist"}
           </h2>
           <div className="flex flex-col gap-3">
             <Input
@@ -62,24 +113,24 @@ const CreatePlaylistModal = ({ onClose }: { onClose: () => void }) => {
               rows={3}
             />
             <div className="flex items-center gap-3">
-                <label className="text-sm text-white">Visibility:</label>
-                <select
-                  value={visibility}
-                  onChange={(e) =>
-                    setVisibility(e.target.value as "public" | "private")
-                  }
-                  className="bg-zinc-800 text-white px-3 py-1 rounded-md border border-zinc-700"
-                >
-                  <option value="public">Public</option>
-                  <option value="private">Private</option>
-                </select>
-              </div>
+              <label className="text-sm text-white">Visibility:</label>
+              <select
+                value={visibility}
+                onChange={(e) =>
+                  setVisibility(e.target.value as "public" | "private")
+                }
+                className="bg-zinc-800 text-white px-3 py-1 rounded-md border border-zinc-700"
+              >
+                <option value="public">Public</option>
+                <option value="private">Private</option>
+              </select>
+            </div>
             <button
-              onClick={handleCreatePlaylist}
+              onClick={handleCreateOrUpdatePlaylist}
               className="bg-zinc-100 text-black flex items-center justify-center gap-2 py-2 rounded-lg hover:bg-zinc-200 transition"
             >
-              <Plus size={18} />
-              Create
+              {isEditing ? <Edit size={18} /> : <Plus size={18} />}
+              {isEditing ? "Update" : "Create"}
             </button>
           </div>
         </div>
