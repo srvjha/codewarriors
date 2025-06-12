@@ -411,9 +411,12 @@ const PlaylistPage = () => {
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg text-gray-100">
-                        {playlist.name}
-                      </CardTitle>
+                      <CardTitle className="text-xl text-gray-100 flex items-center gap-2">
+                          {playlist?.name}
+                          <Badge className="bg-amber-50 text-gray-800 text-xs">
+                            Private
+                          </Badge>
+                        </CardTitle>
                       <div className="flex justify-center items-center gap-2">
                       <Pencil className="w-4 h-4 text-neutral-400 hover:text-blue-400 cursor-pointer" onClick={()=>handleEditPlaylist(playlist.id)} />
                        
