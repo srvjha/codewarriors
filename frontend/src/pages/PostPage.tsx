@@ -4,7 +4,7 @@ import API from "@/utils/AxiosInstance";
 // import TurndownService from "turndown";
 import type { Comment, PostComment } from "@/types/discuss/post";
 import MarkdownPreview from "@uiw/react-markdown-preview";
-import { Eye, MessageSquare, ThumbsUp } from "lucide-react";
+import { Eye, MessageSquare, ThumbsUp} from "lucide-react";
 import { ToastError } from "@/utils/ToastContainers";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -154,6 +154,16 @@ const PostPage = () => {
       : false;
   };
 
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      await API.delete(`/discuss/delete/comment/${commentId}`);
+       await Promise.all([fetchPost(), fetchComments()]);
+    } catch (error: any) {
+      console.error(error.response.data.error || "Failed to delete Comment");
+    }
+
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 text-white">
       <div className="bg-transparent rounded-xl shadow-xl p-6 space-y-4">
@@ -271,16 +281,29 @@ const PostPage = () => {
                       }`}
                     />
                     <div> {comment.upvote}</div>
+
+                    <div className=" gap-4 ml-4 flex">
+                      {comment.user.username === userData?.username && (
+                        <span
+                          onClick={() => setEditingComment(comment)}
+                          className="cursor-pointer text-blue-400 hover:text-blue-500"
+                        >
+                          Edit
+                        </span>
+                      )}
+
+                      {(comment.user.username === userData?.username ||
+                        userData?.role === "ADMIN") && (
+                        <span
+                          onClick={() => handleDeleteComment(comment.id)}
+                          className="cursor-pointer text-red-400 hover:text-red-500"
+                        >
+                          Delete
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-                {comment.user.username === userData?.username && (
-                  <span
-                    onClick={() => setEditingComment(comment)}
-                    className="cursor-pointer text-blue-400"
-                  >
-                    Edit
-                  </span>
-                )}
               </div>
             </div>
           ))}

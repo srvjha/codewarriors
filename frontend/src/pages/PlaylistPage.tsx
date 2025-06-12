@@ -17,7 +17,6 @@ import {
   Target,
   TrendingUp,
   Star,
-  Users,
   Clock,
   Play,
   Code2,
@@ -26,6 +25,7 @@ import {
   PlusCircle,
   Trash,
   Pencil,
+  Copy,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 // import { Link } from "react-router-dom";
@@ -37,7 +37,6 @@ import { debounce } from "@/utils/debounce";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 
-
 const PlaylistPage = () => {
   const [privatePlaylists, setPrivatePlaylists] = useState<Playlist[]>([]);
   const [publicPlaylists, setPublicPlaylists] = useState<Playlist[]>([]);
@@ -45,7 +44,7 @@ const PlaylistPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [recommended, setRecommend] = useState<Playlist[]>([]);
   const [companyBased, setCompanyBased] = useState<Playlist[]>([]);
-   const [editingPlaylist, setEditingPlaylist] = useState<Playlist | null>(null);
+  const [editingPlaylist, setEditingPlaylist] = useState<Playlist | null>(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState({
     playlistName: "",
     playlistId: "",
@@ -54,9 +53,9 @@ const PlaylistPage = () => {
   const searchRef =
     useRef<(event: React.ChangeEvent<HTMLInputElement>) => void | null>(null);
 
-  const {userData} = useSelector((state:RootState)=>state.auth)
+  const { userData } = useSelector((state: RootState) => state.auth);
 
-   const allPrivatePlaylistsDetails = async () => {
+  const allPrivatePlaylistsDetails = async () => {
     try {
       const response = await API.get("/playlist/all/private", {
         withCredentials: true,
@@ -77,7 +76,7 @@ const PlaylistPage = () => {
       const data = response.data.data.filter(
         (d: Playlist) => d.type === "public"
       );
-      console.log({public:data })
+      console.log({ public: data });
       const companyBasedSheets = response.data.data.filter(
         (d: Playlist) => d.type === "company"
       );
@@ -92,7 +91,7 @@ const PlaylistPage = () => {
   useEffect(() => {
     allPrivatePlaylistsDetails();
     allPublicPlaylistsDetails();
-  }, [showAddModal,showCreateModal]);
+  }, [showAddModal, showCreateModal]);
 
   const handleRemovePlaylist = async (playListId: string) => {
     try {
@@ -163,7 +162,6 @@ const PlaylistPage = () => {
   const handleCreatePlayList = () => {
     setShowCreateModal(true);
   };
-  
 
   const handleAddProblemToPlaylist = (name: string, id: string) => {
     setShowAddModal(true);
@@ -258,29 +256,44 @@ const PlaylistPage = () => {
 
   const handleEditPlaylist = (id: string) => {
     const playlistToEdit = [...publicPlaylists, ...privatePlaylists].find(
-      playlist => playlist.id === id
+      (playlist) => playlist.id === id
     );
-    
+
     if (playlistToEdit) {
       setEditingPlaylist(playlistToEdit);
       setShowCreateModal(true);
     }
   };
-   const handleCloseCreateModal = () => {
+  const handleCloseCreateModal = () => {
     setShowCreateModal(false);
-    setEditingPlaylist(null); 
+    setEditingPlaylist(null);
   };
+
+  const createClone = async(playListid:string) =>{
+    try {
+      const res = await API.post(`/playlist/${playListid}/clone`)
+      if(res.status){
+        ToastSuccess(res.data.message);
+        allPrivatePlaylistsDetails();
+      }
+    } catch (error:any) {
+     ToastError(error.response.data.error || "Failed to create clone")
+    }
+
+  }
   return (
     <>
       <Toast />
       {showCreateModal && (
-        <CreatePlaylistModal 
-          defaultName={editingPlaylist?.name || ""} 
-          defaultDescription={editingPlaylist?.description || ""} 
-          defaultVisibility={editingPlaylist?.type === "public" ? "public" : "private"}
+        <CreatePlaylistModal
+          defaultName={editingPlaylist?.name || ""}
+          defaultDescription={editingPlaylist?.description || ""}
+          defaultVisibility={
+            editingPlaylist?.type === "public" ? "public" : "private"
+          }
           playlistId={editingPlaylist?.id || null}
           isEditing={!!editingPlaylist}
-          onClose={handleCloseCreateModal} 
+          onClose={handleCloseCreateModal}
         />
       )}
       <AddProblemsModal
@@ -344,11 +357,16 @@ const PlaylistPage = () => {
                       </div>
                       {playlist.user.fullName === userData?.fullName && (
                         <div className="flex mt-2 justify-center items-center gap-2">
-                       <Pencil className="w-4 h-4 text-neutral-400 hover:text-blue-400 cursor-pointer" onClick={()=>handleEditPlaylist(playlist.id)} />
-                        <Trash className="w-4 h-4 text-neutral-400 hover:text-red-400 cursor-pointer"  onClick={() => handleRemovePlaylist(playlist.id)} />
+                          <Pencil
+                            className="w-4 h-4 text-neutral-400 hover:text-blue-400 cursor-pointer"
+                            onClick={() => handleEditPlaylist(playlist.id)}
+                          />
+                          <Trash
+                            className="w-4 h-4 text-neutral-400 hover:text-red-400 cursor-pointer"
+                            onClick={() => handleRemovePlaylist(playlist.id)}
+                          />
                         </div>
                       )}
-                      
                     </div>
                     <CardDescription className="text-gray-300 h-8 mt-2">
                       {playlist?.description || "No Description"}
@@ -381,8 +399,11 @@ const PlaylistPage = () => {
                           size="sm"
                           className="bg-yellow-500 flex-1 cursor-pointer hover:bg-yellow-600 text-gray-900 font-medium"
                           onClick={() =>
-                          handleAddProblemToPlaylist(playlist.name, playlist.id)
-                        }
+                            handleAddProblemToPlaylist(
+                              playlist.name,
+                              playlist.id
+                            )
+                          }
                         >
                           <PlusCircle className="w-4 h-4 mt-1" />
                           Add Problems
@@ -411,19 +432,25 @@ const PlaylistPage = () => {
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-xl text-gray-100 flex items-center gap-2">
-                          {playlist?.name}
-                          <Badge className="bg-amber-50 text-gray-800 text-xs">
-                            Private
-                          </Badge>
-                        </CardTitle>
-                      <div className="flex justify-center items-center gap-2">
-                      <Pencil className="w-4 h-4 text-neutral-400 hover:text-blue-400 cursor-pointer" onClick={()=>handleEditPlaylist(playlist.id)} />
+                      <div className="flex gap-1.5 mr-1.5">
+                      <CardTitle className="text-xl text-gray-100 flex items-center gap-2 line-clamp-1">
+                        {playlist?.name}
                        
-                      <Trash
-                        className="w-4 h-4 text-neutral-400 cursor-pointer hover:text-red-400"
-                        onClick={() => handleRemovePlaylist(playlist.id)}
-                      />
+                      </CardTitle>
+                       <Badge className="bg-amber-50 text-gray-800 text-xs">
+                          {playlist?.type}
+                        </Badge>
+                        </div>
+                      <div className="flex justify-center items-center gap-2">
+                        <Pencil
+                          className="w-4 h-4 text-neutral-400 hover:text-blue-400 cursor-pointer"
+                          onClick={() => handleEditPlaylist(playlist.id)}
+                        />
+
+                        <Trash
+                          className="w-4 h-4 text-neutral-400 cursor-pointer hover:text-red-400"
+                          onClick={() => handleRemovePlaylist(playlist.id)}
+                        />
                       </div>
                     </div>
                     <CardDescription className="text-sm text-gray-400 mt-1  h-10">
@@ -548,21 +575,25 @@ const PlaylistPage = () => {
                           <Target className="w-4 h-4" />
                           {sheet.problems} problems
                         </span>
-                        <span className="flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          2.4k users
-                        </span>
                       </div>
-                      <Link to={`/${sheet.playlist.name}/${sheet.playlist.id}`}>
+                      <div className="flex gap-1">
+                        <Link
+                          to={`/${sheet.playlist.name}/${sheet.playlist.id}`}
+                        >
+                          <Button size="sm" className={sheet.buttonColor}>
+                            <Play className="w-4 h-4" />
+                            Solve
+                          </Button>
+                        </Link>
                         <Button
                           size="sm"
-                          className={sheet.buttonColor}
-                          onClick={() => console.log("he")}
+                          className="bg-neutral-300 text-neutral-800 cursor-pointer hover:bg-neutral-400"
+                           onClick={()=>createClone(sheet.playlist.id)}
                         >
-                          <Play className="w-4 h-4" />
-                          Solve
+                          <Copy className="w-4 h-4 " />
+                          Clone
                         </Button>
-                      </Link>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -608,20 +639,26 @@ const PlaylistPage = () => {
                           <Target className="w-4 h-4" />
                           {company.problems.length} problems
                         </span>
-                        <span className="flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          2.4k users
-                        </span>
+                       
                       </div>
-                      <Link to={`/${company.name}/${company.id}`}>
+                      <div className="flex gap-1">
+                        <Link
+                          to={`/${company.name}/${company.id}`}
+                        >
+                          <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer">
+                            <Play className="w-4 h-4" />
+                            Solve
+                          </Button>
+                        </Link>
                         <Button
                           size="sm"
-                          className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer"
+                          className="bg-neutral-300 text-neutral-800 cursor-pointer hover:bg-neutral-400"
+                           onClick={()=>createClone(company.id)}
                         >
-                          <Play className="w-4 h-4" />
-                          Solve
+                          <Copy className="w-4 h-4 " />
+                          Clone
                         </Button>
-                      </Link>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

@@ -14,8 +14,11 @@ const getAllPrivatePlaylistDetails = asyncHandler(async (req, res) => {
   const playlists = await db.playlist.findMany({
     where: {
       userId,
-      visibilty:false,
-      type:"private"
+      visibilty: false,
+       OR: [
+      { type: "private" },
+      { type: "clone" },
+    ],
     },
     include: {
       problems: {
@@ -23,24 +26,23 @@ const getAllPrivatePlaylistDetails = asyncHandler(async (req, res) => {
           problem: true,
         },
       },
-      user:{
-        select:{
-          fullName:true
-        }
-      }
+      user: {
+        select: {
+          fullName: true,
+        },
+      },
     },
   });
-  
+
   res
     .status(200)
     .json(new ApiResponse(200, playlists, "All Playlist Fetched Successfully"));
 });
-
 
 const getAllPublicPlaylistDetails = asyncHandler(async (req, res) => {
   const playlists = await db.playlist.findMany({
     where: {
-     visibilty:true,
+      visibilty: true,
     },
     include: {
       problems: {
@@ -48,29 +50,25 @@ const getAllPublicPlaylistDetails = asyncHandler(async (req, res) => {
           problem: true,
         },
       },
-      user:{
-        select:{
-          fullName:true
-        }
-      }
+      user: {
+        select: {
+          fullName: true,
+        },
+      },
     },
   });
-  
+
   res
     .status(200)
     .json(new ApiResponse(200, playlists, "All Playlist Fetched Successfully"));
 });
 
-
-
-
-
 const getPlaylistDetails = asyncHandler(async (req, res) => {
   const { plid } = req.params;
-   validId(plid, "Playlist");
+  validId(plid, "Playlist");
   const playlist = await db.playlist.findUnique({
     where: {
-      id: plid
+      id: plid,
     },
     include: {
       problems: {
@@ -90,7 +88,7 @@ const getPlaylistDetails = asyncHandler(async (req, res) => {
 });
 
 const createPlaylist = asyncHandler(async (req, res) => {
-  const { name, description,visibilty,type} = handleZodError(
+  const { name, description, visibilty, type } = handleZodError(
     createPlaylistValidation(req.body)
   );
   const userId = req.user.id;
@@ -100,7 +98,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
       description,
       userId,
       visibilty,
-      type
+      type,
     },
   });
   res
@@ -109,23 +107,23 @@ const createPlaylist = asyncHandler(async (req, res) => {
 });
 
 const updatePlaylist = asyncHandler(async (req, res) => {
-  const {plid} = req.params;
-  validId(plid,"Playlist")
-  const { name, description,visibilty,type} = handleZodError(
+  const { plid } = req.params;
+  validId(plid, "Playlist");
+  const { name, description, visibilty, type } = handleZodError(
     createPlaylistValidation(req.body)
   );
-  console.log({name,description})
+  console.log({ name, description });
   const userId = req.user.id;
   const playlist = await db.playlist.update({
-    where:{
-      id:plid
+    where: {
+      id: plid,
     },
     data: {
       name,
       description,
       userId,
       visibilty,
-      type
+      type,
     },
   });
   res
@@ -135,7 +133,7 @@ const updatePlaylist = asyncHandler(async (req, res) => {
 
 const deletePlaylist = asyncHandler(async (req, res) => {
   const { plid } = req.params;
-   validId(plid, "Playlist");
+  validId(plid, "Playlist");
   const playlist = await db.playlist.delete({
     where: {
       id: plid,
@@ -145,6 +143,61 @@ const deletePlaylist = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, playlist, "Playlist deleted Successfully"));
 });
+
+const clonePlaylist = asyncHandler(async (req, res) => {
+  const { plid } = req.params;
+  validId(plid, "Playlist");
+
+  const result = await db.$transaction(async (tx) => {
+    const playListInfo = await tx.playlist.findUnique({
+      where: {
+        id: plid,
+      },
+    });
+
+    if (!playListInfo) {
+      throw new ApiError("Playlist not found", 400);
+    }
+
+    const getProblemsInPlaylist = await tx.problemInPlaylist.findMany({
+      where: {
+        playListId: plid, 
+      },
+    });
+
+    const newPlaylist = await tx.playlist.create({
+      data: {
+        name: playListInfo.name + " (Clone)",
+        description: playListInfo.description,
+        userId: req.user.id,
+        visibilty: false,
+        type: "clone",
+      },
+    });
+
+    await Promise.all(
+      getProblemsInPlaylist.map((item) =>
+        tx.problemInPlaylist.create({
+          data: {
+            problemId: item.problemId,
+            playListId: newPlaylist.id,
+          },
+        })
+      )
+    );
+
+    return newPlaylist;
+  });
+
+  res.status(200).json(
+    new ApiResponse(
+      200,
+      result,
+      "Playlist cloned successfully"
+    )
+  );
+});
+
 
 const addProblemToPlaylist = asyncHandler(async (req, res) => {
   const { plid, pid } = req.params;
@@ -205,12 +258,11 @@ const removeProblemFromPlaylist = asyncHandler(async (req, res) => {
 
   const existingProblems = await db.problem.findMany({
     where: {
-      id: pid ,
+      id: pid,
     },
     select: { id: true },
   });
 
- 
   if (existingProblems.length === 0) {
     throw new ApiError("Problem not found", 404);
   }
@@ -240,4 +292,5 @@ export {
   deletePlaylist,
   addProblemToPlaylist,
   removeProblemFromPlaylist,
+  clonePlaylist,
 };

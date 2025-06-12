@@ -218,15 +218,18 @@ const executeCode = asyncHandler(async (req, res) => {
       },
     },
   });
+  // console.log({currentDaySubmission})
 
   if (currentDaySubmission) {
-    await db.user.update({
+    const update = await db.user.update({
       where: { id: userId },
       data: {
+        dailyProblemStreak:{increment:1},
         isStreakMaintained: true,
         lastSubmissionDate: new Date(),
       },
     });
+    // console.log({update})
   }
   res
     .status(200)
