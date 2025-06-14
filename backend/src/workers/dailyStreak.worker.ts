@@ -12,6 +12,8 @@ const checkDailyStreak = asyncHandler(async (req, res) => {
     },
   });
 
+  const userInfo = [];
+
   for (const user of allUsers) {
     const lastSubmission = user.lastSubmissionDate
       ? new Date(user.lastSubmissionDate)
@@ -22,13 +24,19 @@ const checkDailyStreak = asyncHandler(async (req, res) => {
     const todayDateStr = new Date().toLocaleDateString("en-IN", {
       timeZone: "Asia/Kolkata",
     });
-
+  
     const lastSubmissionDateStr = new Date(
       lastSubmission
     ).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" });
-  
+
 
     const kyaWoAajHai = todayDateStr === lastSubmissionDateStr;
+    userInfo.push({
+      user_name:user.fullName || "",
+      user_lastsubmission_date: lastSubmissionDateStr,
+      current_date: todayDateStr,
+      status:kyaWoAajHai
+    })
 
     if (!kyaWoAajHai) {
       await db.user.update({
@@ -42,7 +50,7 @@ const checkDailyStreak = asyncHandler(async (req, res) => {
   }
   res
     .status(200)
-    .json(new ApiResponse(200, null, "Daily Streak Checked Successfully"));
+    .json(new ApiResponse(200, userInfo, "Daily Streak Checked Successfully"));
 });
 
 export { checkDailyStreak };
