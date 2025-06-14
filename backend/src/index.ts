@@ -6,7 +6,7 @@ import { logger } from "./configs/logger";
 dotenv.config({
   path: "./.env",
 });
-const PORT = process.env.PORT ?? 8000;
+const PORT = process.env.PORT || 8000;
 
 
 app.get("/",(req,res)=>{
