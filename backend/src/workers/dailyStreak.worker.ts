@@ -3,8 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asynHandler";
 
 const checkDailyStreak = asyncHandler(async (req, res) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  
 
   const allUsers = await db.user.findMany({
     where: {
@@ -15,30 +14,26 @@ const checkDailyStreak = asyncHandler(async (req, res) => {
   const userInfo = [];
 
   for (const user of allUsers) {
-    const lastSubmission = user.lastSubmissionDate
-      ? new Date(user.lastSubmissionDate)
-      : null;
-    if (!lastSubmission) continue;
+   if (!user.lastSubmissionDate) continue;
 
-    lastSubmission.setHours(0, 0, 0, 0);
     const todayDateStr = new Date().toLocaleDateString("en-IN", {
       timeZone: "Asia/Kolkata",
     });
   
     const lastSubmissionDateStr = new Date(
-      lastSubmission
+      user.lastSubmissionDate
     ).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" });
 
 
-    const kyaWoAajHai = todayDateStr === lastSubmissionDateStr;
+    const isToday = todayDateStr === lastSubmissionDateStr;
     userInfo.push({
       user_name:user.fullName || "",
       user_lastsubmission_date: lastSubmissionDateStr,
       current_date: todayDateStr,
-      status:kyaWoAajHai
+      status:isToday
     })
 
-    if (!kyaWoAajHai) {
+    if (!isToday) {
       await db.user.update({
         where: { id: user.id },
         data: {
