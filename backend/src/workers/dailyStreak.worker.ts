@@ -19,7 +19,17 @@ const checkDailyStreak = asyncHandler(async (req, res) => {
     if (!lastSubmission) continue;
 
     lastSubmission.setHours(0, 0, 0, 0);
-    const kyaWoAajHai = lastSubmission.getTime() === today.getTime();
+    const todayDateStr = new Date().toLocaleDateString("en-IN", {
+      timeZone: "Asia/Kolkata",
+    });
+
+    const lastSubmissionDateStr = new Date(
+      lastSubmission
+    ).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata" });
+  
+
+    const kyaWoAajHai = todayDateStr === lastSubmissionDateStr;
+
     if (!kyaWoAajHai) {
       await db.user.update({
         where: { id: user.id },

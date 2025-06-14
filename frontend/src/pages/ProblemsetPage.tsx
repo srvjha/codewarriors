@@ -241,8 +241,6 @@ const ProblemsetPage = () => {
     setHasMore(filtered.length > problemsPerPage);
   }, [filter, allProblems]);
 
-  
-
   return (
     <div className="max-w-7xl mx-auto p-6 grid grid-cols-4 z-10">
       <div className="col-span-1 p-2">
@@ -259,9 +257,8 @@ const ProblemsetPage = () => {
             {uniqueCompanies.slice(0, 5).map((company, index) => (
               <div key={index} className="flex items-center gap-2 mb-1">
                 <Checkbox
-                  
                   id={`company-${company}`}
-                   className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
+                  className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
                   checked={filter.companyTags.includes(company)}
                   onCheckedChange={() => toggleCheckBox(company, "companyTags")}
                 />
@@ -298,13 +295,14 @@ const ProblemsetPage = () => {
             <div className=" gap-2 mt-0">
               {uniqueCompanies.slice(5).map((company, index) => (
                 <div key={index} className="flex items-center gap-2 mb-1">
-                 <Checkbox
-                  
-                  id={`company-${company}`}
-                   className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
-                  checked={filter.companyTags.includes(company)}
-                  onCheckedChange={() => toggleCheckBox(company, "companyTags")}
-                />
+                  <Checkbox
+                    id={`company-${company}`}
+                    className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
+                    checked={filter.companyTags.includes(company)}
+                    onCheckedChange={() =>
+                      toggleCheckBox(company, "companyTags")
+                    }
+                  />
                   <label
                     htmlFor={`company-${company}`}
                     className="text-base text-zinc-300 flex items-center gap-1"
@@ -339,11 +337,10 @@ const ProblemsetPage = () => {
                 key={status}
                 className="text-[17px] text-zinc-300 flex items-center gap-2 mb-1"
               >
-                <Checkbox                  
+                <Checkbox
                   checked={filter.execType.includes(status)}
                   onCheckedChange={() => toggleCheckBox(status, "execType")}
-                   className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
-                 
+                  className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
                 />
                 {status}
               </label>
@@ -361,8 +358,7 @@ const ProblemsetPage = () => {
                 <Checkbox
                   checked={filter.difficulty.includes(level)}
                   onCheckedChange={() => toggleCheckBox(level, "difficulty")}
-                   className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
-                 
+                  className="size-4 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white "
                 />
                 {level}
               </label>
@@ -535,66 +531,67 @@ const ProblemsetPage = () => {
               )}
 
               {visibleProblems.map((problem, index) => {
-  const isInPlaylist = problem.ProblemInPlaylist.some(
-    (prob) => prob.problemId === problem.id
-  );
+                const isInPlaylist = problem.ProblemInPlaylist.some(
+                  (prob) => prob.problemId === problem.id
+                );
 
-  return (
-    <Card
-      key={problem.id}
-      className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
-    >
-      <Link to={`/problem/${problem.id}`}>
-        <div className="flex flex-row">
-          {problem.isSolved ? (
-            <CheckCircle className="mt-2 mr-3 text-green-500" />
-          ) : (
-            <div className="mr-9"></div>
-          )}
-          <div className="text-white font-medium flex flex-col">
-            <span className="problemtitle">
-              {index + 1}. {problem.title}
-              {problem.demo && (
-                <Badge className="ml-2 bg-zinc-200 text-black">Demo</Badge>
-              )}
-            </span>
-            <span className="text-sm text-gray-400">
-              {problem.description.length > 80
-                ? problem.description.slice(0, 80) + "..."
-                : problem.description}
-            </span>
-          </div>
-        </div>
-      </Link>
+                return (
+                  <Card
+                    key={problem.id}
+                    className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
+                  >
+                    <Link to={`/problem/${problem.id}`}>
+                      <div className="flex flex-row">
+                        {problem.isSolved ? (
+                          <CheckCircle className="mt-2 mr-3 text-green-500" />
+                        ) : (
+                          <div className="mr-9"></div>
+                        )}
+                        <div className="text-white font-medium flex flex-col">
+                          <span className="problemtitle">
+                            {index + 1}. {problem.title}
+                            {problem.demo && (
+                              <Badge className="ml-2 bg-zinc-200 text-black">
+                                Demo
+                              </Badge>
+                            )}
+                          </span>
+                          <span className="text-sm text-gray-400">
+                            {problem.description.length > 80
+                              ? problem.description.slice(0, 80) + "..."
+                              : problem.description}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
 
-      <div className="flex items-center gap-4 px-1 py-1 mr-4">
-        {isInPlaylist ? (
-          <StarIcon
-            size={22}
-            className="mt-1 text-yellow-600 cursor-pointer"
-            onClick={() => handleAddPlaylist(problem.id)}
-          />
-        ) : (
-          <Star
-            size={22}
-            className="mt-1 text-zinc-600 hover:text-yellow-600 cursor-pointer"
-            onClick={() => handleAddPlaylist(problem.id)}
-          />
-        )}
-        <span
-          className={`text-sm font-semibold ${
-            difficultyColor[problem.difficulty]
-          }`}
-        >
-          {problem.difficulty.length > 4
-            ? `${problem.difficulty.slice(0, 3)}.`
-            : problem.difficulty}
-        </span>
-      </div>
-    </Card>
-  );
-})}
-
+                    <div className="flex items-center gap-4 px-1 py-1 mr-4">
+                      {isInPlaylist ? (
+                        <StarIcon
+                          size={22}
+                          className="mt-1 text-yellow-600 cursor-pointer"
+                          onClick={() => handleAddPlaylist(problem.id)}
+                        />
+                      ) : (
+                        <Star
+                          size={22}
+                          className="mt-1 text-zinc-600 hover:text-yellow-600 cursor-pointer"
+                          onClick={() => handleAddPlaylist(problem.id)}
+                        />
+                      )}
+                      <span
+                        className={`text-sm font-semibold ${
+                          difficultyColor[problem.difficulty]
+                        }`}
+                      >
+                        {problem.difficulty.length > 4
+                          ? `${problem.difficulty.slice(0, 3)}.`
+                          : problem.difficulty}
+                      </span>
+                    </div>
+                  </Card>
+                );
+              })}
             </div>
           </InfiniteScroll>
         )}
