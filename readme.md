@@ -70,6 +70,7 @@ CodeWarriors is a comprehensive full-stack web platform for mastering Data Struc
 
 - Threaded discussions for each problem.
 - Share solutions, ask questions, and discuss strategies.
+- User can also comment
 - Upvote helpful answers and mark solutions.
 
 ### 7. Admin Panel
