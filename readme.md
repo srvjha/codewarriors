@@ -200,16 +200,6 @@ codewarriors/
 - Swagger UI:  
   `http://localhost:3000/api-docs` (when backend is running)
 
----
-
-## Contributing
-
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit your changes
-4. Push and open a Pull Request
-
----
 
 ## License
 
