@@ -139,8 +139,7 @@ const executeCode = asyncHandler(async (req, res) => {
     memory: averageMemory ? `${averageMemory} KB` : null,
     time: averageTime ? `${averageTime}s` : null,
   };
-  
- 
+
   if (type === ExecutionTypeEnum.RUN) {
     return res.status(200).json(
       new ApiResponse(
@@ -203,34 +202,40 @@ const executeCode = asyncHandler(async (req, res) => {
       TestCaseResult: true,
     },
   });
- 
-  // Check for current day's accepted submission
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
 
-  const currentDaySubmission = await db.submission.findFirst({
+  const today = new Date();
+today.setHours(0, 0, 0, 0);
+const endOfToday = new Date(today.getTime() + 86399999);
+
+const currentDaySubmission = await db.submission.findFirst({
+  where: {
+    userId,
+    status: "Accepted",
+    createdAt: {
+      gte: today,
+      lte: endOfToday,
+    },
+  },
+});
+
+if (currentDaySubmission) {
+  await db.user.updateMany({
     where: {
-      userId,
-      status: "Accepted",
-      createdAt: {
-        gte: today,
-        lte: new Date(today.getTime() + 86399999),
-      },
+      id: userId,
+      OR: [
+        { lastSubmissionDate: { lt: today } },
+        { lastSubmissionDate: { gt: endOfToday } },
+        { lastSubmissionDate: null },
+      ],
+    },
+    data: {
+      dailyProblemStreak: { increment: 1 },
+      isStreakMaintained: true,
+      lastSubmissionDate: new Date(),
     },
   });
-  // console.log({currentDaySubmission})
+}
 
-  if (currentDaySubmission) {
-    const update = await db.user.update({
-      where: { id: userId },
-      data: {
-        dailyProblemStreak:{increment:1},
-        isStreakMaintained: true,
-        lastSubmissionDate: new Date(),
-      },
-    });
-    // console.log({update})
-  }
   res
     .status(200)
     .json(
