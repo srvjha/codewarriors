@@ -203,38 +203,41 @@ const executeCode = asyncHandler(async (req, res) => {
     },
   });
 
-  const today = new Date();
-today.setHours(0, 0, 0, 0);
-const endOfToday = new Date(today.getTime() + 86399999);
+  const nowIST = new Date().toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+  });
+  const istDate = new Date(nowIST);
+  const today = new Date(istDate);
+  today.setHours(0, 0, 0, 0);
+  const endOfToday = new Date(today.getTime() + 86399999);
 
-const currentDaySubmission = await db.submission.findFirst({
-  where: {
-    userId,
-    status: "Accepted",
-    createdAt: {
-      gte: today,
-      lte: endOfToday,
-    },
-  },
-});
-
-if (currentDaySubmission) {
-  await db.user.updateMany({
+  const currentDaySubmission = await db.submission.findFirst({
     where: {
-      id: userId,
-      OR: [
-        { lastSubmissionDate: { lt: today } },
-        { lastSubmissionDate: { gt: endOfToday } },
-        { lastSubmissionDate: null },
-      ],
-    },
-    data: {
-      dailyProblemStreak: { increment: 1 },
-      isStreakMaintained: true,
-      lastSubmissionDate: new Date(),
+      userId,
+      status: "Accepted",
+      createdAt: {
+        gte: today,
+        lte: endOfToday,
+      },
     },
   });
-}
+  if (currentDaySubmission) {
+    await db.user.updateMany({
+      where: {
+        id: userId,
+        OR: [
+          { lastSubmissionDate: { lt: today } },
+          { lastSubmissionDate: { gt: endOfToday } },
+          { lastSubmissionDate: null },
+        ],
+      },
+      data: {
+        dailyProblemStreak: { increment: 1 },
+        isStreakMaintained: true,
+        lastSubmissionDate: new Date(),
+      },
+    });
+  }
 
   res
     .status(200)
