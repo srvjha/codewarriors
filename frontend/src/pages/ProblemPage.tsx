@@ -24,7 +24,7 @@ import {
   Play,
   SendHorizontal,
   Lock,
-  Eye
+  Eye,
 } from "lucide-react";
 
 import {
@@ -64,6 +64,7 @@ import DiscussWithAI from "@/components/ui/DiscussWithAI";
 import AiChatModal from "@/components/AiChatModal";
 import ComplexityModal from "@/components/ComplexityModal";
 import ViewCode from "@/components/ui/ViewCode";
+import { Toast, ToastError } from "@/utils/ToastContainers";
 const ProblemPage = () => {
   const params = useParams();
   const { problemId } = params;
@@ -84,6 +85,7 @@ const ProblemPage = () => {
   const [activeResultTab, setActiveResultTab] = useState("testcase");
   const [submissions, setSubmissions] = useState<SubmissionType[]>([]);
   const { userData } = useSelector((state: RootState) => state.auth);
+  console.log({ userData });
   const [executionType, setExecutionType] = useState<ExecutionStatus>();
   const [defaultCodeSnippet, setDefaultCodeSnippet] = useState("");
   const [viewCodeStatus, setViewCodeStatus] = useState(false);
@@ -171,7 +173,11 @@ const ProblemPage = () => {
         setActiveTab("submit");
       }
     } catch (error: any) {
+      ToastError(
+        error.response.data.error || "An error occurred during execution"
+      );
       console.error("Error executing code:", error);
+
       setResults({
         status: "Error",
         stderr: error.message || "An error occurred during execution",
@@ -207,6 +213,9 @@ const ProblemPage = () => {
         setActiveResultTab("result");
       }
     } catch (error: any) {
+      ToastError(
+        error.response.data.error || "An error occurred during execution"
+      );
       console.error("Error executing code:", error);
       setResults({
         status: "Error",
@@ -292,6 +301,7 @@ const ProblemPage = () => {
 
   return (
     <>
+      <Toast />
       <Header>
         <div className="flex justify-end p-1">
           <Button
@@ -545,7 +555,8 @@ const ProblemPage = () => {
 
               {activeTab === "solution" && (
                 <div className="flex flex-col  h-full text-gray-400">
-                  {executionType === "SUBMIT" && results?.status==="Accepted" ? (
+                  {executionType === "SUBMIT" &&
+                  results?.status === "Accepted" ? (
                     <pre className="bg-transparent p-4 rounded-md overflow-x-auto hide-scrollbar">
                       <p className="text-cyan-100">{selectedLang}:</p>
                       <div className="flex relative bg-[#2f2f2f] rounded-lg">
@@ -778,7 +789,7 @@ const ProblemPage = () => {
                   <CodeXml size={16} className="mr-1.5 text-green-500" />
                   Code
                 </button>
-              </div>             
+              </div>
             </div>
 
             <div className="flex justify-between items-center p-2 ">

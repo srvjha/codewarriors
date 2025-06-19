@@ -34,6 +34,7 @@ import { DropdownMenuSeparator } from "@radix-ui/react-dropdown-menu";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import type { Post } from "@/types/discuss/post";
+import { ClipLoader } from "react-spinners";
 
 const DiscussPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -43,6 +44,7 @@ const DiscussPage = () => {
   const { userData } = useSelector((state: RootState) => state.auth);
   const [originalPosts, setOriginalPosts] = useState<Post[]>([]);
   const [activeFilter, setActiveFilter] = useState<null | "mv" | "lt">(null);
+   const [loading, setLoading] = useState(true);
 
   const formatTime = (date: string) => {
     const postCreatedTime = new Date(date);
@@ -68,6 +70,7 @@ const DiscussPage = () => {
       if (res.status) {
         setOriginalPosts(res.data.data);
         setPosts(res.data.data);
+        setLoading(false);
       }
     };
     fetchAllPost();
@@ -111,6 +114,8 @@ const DiscussPage = () => {
       }
     } catch (error: any) {
       ToastError(error?.response?.data?.error || "Something went wrong");
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -174,6 +179,18 @@ const DiscussPage = () => {
   return (
     <>
       <Toast />
+       {loading && (
+              <div
+                style={{
+                  height: "100vh",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <ClipLoader size={50} color="#4F46E5" />
+              </div>
+            )}
       <AlertDialog open={deleteDialogOpen} onOpenChange={handleDialogClose}>
         <AlertDialogContent className="bg-neutral-900 border-none text-neutral-100">
           <AlertDialogHeader>

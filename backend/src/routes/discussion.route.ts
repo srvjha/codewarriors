@@ -11,10 +11,10 @@ router.patch("/upvote/post/:postid",verifyUser,addUpvotes);
 router.post("/create/comment/post/:postid",verifyUser,addCommentToPost);
 router.post("/update/comment/:cid",verifyUser,updateCommentToPost);
 router.delete("/delete/comment/:cid",verifyUser,deleteComment)
-router.get("/post/all",verifyUser,getAllPost)
+router.get("/post/all",getAllPost)
 router.get("/post/:postid",getPostById)
-router.get("/comments/all",verifyUser,getAllComments)
-router.get("/comments/:id",verifyUser,getAllCommentsById)
+router.get("/comments/all",getAllComments)
+router.get("/comments/:id",getAllCommentsById)
 router.patch("/comment/:commentid/upvote", verifyUser, addCommentUpvote);
 
 

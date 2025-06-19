@@ -29,7 +29,6 @@ import SheetPage from "./pages/SheetPage";
 import ContestPage from "./pages/ContestPage";
 import ContestDetailPage from "./pages/ContestDetailPage";
 
-
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
@@ -70,14 +69,7 @@ const App = () => {
           }
         />
 
-        <Route
-          path="/discuss"
-          element={
-            <PrivateRoute>
-              <DiscussPage />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/discuss" element={<DiscussPage />} />
 
         <Route
           path="/discuss/create"
@@ -87,14 +79,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/discuss/:postid"
-          element={
-            <PrivateRoute>
-              <PostPage />
-            </PrivateRoute>
-          }
-        />
+        <Route path="/discuss/:postid" element={<PostPage />} />
         <Route
           path="/discuss/edit/:postid"
           element={
@@ -116,9 +101,9 @@ const App = () => {
         <Route
           path="/my-list"
           element={
-            <PrivateRoute>
+            
               <PlaylistPage />
-            </PrivateRoute>
+          
           }
         />
 
@@ -148,22 +133,11 @@ const App = () => {
           path="/forgot/password/:token"
           element={<ResetForgotPassword />}
         />
-        <Route
-        path="/:sheetname/:id"
-        element={<SheetPage/>}
-        />
+        <Route path="/:sheetname/:id" element={<SheetPage />} />
 
-        <Route
-        path="/contest"
-        element={<ContestPage/>}
-        />
+        <Route path="/contest" element={<ContestPage />} />
 
-         
-
-         <Route
-        path="/contest/:contestId"
-        element={<ContestDetailPage/>}
-        />
+        <Route path="/contest/:contestId" element={<ContestDetailPage />} />
 
         <Route path="/about" element={<About />} />
       </Route>

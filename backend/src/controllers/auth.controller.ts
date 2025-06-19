@@ -28,16 +28,16 @@ import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { UserRole } from "@prisma/client";
 import { sanitizeUser } from "../utils/sanitizeUser";
-import { CookieOptions } from "express";
 import { verifyGoogleToken } from "../utils/VerifyGoogleToken";
 import { logger } from "../configs/logger";
+import { cookieOptions } from "../configs/cookiesOptions";
 
 const generateAccessAndRefreshToken = async (userId: string) => {
   try {
     const user = await db.user.findUnique({ where: { id: userId } });
 
     if (!user) {
-      throw new ApiError("User not found", 400);
+      throw new ApiError("User not found", 404);
     }
     const accessToken = generateAccessToken({
       id: user.id,
@@ -71,7 +71,8 @@ const register = asyncHandler(async (req, res) => {
   });
 
   if (existingUser) {
-    throw new ApiError("Email already registered", 500);
+    logger.error("Email already registered");
+    throw new ApiError("Email already registered", 409);
   }
 
   const existingUsername = await db.user.findUnique({
@@ -81,7 +82,8 @@ const register = asyncHandler(async (req, res) => {
   });
 
   if (existingUsername) {
-    throw new ApiError("username already taken", 500);
+    logger.error("username already taken");
+    throw new ApiError("username already taken", 409);
   }
 
   const hashedPassword = await hashPassword(password);
@@ -89,10 +91,8 @@ const register = asyncHandler(async (req, res) => {
 
   let avatarURL;
   const avatarLocalPath = req.file?.path;
-   console.log("avatarlocalPath: ",avatarLocalPath)
   if (avatarLocalPath) {
     const cloudinaryResult = await uploadOnCloudinary(avatarLocalPath);
-    console.log("cloudinary: ",cloudinaryResult)
     avatarURL = cloudinaryResult?.secure_url;
   }
 
@@ -109,7 +109,6 @@ const register = asyncHandler(async (req, res) => {
       avatar: avatarURL,
     },
   });
-  console.log("Base uri: ", env.BASE_URI);
   const verificationUrl = `${env.BASE_URI}/verify/${unHashedToken}`;
 
   await sendEmail(
@@ -128,20 +127,14 @@ const register = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     user.id as string
   );
-  const cookieOption: CookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  };
 
   res
     .status(200)
-    .cookie("accessToken", accessToken, cookieOption)
-    .cookie("refreshToken", refreshToken, cookieOption)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
-        200,
+        201,
         userInfo,
         "User registered successfully. Please verify your email"
       )
@@ -151,7 +144,8 @@ const register = asyncHandler(async (req, res) => {
 const verifyEmail = asyncHandler(async (req, res) => {
   const { token } = req.params;
   if (!token) {
-    throw new ApiError("Verification token is required!", 500);
+    logger.error("Verification token is required");
+    throw new ApiError("Verification token is required!", 400);
   }
   const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
   const user = await db.user.findFirst({
@@ -162,10 +156,9 @@ const verifyEmail = asyncHandler(async (req, res) => {
       },
     },
   });
-
-  console.log("user: ", user);
   if (!user) {
-    throw new ApiError("Invalid User or token expired", 400);
+    logger.error("Invalid User or token expired");
+    throw new ApiError("Invalid User or token expired", 401);
   }
 
   await db.user.update({
@@ -192,26 +185,23 @@ const loginUser = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new ApiError("User not found", 400);
+    logger.error("User not found");
+    throw new ApiError("User not found", 404);
   }
   const verifyPassword = await isPasswordCorrect(password, user.password);
 
   if (!verifyPassword) {
-    throw new ApiError("Invalid Credentials", 400);
+    logger.error("Invalid Credentials");
+    throw new ApiError("Invalid Credentials", 401);
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     user.id as string
   );
-  const cookieOption: CookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  };
+
   res
-    .cookie("accessToken", accessToken, cookieOption)
-    .cookie("refreshToken", refreshToken, cookieOption)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .status(200)
     .json(
       new ApiResponse(200, sanitizeUser(user), "User logged in Successfully")
@@ -221,6 +211,7 @@ const loginUser = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler(async (req, res) => {
   const id = req.user.id;
   if (!id) {
+    logger.error("Invalid Request: User ID is required for logout");
     throw new ApiError("Invalid Request", 400);
   }
 
@@ -228,7 +219,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     where: { id },
   });
   if (!userInfo) {
-    throw new ApiError("User not found", 400);
+    logger.error("User not found");
+    throw new ApiError("User not found", 404);
   }
   await db.user.update({
     where: { id },
@@ -237,36 +229,31 @@ const logoutUser = asyncHandler(async (req, res) => {
     },
   });
 
-  const cookieOption: CookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  };
-
   res
-    .clearCookie("accessToken", cookieOption)
-    .clearCookie("refreshToken", cookieOption)
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
     .status(200)
     .json(new ApiResponse(200, null, "User Logged Out Successfully"));
 });
 
 const resendEmailVerification = asyncHandler(async (req, res) => {
   const { email } = handleZodError(validateEmailData(req.body));
-  console.log("email: ", email);
-
   const user = await db.user.findUnique({
     where: {
       email,
     },
   });
 
-  if (!user) {
-    throw new ApiError("User not found", 400);
-  }
-
-  if (user.isEmailVerified) {
-    throw new ApiError("User already exists", 400);
+  if (!user || user.isEmailVerified) {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          null,
+          "Verification link sent successfully. Check Inbox"
+        )
+      );
   }
 
   const { hashedToken, tokenExpiry, unHashedToken } = generateToken();
@@ -313,15 +300,14 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
         new ApiResponse(
           200,
           null,
-          "If an account exists, a reset link has been sent to the email"
+          "Reset password link sent successfully. Check Inbox"
         )
       );
   }
 
   const { hashedToken, tokenExpiry, unHashedToken } = generateToken();
 
-
-   await db.user.update({
+  await db.user.update({
     where: { id: user.id },
     data: {
       forgotPasswordToken: hashedToken,
@@ -351,14 +337,16 @@ const resetForgottenPassword = asyncHandler(async (req, res) => {
 const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken;
   if (!incomingRefreshToken) {
-    throw new ApiError("Unauthorized Request", 400);
+    logger.error("Unauthorized Request: Refresh token is required");
+    throw new ApiError("Unauthorized Request", 401);
   }
 
   let decodedToken: any;
   try {
     decodedToken = jwt.verify(incomingRefreshToken, env.REFRESH_TOKEN_SECRET);
   } catch (error) {
-    throw new ApiError("Invalid or expired refresh token", 400);
+    logger.error("Invalid or expired refresh token");
+    throw new ApiError("Invalid or expired refresh token", 401);
   }
 
   const user = await db.user.findUnique({
@@ -366,33 +354,27 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new ApiError("Invalid Refresh Token", 400);
+    logger.error("Invalid Refresh Token: User not found");
+    throw new ApiError("Invalid Refresh Token", 401);
   }
 
   if (incomingRefreshToken !== user.refreshToken) {
-    console.log("in: ", incomingRefreshToken);
-    console.log("user token: ", user.refreshToken);
-    throw new ApiError("Refresh Token Expired", 400);
+    logger.error("Refresh Token Expired");
+    throw new ApiError("Refresh Token Expired", 401);
   }
-  const options = {
-    httpOnly: true,
-    secure: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  };
 
   const { accessToken, refreshToken: newRefreshToken } =
     await generateAccessAndRefreshToken(user.id as string);
 
   res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", newRefreshToken, options)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", newRefreshToken, cookieOptions)
     .json(new ApiResponse(200, null, "Token Refreshed Successfully"));
 });
 
 const forgotPasswordRequest = asyncHandler(async (req, res) => {
   const { token } = req.params;
-  console.log("token: ",token)
   const { newPassword } = handleZodError(validateResetPassword(req.body));
 
   if (!token) {
@@ -409,7 +391,8 @@ const forgotPasswordRequest = asyncHandler(async (req, res) => {
   });
 
   if (!user) {
-    throw new ApiError("Invalid User or token expired", 400);
+    logger.error("Invalid User or token expired");
+    throw new ApiError("Invalid User or token expired", 401);
   }
   const hashedPassword = await hashPassword(newPassword);
 
@@ -443,14 +426,16 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
   }
 
   if (!user) {
-    throw new ApiError("Invalid Token or Token expired", 400);
+    logger.error("Unauthorized Request: User not authenticated");
+    throw new ApiError("Invalid Token or Token expired", 401);
   }
 
   const userInfo = await db.user.findUnique({
     where: { id: user.id },
   });
   if (!userInfo) {
-    throw new ApiError("Invalid User", 400);
+    logger.error("User not found");
+    throw new ApiError("user not found", 404);
   }
 
   const oldPasswordCorrect = await isPasswordCorrect(
@@ -458,7 +443,8 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     userInfo.password
   );
   if (!oldPasswordCorrect) {
-    throw new ApiError("Invalid old password", 400);
+    logger.error("Invalid old password");
+    throw new ApiError("Invalid old password", 401);
   }
 
   const hashedPassword = await hashPassword(newPassword);
@@ -479,7 +465,8 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   const userId = req.user?.id;
 
   if (!userId) {
-    throw new ApiError("User ID not found in request", 400);
+    logger.error("Unauthorized Request: User not authenticated");
+    throw new ApiError("User not authenticated", 401);
   }
 
   const userInfo = await db.user.findUnique({
@@ -497,7 +484,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   });
 
   if (!userInfo) {
-    throw new ApiError("User not found", 400);
+    throw new ApiError("User not found", 401);
   }
 
   res
@@ -532,7 +519,7 @@ const googleLogin = asyncHandler(async (req, res) => {
 
   const { email, name, picture, email_verified } = payload;
   if (!email || !name || !picture || !email_verified) {
-    throw new ApiError("Missing required Fields", 500);
+    throw new ApiError("Missing required Fields", 400);
   }
 
   const existingUser = await db.user.findUnique({
@@ -566,24 +553,14 @@ const googleLogin = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     user.id as string
   );
-  const cookieOption: CookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  };
-
 
   logger.info(`${email} logged in via Google`);
 
-
   res
     .status(200)
-    .cookie("accessToken", accessToken, cookieOption)
-    .cookie("refreshToken", refreshToken, cookieOption)
-    .json(
-      new ApiResponse(200,null, "Google login successful")
-    );
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
+    .json(new ApiResponse(200, null, "Google login successful"));
 });
 
 export {
@@ -598,5 +575,5 @@ export {
   resetForgottenPassword,
   verifyEmail,
   allUsers,
-  googleLogin
+  googleLogin,
 };

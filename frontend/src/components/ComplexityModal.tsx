@@ -22,7 +22,7 @@ const ComplexityModal = ({
     const calculateComplexity = async () => {
       try {
         setLoading(true);
-        const response = await API.post("/auth/get-complexity", {sourceCode});
+        const response = await API.post("/auth/ai/complexities", {sourceCode});
         const cleaned = response.data.data.replace(/```json\s*/, "").replace(/```$/, "")   
         const parsed = JSON.parse(cleaned);
         setResult(parsed);

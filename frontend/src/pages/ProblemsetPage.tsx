@@ -36,6 +36,7 @@ import tags from "../../companyTags.json";
 import PlaylistSheet from "@/components/ui/PlaylistSheet";
 import type { Problem } from "@/types/problem/problemTypes";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ClipLoader } from "react-spinners";
 
 const problemsPerPage = 10;
 
@@ -500,7 +501,16 @@ const ProblemsetPage = () => {
         </div>
 
         {loading ? (
-          <p className="text-gray-400">Loading problems...</p>
+          <div
+            style={{
+              height: "100vh",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <ClipLoader size={50} color="#4F46E5" />
+          </div>
         ) : visibleProblems.length === 0 ? (
           <p className="text-gray-400">No problems found.</p>
         ) : (

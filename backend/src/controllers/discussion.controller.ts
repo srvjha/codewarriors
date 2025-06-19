@@ -181,7 +181,7 @@ const addPost = asyncHandler(async (req, res) => {
     },
   });
   if (!user) {
-    throw new ApiError("User not found", 400);
+    throw new ApiError("User not found", 404);
   }
 
   const existingPost = await db.discussion.findFirst({
@@ -192,7 +192,7 @@ const addPost = asyncHandler(async (req, res) => {
   });
 
   if (existingPost) {
-    throw new ApiError("You have already created a post with this title", 400);
+    throw new ApiError("You have already created a post with this title", 409);
   }
 
   const createPost = await db.discussion.create({
@@ -223,10 +223,10 @@ const updatePost = asyncHandler(async (req, res) => {
     },
   });
   if (!post) {
-    throw new ApiError("Post not found", 400);
+    throw new ApiError("Post not found", 404);
   }
   if (post.userId !== req.user.id) {
-    throw new ApiError("Unauthorized", 403);
+    throw new ApiError("Unauthorized", 401);
   }
 
   const updatePayload: Partial<{
@@ -268,7 +268,7 @@ const deletePost = asyncHandler(async (req, res) => {
   });
 
   if (!post) {
-    throw new ApiError("Post already deleted or not found", 400);
+    throw new ApiError("Post already deleted or not found", 404);
   }
 
   await db.discussion.delete({
@@ -288,7 +288,7 @@ const addUpvotes = asyncHandler(async (req, res) => {
   // console.log({postid,userId})
 
   const post = await db.discussion.findUnique({ where: { id: postid } });
-  if (!post) throw new ApiError("Post not found", 400);
+  if (!post) throw new ApiError("Post not found", 404);
 
   const alreadyUpvoted = await db.discussionUpvote.findUnique({
     where: {
@@ -339,7 +339,7 @@ const addCommentUpvote = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
   const comment = await db.comment.findUnique({ where: { id: commentid } });
-  if (!comment) throw new ApiError("Comment not found", 400);
+  if (!comment) throw new ApiError("Comment not found", 404);
 
   const alreadyUpvoted = await db.commentUpvote.findUnique({
     where: {
@@ -393,7 +393,7 @@ const addCommentToPost = asyncHandler(async (req, res) => {
   });
 
   if (!post) {
-    throw new ApiError("Post not found", 400);
+    throw new ApiError("Post not found", 404);
   }
 
   const newComment = await db.comment.create({
@@ -426,11 +426,11 @@ const updateCommentToPost = asyncHandler(async (req, res) => {
   });
 
   if (!commentInfo) {
-    throw new ApiError("Comment not found", 400);
+    throw new ApiError("Comment not found", 404);
   }
 
   if (commentInfo.userId !== req.user.id) {
-    throw new ApiError("Unauthorized", 403);
+    throw new ApiError("Unauthorized", 401);
   }
 
   const updateComment = await db.comment.update({
@@ -458,7 +458,7 @@ const deleteComment = asyncHandler(async (req, res) => {
   });
 
   if (!commentInfo) {
-    throw new ApiError("Comment not found", 400);
+    throw new ApiError("Comment not found", 404);
   }
 
   await db.comment.delete({

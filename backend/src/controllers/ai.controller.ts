@@ -4,7 +4,7 @@ import { asyncHandler } from "../utils/asynHandler";
 import { handleZodError } from "../utils/handleZodError";
 import { timeComplexityValidation } from "../validators/problem.validation";
 
-const getTimeComplexity = asyncHandler(async(req,res)=>{
+const getComplexities = asyncHandler(async(req,res)=>{
   const {sourceCode} = handleZodError(timeComplexityValidation(req.body));
   const result = await generateContent(sourceCode)
 
@@ -30,4 +30,4 @@ const chatWithAi = asyncHandler(async(req,res)=>{
   )
 })
 
-export {getTimeComplexity,chatWithAi}
+export {getComplexities,chatWithAi}

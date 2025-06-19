@@ -36,10 +36,12 @@ import { Link } from "react-router-dom";
 import { debounce } from "@/utils/debounce";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
+import { ClipLoader } from "react-spinners";
 
 const PlaylistPage = () => {
   const [privatePlaylists, setPrivatePlaylists] = useState<Playlist[]>([]);
   const [publicPlaylists, setPublicPlaylists] = useState<Playlist[]>([]);
+  const[loading,setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [recommended, setRecommend] = useState<Playlist[]>([]);
@@ -64,6 +66,8 @@ const PlaylistPage = () => {
       setPrivatePlaylists(response.data.data || []);
     } catch (err) {
       console.error("Failed to fetch playlists", err);
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -85,6 +89,8 @@ const PlaylistPage = () => {
       setCompanyBased(companyBasedSheets);
     } catch (err) {
       console.error("Failed to fetch playlists", err);
+    } finally{
+      setLoading(false);
     }
   };
 
@@ -269,20 +275,31 @@ const PlaylistPage = () => {
     setEditingPlaylist(null);
   };
 
-  const createClone = async(playListid:string) =>{
+  const createClone = async (playListid: string) => {
     try {
-      const res = await API.post(`/playlist/${playListid}/clone`)
-      if(res.status){
+      const res = await API.post(`/playlist/${playListid}/clone`);
+      if (res.status) {
         ToastSuccess(res.data.message);
         allPrivatePlaylistsDetails();
       }
-    } catch (error:any) {
-     ToastError(error.response.data.error || "Failed to create clone")
+    } catch (error: any) {
+      ToastError(error.response.data.error || "Failed to create clone");
     }
-
-  }
+  };
   return (
     <>
+      {loading && (
+        <div
+          style={{
+            height: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ClipLoader size={50} color="#4F46E5" />
+        </div>
+      )}
       <Toast />
       {showCreateModal && (
         <CreatePlaylistModal
@@ -333,7 +350,9 @@ const PlaylistPage = () => {
 
           <div className="space-y-6">
             <div className="flex items-center gap-3">
-              <h2 className="text-3xl font-bold text-gray-100">Your Sheets</h2>
+              <h2 className="text-3xl font-bold text-gray-100">
+                Public Sheets
+              </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -424,6 +443,11 @@ const PlaylistPage = () => {
               ))}
             </div>
 
+            <div className="flex items-center gap-3">
+              <h2 className="text-3xl font-bold text-gray-100">
+                Private Sheets
+              </h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {privatePlaylists.map((playlist) => (
                 <Card
@@ -433,14 +457,13 @@ const PlaylistPage = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex gap-1.5 mr-1.5">
-                      <CardTitle className="text-xl text-gray-100 flex items-center gap-2 line-clamp-1">
-                        {playlist?.name}
-                       
-                      </CardTitle>
-                       <Badge className="bg-amber-50 text-gray-800 text-xs">
+                        <CardTitle className="text-xl text-gray-100 flex items-center gap-2 line-clamp-1">
+                          {playlist?.name}
+                        </CardTitle>
+                        <Badge className="bg-amber-50 text-gray-800 text-xs">
                           {playlist?.type}
                         </Badge>
-                        </div>
+                      </div>
                       <div className="flex justify-center items-center gap-2">
                         <Pencil
                           className="w-4 h-4 text-neutral-400 hover:text-blue-400 cursor-pointer"
@@ -588,7 +611,7 @@ const PlaylistPage = () => {
                         <Button
                           size="sm"
                           className="bg-neutral-300 text-neutral-800 cursor-pointer hover:bg-neutral-400"
-                           onClick={()=>createClone(sheet.playlist.id)}
+                          onClick={() => createClone(sheet.playlist.id)}
                         >
                           <Copy className="w-4 h-4 " />
                           Clone
@@ -639,13 +662,13 @@ const PlaylistPage = () => {
                           <Target className="w-4 h-4" />
                           {company.problems.length} problems
                         </span>
-                       
                       </div>
                       <div className="flex gap-1">
-                        <Link
-                          to={`/${company.name}/${company.id}`}
-                        >
-                          <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer">
+                        <Link to={`/${company.name}/${company.id}`}>
+                          <Button
+                            size="sm"
+                            className="bg-emerald-500 hover:bg-emerald-600 cursor-pointer"
+                          >
                             <Play className="w-4 h-4" />
                             Solve
                           </Button>
@@ -653,7 +676,7 @@ const PlaylistPage = () => {
                         <Button
                           size="sm"
                           className="bg-neutral-300 text-neutral-800 cursor-pointer hover:bg-neutral-400"
-                           onClick={()=>createClone(company.id)}
+                          onClick={() => createClone(company.id)}
                         >
                           <Copy className="w-4 h-4 " />
                           Clone

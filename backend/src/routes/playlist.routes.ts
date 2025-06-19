@@ -5,7 +5,7 @@ import { addProblemToPlaylist, createPlaylist, deletePlaylist, getAllPrivatePlay
 const router = Router();
 
 router.get("/all/private",verifyUser,getAllPrivatePlaylistDetails);
-router.get("/all/public",verifyUser,getAllPublicPlaylistDetails);
+router.get("/all/public",getAllPublicPlaylistDetails);
 router.get("/:plid",getPlaylistDetails);
 router.post("/create",verifyUser,createPlaylist);
 router.put("/:plid",verifyUser,updatePlaylist);

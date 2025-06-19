@@ -15,7 +15,6 @@ const getAllContests = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, contests, "All Contests Fetched Successfully"));
 });
 
-
 const getContestById = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const contest = await db.contest.findUnique({
@@ -27,7 +26,6 @@ const getContestById = asyncHandler(async (req, res) => {
       },
     },
   });
-
 
   if (!contest) throw new ApiError("Contest not found", 404);
 
@@ -47,7 +45,7 @@ const createContest = asyncHandler(async (req, res) => {
   });
   // checking for existing contest
   if (existingContest) {
-    throw new ApiError("Contest Already Created", 400);
+    throw new ApiError("Contest Already Created", 409);
   }
 
   // now will create contest
@@ -74,11 +72,11 @@ const createContest = asyncHandler(async (req, res) => {
 
   res
     .status(200)
-    .json(new ApiResponse(200, contest, "Contest Created Successfully"));
+    .json(new ApiResponse(201, contest, "Contest Created Successfully"));
 });
 
 const registerUserToContest = asyncHandler(async (req, res) => {
-  const {contestId} = req.params;
+  const { contestId } = req.params;
   // console.log("contest id: ",contestId)
   const userId = req.user.id;
 
@@ -87,7 +85,7 @@ const registerUserToContest = asyncHandler(async (req, res) => {
   });
 
   if (alreadyRegistered)
-    throw new ApiError("Already registered for this contest", 400);
+    throw new ApiError("Already registered for this contest", 409);
 
   const contestant = await db.contestant.create({
     data: {
@@ -121,11 +119,6 @@ const unregisterUserFromContest = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, {}, "Unregistered from contest successfully"));
 });
-
-
-
-
-
 
 const getContestLeaderboard = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -167,7 +160,7 @@ const createContestSubmission = asyncHandler(async (req, res) => {
   if (existing) {
     throw new ApiError(
       "Submission for this problem already exists in contest",
-      400
+      409
     );
   }
 
@@ -195,8 +188,6 @@ const createContestSubmission = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, result, "Contest Submission Recorded"));
 });
 
- 
-
 const checkUserRegistration = asyncHandler(async (req, res) => {
   const { contestId } = req.params;
   const userId = req.user.id;
@@ -210,16 +201,16 @@ const checkUserRegistration = asyncHandler(async (req, res) => {
     },
   });
 
-  res.status(200).json(
-    new ApiResponse(
-      200,
-      { registered: Boolean(registration) },
-      registration ? "User is registered" : "User is not registered"
-    )
-  );
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        { registered: Boolean(registration) },
+        registration ? "User is registered" : "User is not registered"
+      )
+    );
 });
-
-
 
 export {
   createContest,
@@ -229,5 +220,5 @@ export {
   getAllContests,
   registerUserToContest,
   unregisterUserFromContest,
-  checkUserRegistration
+  checkUserRegistration,
 };

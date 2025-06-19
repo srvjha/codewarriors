@@ -35,6 +35,16 @@ const executeCode = asyncHandler(async (req, res) => {
   if (type !== ExecutionTypeEnum.RUN && type !== ExecutionTypeEnum.SUBMIT) {
     return new ApiError("Invalid execution type", 400);
   }
+  const userInfo = await db.user.findUnique({
+    where: { id: userId },
+    select: { isEmailVerified: true },
+  });
+  if (!userInfo?.isEmailVerified) {
+    throw new ApiError(
+      "Please verify your email before executing code",
+      403
+    );
+  }
   const language_id = getJudge0LanguageById(language);
   const inputs = await db.problem.findUnique({
     where: { id: pid },

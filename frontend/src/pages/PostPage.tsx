@@ -5,7 +5,7 @@ import API from "@/utils/AxiosInstance";
 import type { Comment, PostComment } from "@/types/discuss/post";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 import { Eye, MessageSquare, ThumbsUp} from "lucide-react";
-import { ToastError } from "@/utils/ToastContainers";
+import { Toast, ToastError } from "@/utils/ToastContainers";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CommentInput from "@/components/CommentInput";
@@ -165,6 +165,8 @@ const PostPage = () => {
   };
 
   return (
+    <> 
+    <Toast/> 
     <div className="max-w-7xl mx-auto px-4 py-10 text-white">
       <div className="bg-transparent rounded-xl shadow-xl p-6 space-y-4">
         <div className="flex items-center gap-4">
@@ -310,6 +312,7 @@ const PostPage = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

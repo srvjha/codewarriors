@@ -14,6 +14,7 @@ import {
 import { ApiResponse } from "../utils/ApiResponse";
 import { validId } from "../helper/validId.helper";
 import { Difficulty, UserRole } from "@prisma/client";
+import { logger } from "../configs/logger";
 
 const createProblem = asyncHandler(async (req, res) => {
   const {
@@ -32,6 +33,7 @@ const createProblem = asyncHandler(async (req, res) => {
   const userRole = req.user.role;
 
   if (userRole.toUpperCase() !== UserRole.ADMIN) {
+    logger.error("Unauthorized Request: User not authenticated");
     throw new ApiError("You are not allowed to create a problem", 403);
   }
 
@@ -42,12 +44,13 @@ const createProblem = asyncHandler(async (req, res) => {
   });
 
   if (existingProblem) {
-    throw new ApiError("Problem already exists", 400);
+    throw new ApiError("Problem already exists", 409);
   }
 
   for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
     const languageId = getJudge0LanguageById(language);
     if (!languageId) {
+      logger.error(`Invalid language: ${language}`);
       throw new ApiError(`Invalid ${language} language `, 400);
     }
 
@@ -64,11 +67,13 @@ const createProblem = asyncHandler(async (req, res) => {
 
     const tokens = await submitBatch(submissions);
     const results = await pollBatchResults(tokens);
-    console.log("Results: ",results)
 
     for (let i = 0; i < results.length; i++) {
       const result = results[i];
       if (result.status.id !== 3) {
+        logger.error(
+          `Submission ${i + 1} failed: ${result.status.description}`
+        );
         throw new ApiError(`Submission ${i + 1} failed`, 400);
       }
     }
@@ -77,7 +82,7 @@ const createProblem = asyncHandler(async (req, res) => {
       data: {
         title,
         description,
-        demo:false,
+        demo: false,
         difficulty: difficulty.toUpperCase() as Difficulty,
         tags,
         examples,
@@ -92,7 +97,7 @@ const createProblem = asyncHandler(async (req, res) => {
 
     return res
       .status(200)
-      .json(new ApiResponse(200, newProblem, "Problem created successfully"));
+      .json(new ApiResponse(201, newProblem, "Problem created successfully"));
   }
 });
 
@@ -104,46 +109,47 @@ const getAllProblems = asyncHandler(async (req, res) => {
       description: true,
       difficulty: true,
       tags: true,
-      demo:true,
+      demo: true,
       createdAt: true,
       updatedAt: true,
-      ProblemInPlaylist:{
-        select:{
-          problemId:true
-        }
-      }
+      ProblemInPlaylist: {
+        select: {
+          problemId: true,
+        },
+      },
     },
     orderBy: {
-    demo: 'desc'
-  }
+      demo: "desc",
+    },
   });
   if (!problems) {
     throw new ApiError("No problems found", 404);
   }
-
+  logger.info("All Problems retrieved successfully");
   return res
     .status(200)
-    .json(new ApiResponse(200, problems, "Problems retrieved successfully"));
+    .json(
+      new ApiResponse(200, problems, "All Problems retrieved successfully")
+    );
 });
 
 const getProblemById = asyncHandler(async (req, res) => {
   const { pid } = req.params;
   validId(pid, "Problem");
   const problem = await db.problem.findUnique({
-    where: { id: pid }
+    where: { id: pid },
   });
 
   if (!problem) {
     throw new ApiError("Problem not found", 404);
   }
-
+  logger.info(`Problem with ID ${pid} retrieved successfully`);
   res
     .status(200)
     .json(new ApiResponse(200, problem, "Problem retrieved successfully"));
 });
 
 const updateProblem = asyncHandler(async (req, res) => {
-  console.log("update se yaha aaya hu");
   const { pid } = req.params;
   validId(pid, "Problem");
   const {
@@ -163,6 +169,7 @@ const updateProblem = asyncHandler(async (req, res) => {
   const userRole = req.user.role;
 
   if (userRole.toUpperCase() !== "ADMIN") {
+    logger.error("Unauthorized Request: User not authenticated");
     throw new ApiError("You are not allowed to create a problem", 403);
   }
 
@@ -211,40 +218,43 @@ const updateProblem = asyncHandler(async (req, res) => {
         400
       );
     }
-  }
-  else if(updatePayload.referenceSolutions && updatePayload.testcases){
-  for (const [language, solutionCode] of Object.entries(
-    updatePayload.referenceSolutions
-  )) {
-    const languageId = getJudge0LanguageById(language);
-    if (!languageId) {
-      throw new ApiError(`Invalid ${language} language `, 400);
-    }
-
-    const submissions = updatePayload.testcases.map(
-      ({ input, output }: { input: string; output: string }) => {
-        return {
-          source_code: solutionCode,
-          language_id: languageId,
-          stdin: input,
-          expected_output: output,
-        };
+  } else if (updatePayload.referenceSolutions && updatePayload.testcases) {
+    for (const [language, solutionCode] of Object.entries(
+      updatePayload.referenceSolutions
+    )) {
+      const languageId = getJudge0LanguageById(language);
+      if (!languageId) {
+        logger.error(`Invalid language: ${language}`);
+        throw new ApiError(`Invalid ${language} language `, 400);
       }
-    );
 
-    const submissionResults = await submitBatch(submissions);
-    const tokens = submissionResults.map((res) => ({ token: res.token }));
+      const submissions = updatePayload.testcases.map(
+        ({ input, output }: { input: string; output: string }) => {
+          return {
+            source_code: solutionCode,
+            language_id: languageId,
+            stdin: input,
+            expected_output: output,
+          };
+        }
+      );
 
-    const results = await pollBatchResults(tokens);
+      const submissionResults = await submitBatch(submissions);
+      const tokens = submissionResults.map((res) => ({ token: res.token }));
 
-    for (let i = 0; i < results.length; i++) {
-      const result = results[i];
-      if (result.status.id !== 3) {
-        throw new ApiError(`Submission ${i + 1} failed`, 400);
+      const results = await pollBatchResults(tokens);
+
+      for (let i = 0; i < results.length; i++) {
+        const result = results[i];
+        if (result.status.id !== 3) {
+          logger.error(
+            `Submission ${i + 1} failed: ${result.status.description}`
+          );
+          throw new ApiError(`Submission ${i + 1} failed`, 400);
+        }
       }
     }
   }
-}
 
   const newProblem = await db.problem.update({
     where: { id: pid },
@@ -260,7 +270,6 @@ const updateProblem = asyncHandler(async (req, res) => {
 });
 
 const deleteProblem = asyncHandler(async (req, res) => {
-  console.log("delete se  idhr aaya main");
   const { pid } = req.params;
   validId(pid, "Problem");
   const deletedProblem = await db.problem.deleteMany({ where: { id: pid } });
@@ -297,34 +306,30 @@ const getAllProblemsSolvedByUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, problems, "Problem Fetched Successfully"));
 });
 
-const isProblemSolved = asyncHandler(async(req,res)=>{
+const isProblemSolved = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const {pid} = req.params;
- 
+  const { pid } = req.params;
 
-  validId(pid,"Problem");
-  let problemSolved = false
+  validId(pid, "Problem");
+  let problemSolved = false;
 
   const foundProblem = await db.problemSolved.findFirst({
-    where:{
-      userId:userId,
-      problemId:pid
-    }
-  })
+    where: {
+      userId: userId,
+      problemId: pid,
+    },
+  });
 
-  if(foundProblem){
+  if (foundProblem) {
     problemSolved = true;
   }
-  
-  return res.status(200).json(
-    new ApiResponse(
 
-      200,
-      problemSolved,
-      "Problem Status Found Successfully"
-    )
-  )
-})
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, problemSolved, "Problem Status Found Successfully")
+    );
+});
 
 export {
   createProblem,
@@ -333,5 +338,5 @@ export {
   updateProblem,
   deleteProblem,
   getAllProblemsSolvedByUser,
-  isProblemSolved
+  isProblemSolved,
 };
