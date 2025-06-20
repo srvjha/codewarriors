@@ -232,7 +232,9 @@ const executeCode = asyncHandler(async (req, res) => {
     },
   });
   if (currentDaySubmission) {
-    await db.user.updateMany({
+    console.log("i m here")
+    console.log({today, endOfToday, currentDaySubmission: currentDaySubmission.createdAt});
+  const update =   await db.user.updateMany({
       where: {
         id: userId,
         OR: [
@@ -247,6 +249,7 @@ const executeCode = asyncHandler(async (req, res) => {
         lastSubmissionDate: new Date(),
       },
     });
+    console.log("update: ", update);
   }
 
   res
