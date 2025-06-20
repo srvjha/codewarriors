@@ -13,6 +13,7 @@ import {
 } from "../utils/judge0";
 import { executeCodeSchemaValidation } from "../validators/executeCode.validation";
 import { testcaseSchema } from "../validators/problem.validation";
+import { DateTime } from "luxon";
 
 enum ExecutionTypeEnum {
   RUN = "run",
@@ -40,10 +41,7 @@ const executeCode = asyncHandler(async (req, res) => {
     select: { isEmailVerified: true },
   });
   if (!userInfo?.isEmailVerified) {
-    throw new ApiError(
-      "Please verify your email before executing code",
-      403
-    );
+    throw new ApiError("Please verify your email before executing code", 403);
   }
   const language_id = getJudge0LanguageById(language);
   const inputs = await db.problem.findUnique({
@@ -213,32 +211,29 @@ const executeCode = asyncHandler(async (req, res) => {
     },
   });
 
-  const nowIST = new Date().toLocaleString("en-US", {
-    timeZone: "Asia/Kolkata",
-  });
-  const istDate = new Date(nowIST);
-  const today = new Date(istDate);
-  today.setHours(0, 0, 0, 0);
-  const endOfToday = new Date(today.getTime() + 86399999);
+  const nowIST = DateTime.now().setZone("Asia/Kolkata");
+  const startOfToday = nowIST.startOf("day").toJSDate();
+  const endOfToday = nowIST.endOf("day").toJSDate();
+  console.log("startOfToday: ", startOfToday);
+  console.log("endOfToday: ", endOfToday);
+  
 
   const currentDaySubmission = await db.submission.findFirst({
     where: {
       userId,
       status: "Accepted",
       createdAt: {
-        gte: today,
+        gte: startOfToday,
         lte: endOfToday,
       },
     },
   });
   if (currentDaySubmission) {
-    console.log("i m here")
-    console.log({today, endOfToday, currentDaySubmission: currentDaySubmission.createdAt});
-  const update =   await db.user.updateMany({
+    const update = await db.user.updateMany({
       where: {
         id: userId,
         OR: [
-          { lastSubmissionDate: { lt: today } },
+          { lastSubmissionDate: { lt: startOfToday } },
           { lastSubmissionDate: { gt: endOfToday } },
           { lastSubmissionDate: null },
         ],
