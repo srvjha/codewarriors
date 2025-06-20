@@ -17,33 +17,33 @@ export default function ContestListPage() {
   const userInfo = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchServerTime = async () => {
-      try {
-        const res = await API.get("/server-time");
-        const serverNow = new Date(res.data.data.serverTime).getTime();
-        const clientNow = Date.now();
-        setServerOffset(serverNow - clientNow);
-      } catch (error) {
-        console.error("Failed to fetch contests:", error);
-      }
-    };
-    fetchServerTime();
-  }, []);
+  const fetchContests = async () => {
+    try {
+      const res = await API.get("/contests/all");
+      setContests(res.data.data);
+    } catch (err) {
+      console.error("Failed to fetch contests:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchServerTime = async () => {
+    try {
+      const res = await API.get("/server-time");
+      const serverNow = new Date(res.data.data.serverTime).getTime();
+      const clientNow = Date.now();
+      setServerOffset(serverNow - clientNow);
+    } catch (error) {
+      console.error("Failed to fetch contests:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchContests = async () => {
-      try {
-        const res = await API.get("/contests/all");
-        setContests(res.data.data);
-      } catch (err) {
-        console.error("Failed to fetch contests:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
 
     fetchContests();
+    fetchServerTime();
+
   }, []);
 
   const statusColors = {

@@ -1,6 +1,5 @@
-
 import Lottie from 'react-lottie';
-import  animationData from '../../../coder.json';
+import animationData from '../../../coder.json';
 
 const CoderDesc = () => {
   const defaultOptions = {
@@ -13,11 +12,9 @@ const CoderDesc = () => {
   };
 
   return (
-    <Lottie
-      options={defaultOptions}
-      height={500}
-      width={500}
-    />
+    <div className="w-full h-auto max-w-[500px] mx-auto">
+      <Lottie options={defaultOptions} />
+    </div>
   );
 };
 

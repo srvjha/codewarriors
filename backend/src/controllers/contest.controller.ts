@@ -48,13 +48,21 @@ const createContest = asyncHandler(async (req, res) => {
     throw new ApiError("Contest Already Created", 409);
   }
 
+  const startTimeDate = new Date(startTime);
+  const endTimeDate = new Date(endTime);
+  // checking for valid start and end time
+  if (startTimeDate >= endTimeDate) {
+    throw new ApiError("End time must be after start time", 400);
+  }
+
+
   // now will create contest
   const contest = await db.contest.create({
     data: {
       title: title,
       description: description,
-      startTime: startTime,
-      endTime: endTime,
+      startTime: startTimeDate,
+      endTime: endTimeDate,
       status: status,
     },
   });
@@ -134,7 +142,7 @@ const getContestLeaderboard = asyncHandler(async (req, res) => {
       },
     },
     orderBy: {
-      score: "desc", // Assuming you add a `score` column later
+      score: "desc", 
     },
   });
 

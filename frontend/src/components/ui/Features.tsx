@@ -11,9 +11,9 @@ import FeatureDash from './FeatureDash';
 
 const Features = () => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 auto-rows-[320px] md:auto-rows-[240px] items-start">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 md:auto-rows-[240px] auto-rows-auto  items-start">
 
-      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10 hover:shadow-md hover:shadow-neutral-500/40 col-span-2 row-span-1">
+      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10 hover:shadow-md hover:shadow-neutral-500/40 col-span-6 lg:col-span-2 row-span-1  lg:row-span-1">
         <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />
         <h3 className="text-xl font-semibold mb-2 flex gap-2 text-white">
           <span className='text-zinc-100 text-2xl'>Structured DSA Practice</span>
@@ -25,7 +25,7 @@ const Features = () => {
       </div>
 
  
-      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-6 hover:shadow-md hover:shadow-neutral-500/40 col-span-2 row-span-2">
+      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-6 hover:shadow-md hover:shadow-neutral-500/40 col-span-6 lg:col-span-2 row-span-2  lg:row-span-2">
         <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />
         <h3 className="text-2xl font-semibold mb-2 flex gap-2 text-white">
           <span className='text-zinc-100 text-2xl'>Discuss with AlgoAI</span>
@@ -40,7 +40,7 @@ const Features = () => {
       </div>
 
     
-      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-6 hover:shadow-md hover:shadow-neutral-500/40 col-span-2 row-span-2">
+      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-6 hover:shadow-md hover:shadow-neutral-500/40 col-span-6 lg:col-span-2 row-span-2  lg:row-span-2">
         <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />
         <h3 className="text-xl font-semibold mb-2 flex gap-2 text-white">
           <span className="text-zinc-100 text-2xl">Profile Dashboard</span>
@@ -51,7 +51,7 @@ const Features = () => {
          <div className=' flex justify-center items-center'> <FeatureDash /></div>
       </div>
 
-      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10 hover:shadow-md hover:shadow-neutral-500/40 col-span-2 row-span-1 ">
+      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10 hover:shadow-md hover:shadow-neutral-500/40 col-span-6 lg:col-span-2    lg:row-span-1 ">
         <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />
         <h3 className="text-xl font-semibold mb-2 flex gap-2 text-white">
           <span className='text-zinc-100 text-2xl'>Practice Sheets</span>
@@ -64,7 +64,7 @@ const Features = () => {
      
 
      
-      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10  hover:shadow-md hover:shadow-neutral-500/40 col-span-4 row-span-1 -mt-14   ">
+      <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10  hover:shadow-md hover:shadow-neutral-500/40 col-span-6 lg:col-span-4  lg:row-span-1 md:-mt-14   ">
         <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />
         <h3 className="text-xl font-semibold mb-2 flex gap-2 text-white">
           <span className='text-zinc-100 text-2xl'>Code Editors</span>
@@ -78,7 +78,7 @@ const Features = () => {
         </div>
       </div>
 
-       <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10 hover:shadow-md hover:shadow-neutral-500/40 col-span-2 row-span-1 -mt-14">
+       <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-10 hover:shadow-md hover:shadow-neutral-500/40 col-span-6 lg:col-span-2  lg:row-span-1 lg:-mt-14">
         <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />
         <h3 className="text-xl font-semibold mb-2 flex gap-2 text-white">
           <span className='text-zinc-100 text-2xl'>Discussion Forum</span>
@@ -90,7 +90,7 @@ const Features = () => {
       </div>
       
 
-        <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-16 hover:shadow-md hover:shadow-neutral-500/40 col-start-5 col-span-2 -mt-28">
+        <div className="bg-neutral-900/10 relative border border-neutral-800 rounded-2xl px-6 py-16 hover:shadow-md hover:shadow-neutral-500/40 col-span-6 lg:col-span-2  lg:col-start-5 lg:-mt-28">
         <div className="absolute inset-0 bg-dot-pattern opacity-10 pointer-events-none" />
         <h3 className="text-xl font-semibold mb-2 flex gap-2 text-white">
           <span className='text-zinc-100 text-2xl'>Daily Streak Feature</span>

@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import API from "@/utils/AxiosInstance";
 import { Button } from "@/components/ui/button";
@@ -8,22 +8,11 @@ import ContestTimer from "@/components/ui/ContestTimer";
 import { BeatLoader } from "react-spinners";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import UnregisterDialog from "@/components/ui/UnRegisteredDialog";
+import type { Contest } from "@/types/contest/contest.Types";
 
-interface Problem {
-  id: string;
-  title: string;
-  points?: number;
-}
 
-interface Contest {
-  id: string;
-  title: string;
-  description?: string;
-  status: "LIVE" | "UPCOMING" | "ENDED";
-  startTime: string;
-  endTime: string;
-  problems: { order: number; problem: Problem }[];
-}
+
+
 
 export default function ContestDetailPage() {
   const { contestId: id } = useParams();
@@ -31,11 +20,13 @@ export default function ContestDetailPage() {
   const [serverOffset, setServerOffset] = useState(0);
   const [registered, setRegistered] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchContest = async () => {
       try {
         const res = await API.get(`/contests/${id}`);
+        console.log(res.data.data);
         setContest(res.data.data);
       } catch (err) {}
     };
@@ -107,6 +98,14 @@ export default function ContestDetailPage() {
       ToastError(error?.response?.data?.message || "Unregistration failed");
     }
   };
+
+  const handleSolve = (id:string)=>{
+    if(!registered) {
+      ToastError("You must register for the contest to solve problems.");
+      return;
+    }
+    navigate(`/contest/problem/${id}`)
+  }
 
   if (!contest)
     return (
@@ -184,8 +183,70 @@ export default function ContestDetailPage() {
             </div>
           </>
         )}
+        
+         {(contest.status === "LIVE") && (
+          <div>
+            <div className="mb-10">
+             {!registered ? (
+              <Button
+                disabled={loading}
+                className="bg-green-100 text-green-800 hover:bg-green-200 w-32 h-10 rounded-full text-base"
+                onClick={handleRegister}
+              >
+                {loading ? "Registering..." : "Register"}
+              </Button>
+            ) : (
+              <UnregisterDialog
+                onConfirm={handleUnregister}
+                trigger={
+                  <Button className="bg-red-100 text-red-800 hover:bg-red-200 w-32 h-10 rounded-full text-base">
+                    Registered
+                  </Button>
+                }
+              />
+            )}
+            </div>
 
-        {(contest.status === "LIVE" || contest.status === "ENDED") && (
+            <h2 className="text-2xl font-semibold mb-4">Problems</h2>
+            <div className="space-y-4">
+              {contest.problems.map((entry) => (
+                <Card
+                  key={entry.problem.id}
+                  className="p-4 w-full flex items-center justify-between bg-zinc-900 border-zinc-800 hover:bg-zinc-800 cursor-pointer"
+                >
+                  <div>
+                    <h3 className="text-lg font-medium">
+                      {entry.order + 1}. {entry.problem.title}
+                    </h3>
+                    {entry.points !== undefined && (
+                      <p className="text-sm text-slate-400">
+                        Points: {entry.points}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    {contest.status === "LIVE" ? (
+                      <Button
+                        asChild
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        <div onClick={()=>handleSolve(entry.problem.id)}>Solve</div>
+                      </Button>
+                    ) : (
+                      <Button
+                        asChild
+                        className="border-neutral-600 bg-zinc-100 hover:bg-zinc-200 text-neutral-800"
+                      >
+                        <Link to={`/problem/${entry.problem.id}`}>View</Link>
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+        {(contest.status === "ENDED") && (
           <div>
             <h2 className="text-2xl font-semibold mb-4">Problems</h2>
             <div className="space-y-4">
@@ -210,14 +271,14 @@ export default function ContestDetailPage() {
                         asChild
                         className="bg-emerald-600 hover:bg-emerald-700"
                       >
-                        <a href={`/problem/${entry.problem.id}`}>Solve</a>
+                        <Link to={`/contest/problem/${entry.problem.id}`}>Solve</Link>
                       </Button>
                     ) : (
                       <Button
                         asChild
                         className="border-neutral-600 bg-zinc-100 hover:bg-zinc-200 text-neutral-800"
                       >
-                        <a href={`/problem/${entry.problem.id}`}>View</a>
+                        <Link to={`/contest/problem/${entry.problem.id}`}>View</Link>
                       </Button>
                     )}
                   </div>

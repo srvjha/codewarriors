@@ -1,3 +1,4 @@
+import type { Problem } from "../problem/problemTypes";
 
 export interface Contest {
   id: string;
@@ -5,8 +6,7 @@ export interface Contest {
   description?: string;
   startTime: string;
   endTime: string;
+  points?: number;
   status: "LIVE" | "UPCOMING" |  "ENDED";
-  problem:{
-    id: string;
-  }[]
+  problems: { order: number; points:number; problem: Problem }[]
 }

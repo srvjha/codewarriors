@@ -28,6 +28,7 @@ export interface Problem {
   referenceSolutions: {
     [key: string]: string;
   };
+  points?: number;
   createdAt: string;
   updatedAt: string;
 }

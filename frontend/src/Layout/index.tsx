@@ -6,7 +6,7 @@ const Layout = () => {
   const params = useParams();
   const location = useLocation();
  const isProblemPage =
-  matchPath("/problem/:id", location.pathname) ||
+  matchPath("/problem/:id", location.pathname) || matchPath("/contest/problem/:id", location.pathname) ||
   location.pathname === "/problem";
 
   const { problemId } = params;

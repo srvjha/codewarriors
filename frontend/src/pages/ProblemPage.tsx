@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import {
   BookOpen,
   ChevronDown,
@@ -10,7 +10,6 @@ import {
   RotateCw,
   XCircle,
   AlignLeft,
-  // Settings,
   SquareCheck,
   ChevronRight,
   XOctagon,
@@ -67,6 +66,8 @@ import ViewCode from "@/components/ui/ViewCode";
 import { Toast, ToastError } from "@/utils/ToastContainers";
 const ProblemPage = () => {
   const params = useParams();
+  const location =  useLocation();
+  console.log({location});
   const { problemId } = params;
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -85,7 +86,6 @@ const ProblemPage = () => {
   const [activeResultTab, setActiveResultTab] = useState("testcase");
   const [submissions, setSubmissions] = useState<SubmissionType[]>([]);
   const { userData } = useSelector((state: RootState) => state.auth);
-  console.log({ userData });
   const [executionType, setExecutionType] = useState<ExecutionStatus>();
   const [defaultCodeSnippet, setDefaultCodeSnippet] = useState("");
   const [viewCodeStatus, setViewCodeStatus] = useState(false);

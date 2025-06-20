@@ -61,6 +61,14 @@ const App = () => {
           }
         />
         <Route
+          path="/contest/problem/:problemId"
+          element={
+            <PrivateRoute>
+              <ProblemPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/admin/dashboard"
           element={
             <PrivateRoute>
