@@ -48,8 +48,7 @@ export const Header = ({ children }: React.PropsWithChildren) => {
   };
   return (
     <>
-      <nav className="text-white flex flex-row justify-between px-4 md:px-8 py-4 h-14 border-b border-neutral-800 sticky top-0 z-50  bg-opacity-90 backdrop-blur-sm">
-        <div className="flex flex-row gap-5 items-center">
+     <nav className="text-white flex flex-row justify-between px-4 md:px-8 py-4 h-14 border-b border-neutral-800 sticky top-0 z-50 backdrop-blur-md bg-black/70">  <div className="flex flex-row gap-5 items-center">
           <Link to="/">
             <svg
               width="200"

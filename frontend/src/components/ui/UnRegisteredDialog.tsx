@@ -1,7 +1,7 @@
 
 
 import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./alert-dialog";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./alert-dialog";
 
 interface UnregisterDialogProps {
   onConfirm: () => void;
@@ -20,7 +20,7 @@ export default function UnregisterDialog({ onConfirm, trigger }: UnregisterDialo
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <Button variant="ghost">Cancel</Button>
+           <AlertDialogCancel className="bg-transparent border-neutral-400">Cancel</AlertDialogCancel>
           <Button variant="destructive" onClick={onConfirm}>
            Leave
           </Button>

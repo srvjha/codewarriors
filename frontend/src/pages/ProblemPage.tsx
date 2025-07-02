@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams , useNavigate} from "react-router-dom";
 import {
   BookOpen,
   ChevronDown,
@@ -68,7 +68,7 @@ const ProblemPage = () => {
   const params = useParams();
   const location =  useLocation();
   console.log({location});
-  const { problemId } = params;
+  const { problemId,contestId } = params;
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedLang, setSelectedLang] = useState<
@@ -92,6 +92,7 @@ const ProblemPage = () => {
   const [viewCode, setViewCode] = useState("");
   const [aiChatOpen, setAiChatOpen] = useState(false);
   const [complexity, setShowComplexity] = useState(false);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -147,6 +148,23 @@ const ProblemPage = () => {
 
   const selectedExample = problem.examples;
 
+   const fetchContest = async () => {
+        try {
+          const res = await API.get(`/contests/${contestId}`);
+          if (!res.data.success) {
+            throw new Error("Failed to fetch contest details");
+           
+          }
+         return res.data.data;
+        } catch (err:any) {
+          if (err.response && err.response.status === 404) {
+            ToastError("Contest not found");
+          } else {
+            ToastError("Failed to fetch contest details");
+          }
+        }
+      };
+
   const handleSubmitCode = async () => {
     setIsSubmitting(true);
     setExecutionType("SUBMIT");
@@ -169,10 +187,40 @@ const ProblemPage = () => {
 
       if (res.data.success) {
         // console.log("Execution result:", res.data.data);
+        if(location.pathname.includes("contest")) {
+          const contests = await fetchContest();
+          const score = contests.problems.reduce((acc:number,problem:any)=>{
+            return problem.problemId===problemId?acc+problem.points:acc;
+           },0)
+         const scoreUpdate =  await API.post(`/contests/add/score`,{
+            contestId,
+           // score: contests.problems.map((problem:any)=>problem.problemId===problemId?problem.points:0),
+           score
+          })
+          
+          if(!scoreUpdate.data.success) {
+            throw new Error(scoreUpdate.data.error || "Failed to update score");
+          }
+          // now will create a contest submission
+          const contestSubmission = await API.post(`/contests/submission`,{
+            contestId,
+            userId: userData?.id,
+            problemId,
+            submissionId:res.data.data.id,
+            score
+          });
+          if(!contestSubmission.data.success) {
+            throw new Error(contestSubmission.data.error || "Failed to create contest submission");
+          }
+          setTimeout(()=>navigate(`/contest/${contestId}`),2000)
+          
+        }
         setResults(res.data.data);
         setActiveTab("submit");
+        
       }
     } catch (error: any) {
+      console.log({error})
       ToastError(
         error.response.data.error || "An error occurred during execution"
       );

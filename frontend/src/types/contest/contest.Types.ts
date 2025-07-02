@@ -7,6 +7,18 @@ export interface Contest {
   startTime: string;
   endTime: string;
   points?: number;
-  status: "LIVE" | "UPCOMING" |  "ENDED";
-  problems: { order: number; points:number; problem: Problem }[]
+  status: "LIVE" | "UPCOMING" | "ENDED";
+  problems: { order: number; points: number; problem: Problem }[];
+}
+
+export interface ContestSubmission {
+  contestId: string;
+  createdAt: string;
+  id: string;
+  problemId: string;
+  score: number;
+  submissionId: string;
+  timeTaken: string | null;
+  updatedAt: string;
+  userId: string;
 }

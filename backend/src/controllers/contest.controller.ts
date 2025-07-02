@@ -22,7 +22,23 @@ const getContestById = asyncHandler(async (req, res) => {
     include: {
       problems: {
         orderBy: { order: "asc" },
-        include: { problem: true },
+        include: { problem: {
+          select:{
+            id: true,
+            title:true
+          }
+        } },
+      },
+      contestants: {
+        select: {
+          userId: true,
+          score: true,
+          user: {
+            select: {
+              username: true,
+            },
+          },
+        },
       },
     },
   });
@@ -154,7 +170,7 @@ const getContestLeaderboard = asyncHandler(async (req, res) => {
 });
 
 const createContestSubmission = asyncHandler(async (req, res) => {
-  const { contestId, userId, problemId, submissionId, score, timeTaken } =
+  const { contestId, userId, problemId, submissionId, score} =
     req.body;
 
   const existing = await db.contestSubmission.findFirst({
@@ -186,8 +202,7 @@ const createContestSubmission = asyncHandler(async (req, res) => {
       userId,
       problemId,
       submissionId,
-      score,
-      timeTaken,
+      score
     },
   });
 
@@ -195,6 +210,27 @@ const createContestSubmission = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, result, "Contest Submission Recorded"));
 });
+
+const getContestSubmissionDetailsById = asyncHandler(async (req, res) => {
+  const { contestId } = req.params;
+  const userId = req.user.id;
+
+  const submission = await db.contestSubmission.findMany({
+    where: {
+      contestId,
+      userId,
+    }
+  });
+
+  if (!submission) {
+    throw new ApiError("Submission not found", 404);
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, submission, "Contest Submission Details Fetched"));
+}
+);
 
 const checkUserRegistration = asyncHandler(async (req, res) => {
   const { contestId } = req.params;
@@ -220,6 +256,25 @@ const checkUserRegistration = asyncHandler(async (req, res) => {
     );
 });
 
+const addContestantScore = asyncHandler(async(req,res)=>{
+  const userId = req.user.id;
+  const { contestId, score } = req.body;
+  console.log("contestId: ", contestId, "score: ", score);
+  const contestant = await db.contestant.findUnique({
+    where: { userId_contestId: { userId, contestId } },
+  });
+  if (!contestant) {
+    throw new ApiError("User is not registered for this contest", 400);
+  }
+  const updatedContestant = await db.contestant.update({
+    where: { userId_contestId: { userId, contestId } },
+    data: { score: contestant.score + score },
+  });
+  res
+    .status(200)
+    .json(new ApiResponse(200, updatedContestant, "Score Updated Successfully"));
+})
+
 export {
   createContest,
   getContestById,
@@ -229,4 +284,6 @@ export {
   registerUserToContest,
   unregisterUserFromContest,
   checkUserRegistration,
+  addContestantScore,
+  getContestSubmissionDetailsById
 };

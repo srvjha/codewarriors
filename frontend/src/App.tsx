@@ -61,7 +61,7 @@ const App = () => {
           }
         />
         <Route
-          path="/contest/problem/:problemId"
+          path="/contest/:contestId/problem/:problemId"
           element={
             <PrivateRoute>
               <ProblemPage />
