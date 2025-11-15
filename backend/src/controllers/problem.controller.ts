@@ -8,14 +8,17 @@ import {
 import { ApiError } from "../utils/ApiError";
 import {
   getJudge0LanguageById,
-  pollBatchResults,
-  submitBatch,
+  // pollBatchResults,
+  // submitBatch,
 } from "../utils/judge0";
 import { ApiResponse } from "../utils/ApiResponse";
 import { validId } from "../helper/validId.helper";
 import { Difficulty, UserRole } from "@prisma/client";
 import { logger } from "../configs/logger";
 
+
+/*
+TODO: Have to change the setup of submission from sulu to rapidClient they dont have batch support have to use for loops
 const createProblem = asyncHandler(async (req, res) => {
   const {
     title,
@@ -99,54 +102,6 @@ const createProblem = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(201, newProblem, "Problem created successfully"));
   }
-});
-
-const getAllProblems = asyncHandler(async (req, res) => {
-  const problems = await db.problem.findMany({
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      difficulty: true,
-      tags: true,
-      demo: true,
-      createdAt: true,
-      updatedAt: true,
-      ProblemInPlaylist: {
-        select: {
-          problemId: true,
-        },
-      },
-    },
-    orderBy: {
-      demo: "desc",
-    },
-  });
-  if (!problems) {
-    throw new ApiError("No problems found", 404);
-  }
-  logger.info("All Problems retrieved successfully");
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, problems, "All Problems retrieved successfully")
-    );
-});
-
-const getProblemById = asyncHandler(async (req, res) => {
-  const { pid } = req.params;
-  validId(pid, "Problem");
-  const problem = await db.problem.findUnique({
-    where: { id: pid },
-  });
-
-  if (!problem) {
-    throw new ApiError("Problem not found", 404);
-  }
-  logger.info(`Problem with ID ${pid} retrieved successfully`);
-  res
-    .status(200)
-    .json(new ApiResponse(200, problem, "Problem retrieved successfully"));
 });
 
 const updateProblem = asyncHandler(async (req, res) => {
@@ -268,6 +223,57 @@ const updateProblem = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, newProblem, "Problem updated successfully"));
 });
+*/
+
+const getAllProblems = asyncHandler(async (req, res) => {
+  const problems = await db.problem.findMany({
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      difficulty: true,
+      tags: true,
+      demo: true,
+      createdAt: true,
+      updatedAt: true,
+      ProblemInPlaylist: {
+        select: {
+          problemId: true,
+        },
+      },
+    },
+    orderBy: {
+      demo: "desc",
+    },
+  });
+  if (!problems) {
+    throw new ApiError("No problems found", 404);
+  }
+  logger.info("All Problems retrieved successfully");
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, problems, "All Problems retrieved successfully")
+    );
+});
+
+const getProblemById = asyncHandler(async (req, res) => {
+  const { pid } = req.params;
+  validId(pid, "Problem");
+  const problem = await db.problem.findUnique({
+    where: { id: pid },
+  });
+
+  if (!problem) {
+    throw new ApiError("Problem not found", 404);
+  }
+  logger.info(`Problem with ID ${pid} retrieved successfully`);
+  res
+    .status(200)
+    .json(new ApiResponse(200, problem, "Problem retrieved successfully"));
+});
+
+
 
 const deleteProblem = asyncHandler(async (req, res) => {
   const { pid } = req.params;
@@ -332,10 +338,10 @@ const isProblemSolved = asyncHandler(async (req, res) => {
 });
 
 export {
-  createProblem,
+  // createProblem,
+  // updateProblem,
   getAllProblems,
   getProblemById,
-  updateProblem,
   deleteProblem,
   getAllProblemsSolvedByUser,
   isProblemSolved,
