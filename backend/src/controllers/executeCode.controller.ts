@@ -8,8 +8,8 @@ import { handleZodError } from "../utils/handleZodError";
 import {
   getJudge0LanguageById,
   getLanguageNameById,
-  pollBatchResults,
-  submitBatch,
+  pollOne,
+  submitOne,
 } from "../utils/judge0";
 import { executeCodeSchemaValidation } from "../validators/executeCode.validation";
 import { testcaseSchema } from "../validators/problem.validation";
@@ -81,22 +81,28 @@ const executeCode = asyncHandler(async (req, res) => {
     finalOutput = standardDbOutput;
   }
 
-  // prepare each cases for judge0 batch submission
+  // Prepare each test case submission for Judge0 RapidAPI
   const submissions = finalInput.map((input) => ({
     source_code,
     language_id,
     stdin: input,
   }));
 
-  // send batch to judge0
+  // Submit each test case one-by-one (RapidAPI does not support batch so i adjusted accordingly)
+  const tokens: string[] = [];
 
-  const submitResponse = await submitBatch(submissions);
+  for (const sub of submissions) {
+    const { token } = await submitOne(sub);
+    tokens.push(token);
+  }
 
-  // console.log("submission Response: ",submitResponse);
-  const tokens = submitResponse.map((res) => ({ token: res.token }));
+  // Poll each test case separately
+  const results = [];
 
-  const results = await pollBatchResults(tokens);
-  // console.log("results : ",results);
+  for (const token of tokens) {
+    const res = await pollOne(token);
+    results.push(res);
+  }
 
   let allPassedCases = true;
   const detailedResults = results.map((result, index) => {
@@ -119,14 +125,7 @@ const executeCode = asyncHandler(async (req, res) => {
       memory: result.memory ? `${result.memory} KB` : undefined,
       time: result.time ? `${result.time}s` : undefined,
     };
-    // console.log(`TestCases ${index + 1}`)
-    // console.log(`Input: ${stdin[index]}`)
-    // console.log(`Expected Output: ${expected_output}`)
-    // console.log(`Actual output: ${stdout}`)
-
-    // console.log(`Passed: ${passedTestCases}`)
   });
-  // console.log("Detailed Results: ", detailedResults);
   const averageMemory = getAverage(detailedResults.map((r) => r.memory));
   const averageTime = getAverage(detailedResults.map((r) => r.time));
 
@@ -214,9 +213,6 @@ const executeCode = asyncHandler(async (req, res) => {
   const nowIST = DateTime.now().setZone("Asia/Kolkata");
   const startOfToday = nowIST.startOf("day").toJSDate();
   const endOfToday = nowIST.endOf("day").toJSDate();
-  console.log("startOfToday: ", startOfToday);
-  console.log("endOfToday: ", endOfToday);
-  
 
   const currentDaySubmission = await db.submission.findFirst({
     where: {
@@ -244,7 +240,6 @@ const executeCode = asyncHandler(async (req, res) => {
         lastSubmissionDate: new Date(),
       },
     });
-    console.log("update: ", update);
   }
 
   res
@@ -268,14 +263,19 @@ const handleCustomInput = async (
   }));
 
   // send batch to judge0
+  const tokens: string[] = [];
 
-  const submitResponse = await submitBatch(submissions);
+  for (const sub of submissions) {
+    const { token } = await submitOne(sub);
+    tokens.push(token);
+  }
 
-  // console.log("submission Response: ",submitResponse);
-  const tokens = submitResponse.map((res) => ({ token: res.token }));
+  const results = [];
 
-  const results = await pollBatchResults(tokens);
-  console.log("results: ", results);
+  for (const token of tokens) {
+    const res = await pollOne(token);
+    results.push(res);
+  }
   const sanitizeResults = results.map((result) =>
     result.stdout?.replace("\n", "")
   );

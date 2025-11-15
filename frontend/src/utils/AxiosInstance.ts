@@ -1,26 +1,32 @@
 import axios from "axios";
+let serverURL = import.meta.env.VITE_DEV_ENV;
+
+if (import.meta.env.PROD) {
+  serverURL = import.meta.env.VITE_PROD_ENV;
+}
 
 const API = axios.create({
-  baseURL:`${import.meta.env.VITE_PROD_ENV}/api/v1`,
-  withCredentials: true, 
+  baseURL: `${serverURL}/api/v1`,
+  withCredentials: true,
 });
-
 
 let isRefreshing = false;
 interface FailedRequestCallback {
-    (): void;
+  (): void;
 }
 
 let failedRequestsQueue: FailedRequestCallback[] = [];
 
-
 API.interceptors.response.use(
-  (response) => response, 
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
     //console.log(error.response?.data?.error)
-   
-    if (error.response?.data?.error === "jwt expired" && !originalRequest._retry) {
+
+    if (
+      error.response?.data?.error === "jwt expired" &&
+      !originalRequest._retry
+    ) {
       if (isRefreshing) {
         return new Promise((resolve) => {
           failedRequestsQueue.push(() => resolve(API(originalRequest)));
@@ -32,7 +38,7 @@ API.interceptors.response.use(
 
       try {
         await API.get("/auth/refresh", {
-          withCredentials: true, 
+          withCredentials: true,
         });
 
         failedRequestsQueue.forEach((callback) => callback());

@@ -22,9 +22,6 @@ type Judge0Submission = {
   wait?: boolean;
 };
 
-type Token = {
-  token: string;
-};
 
 type Statuses = {
   token: string;
@@ -40,51 +37,48 @@ type Statuses = {
   };
 };
 
-export const submitBatch = async (submissions: Judge0Submission[]) => {
+export const submitOne = async (submission: Judge0Submission) => {
   const { data } = await axios.post(
-    `${env.JUDGE0_API_URL}/submissions/batch`,
-    { submissions },
+    `${env.JUDGE0_API_URL}/submissions?base64_encoded=false&fields=*`,
+    submission,
     {
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${env.JUDGE0_API_KEY}`,
+        "x-rapidapi-key": env.JUDGE0_API_KEY,
+        "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
       },
     }
   );
-  return data as Token[]; // array of tokens;
+
+  return data; // contains { token }
 };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const pollBatchResults = async (tokens: Token[]) => {
-  try {
-    while (true) {
-      const { data } = await axios.get(
-        `${env.JUDGE0_API_URL}/submissions/batch`,
-        {
-          params: {
-            tokens: tokens.map((t) => t.token).join(","),
-            base64_encoded: false,
-          },
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${env.JUDGE0_API_KEY}`,
-          },
-        }
-      );
+export const pollOne = async (token: string) => {
+  while (true) {
+    const { data } = await axios.get(
+      `${env.JUDGE0_API_URL}/submissions/${token}`,
+      {
+        params: {
+          base64_encoded: false,
+          fields: "*",
+        },
+        headers: {
+          "x-rapidapi-key": env.JUDGE0_API_KEY,
+          "x-rapidapi-host": "judge0-ce.p.rapidapi.com",
+        },
+      }
+    );
 
-      const results = data.submissions as Statuses[];
-      const isAllDone = results.every(
-        (result) => result.status.id !== 1 && result.status.id !== 2
-      );
-      if (isAllDone) return results;
-      await sleep(1000);
+    if (data.status.id !== 1 && data.status.id !== 2) {
+      return data as Statuses;
     }
-  } catch (error) {
-    console.log("error: ", error);
-    throw new ApiError("Error while polling Judge0 submissions", 500);
+
+    await sleep(1000);
   }
 };
+
 
 export const getLanguageNameById = (languageId: number) => {
   const languages = {
