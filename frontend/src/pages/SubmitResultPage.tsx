@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import type { SubmissionType } from "@/types/submit/SubmissionTypes";
 import { CheckCircle2, Cpu, Timer } from "lucide-react";
 
-const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {
+const SubmissionResult = ({ submission }: { submission: SubmissionType }) => {
   const {
     status,
     time,
@@ -11,7 +11,7 @@ const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {
     language,
     TestCaseResult,
     createdAt,
-    sourceCode
+    sourceCode,
   } = submission;
 
   // console.log("Submission Result: ", submission);
@@ -21,7 +21,10 @@ const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {
       <div className="flex items-center justify-between">
         <div className="text-green-600 font-semibold text-lg flex items-center gap-2">
           <CheckCircle2 className="text-green-500" size={20} />
-          {status} <span className="text-gray-400 text-sm">({TestCaseResult.length} test cases passed)</span>
+          {status}{" "}
+          <span className="text-gray-400 text-sm">
+            ({TestCaseResult.length} test cases passed)
+          </span>
         </div>
         <div className="text-sm text-gray-500">
           Submitted at {new Date(createdAt).toLocaleString()}
@@ -66,7 +69,9 @@ const SubmissionResult = ({ submission }:{submission:SubmissionType}) => {
 
       <Card>
         <CardContent className="p-4">
-          <div className="font-mono text-sm text-muted-foreground mb-2">Output (stdout)</div>
+          <div className="font-mono text-sm text-muted-foreground mb-2">
+            Output (stdout)
+          </div>
           <pre className="bg-gray-900 text-green-400 p-3 rounded text-sm whitespace-pre-wrap">
             {stdout}
           </pre>

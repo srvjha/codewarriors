@@ -1,6 +1,6 @@
 import { MessageCircle } from "lucide-react";
 
-const DiscussWithAI = ({ onClick }:{onClick:()=>void}) => {
+const DiscussWithAI = ({ onClick }: { onClick: () => void }) => {
   return (
     <button
       onClick={onClick}

@@ -1,4 +1,4 @@
-import {  useRef } from "react";
+import { useRef } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Copy, X } from "lucide-react";

@@ -12,11 +12,11 @@ export interface Problem {
   }[];
   constraints: string;
   hints: string | null;
-  isSolved:boolean;
-  ProblemInPlaylist:{
-    problemId:string
+  isSolved: boolean;
+  ProblemInPlaylist: {
+    problemId: string;
   }[];
-  demo:boolean;
+  demo: boolean;
   editorial: string | null;
   testcases: {
     input: string;
@@ -47,15 +47,15 @@ export type ResultType = {
   [key: string]: any;
 };
 
-export interface Playlist{
+export interface Playlist {
   id: string;
   name: string;
   description: string;
   userId: string;
-  visibility:boolean;
-  type:string;
-  user:{
-    fullName:string
+  visibility: boolean;
+  type: string;
+  user: {
+    fullName: string;
   };
   problems: {
     problem: Problem;
@@ -74,14 +74,13 @@ export const ExecutionStatus = {
 export type ExecutionStatus = keyof typeof ExecutionStatus;
 
 export interface ProgressData {
-     totalProblems: number;
-    easyProblems: number;
-    medProblems: number;
-    hardProblems: number;
-    solvedProblems: number;
-  }
-
-
-export type P =  {
-  progressData:ProgressData
+  totalProblems: number;
+  easyProblems: number;
+  medProblems: number;
+  hardProblems: number;
+  solvedProblems: number;
 }
+
+export type P = {
+  progressData: ProgressData;
+};

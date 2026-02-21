@@ -75,7 +75,7 @@ const DiscussCreatePage = () => {
           description: payload.contentHtml,
           tags: payload.topics,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (res.data.success) {

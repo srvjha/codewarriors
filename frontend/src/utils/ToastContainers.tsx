@@ -18,7 +18,7 @@ export const Toast = () => {
   );
 };
 
-export const ToastSuccess = (message:string) => {
+export const ToastSuccess = (message: string) => {
   return toast.success(message, {
     position: "bottom-right",
     autoClose: 2000,
@@ -32,7 +32,7 @@ export const ToastSuccess = (message:string) => {
   });
 };
 
-export const ToastError = (message:string) => {
+export const ToastError = (message: string) => {
   return toast.error(message, {
     position: "bottom-right",
     autoClose: 5000,

@@ -95,7 +95,7 @@ const RegisterPage = () => {
       }, 3000);
     } catch (error: any) {
       ToastError(
-        error || error?.response?.data?.message || "Something went wrong"
+        error || error?.response?.data?.message || "Something went wrong",
       );
     } finally {
       setIsLoading(false);
@@ -141,12 +141,12 @@ const RegisterPage = () => {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-          >  
-          <Link to="/">
-            <div className="flex items-center justify-center md:justify-start space-x-2">
-              <Code className="text-blue-500 w-8 h-8" />
-              <h2 className="text-xl font-bold text-blue-400">CodeWarrior</h2>
-            </div>
+          >
+            <Link to="/">
+              <div className="flex items-center justify-center md:justify-start space-x-2">
+                <Code className="text-blue-500 w-8 h-8" />
+                <h2 className="text-xl font-bold text-blue-400">CodeWarrior</h2>
+              </div>
             </Link>
 
             <h1 className="text-5xl font-extrabold text-white leading-tight">
@@ -351,7 +351,7 @@ const RegisterPage = () => {
                         const res = await dispatch(
                           googleAuthLoginUser({
                             credential: credentialResponse.credential,
-                          })
+                          }),
                         ).unwrap();
                         ToastSuccess(res.message);
 

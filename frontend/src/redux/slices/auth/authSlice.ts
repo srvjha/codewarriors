@@ -13,7 +13,7 @@ let initialState: AuthState = {
   isLoading: false,
   userData: null,
   isError: false,
-  message:"",
+  message: "",
   hasFetchedUser: false,
 };
 
@@ -49,12 +49,12 @@ export const authSlice = createSlice({
       state.userData = action.payload.data;
       state.message = action.payload.message;
     });
-    builder.addCase(LoginUser.rejected, (state,_) => {
+    builder.addCase(LoginUser.rejected, (state, _) => {
       state.isLoading = false;
       state.isError = true;
     });
 
-     // google login
+    // google login
 
     builder.addCase(googleAuthLoginUser.pending, (state, _) => {
       state.isLoading = true;
@@ -65,7 +65,7 @@ export const authSlice = createSlice({
       state.userData = action.payload.data;
       state.message = action.payload.message;
     });
-    builder.addCase(googleAuthLoginUser.rejected, (state,_) => {
+    builder.addCase(googleAuthLoginUser.rejected, (state, _) => {
       state.isLoading = false;
       state.isError = true;
     });
@@ -76,7 +76,6 @@ export const authSlice = createSlice({
       state.userData = null;
       state.isLoading = false;
       state.isError = false;
-      
     });
     builder.addCase(LogoutUser.rejected, (state, _) => {
       state.isError = true;
@@ -85,25 +84,22 @@ export const authSlice = createSlice({
 
     // current user
     builder.addCase(fetchCurrentUser.pending, (state) => {
-    state.isLoading = true;
-});
+      state.isLoading = true;
+    });
 
     builder.addCase(fetchCurrentUser.fulfilled, (state, action) => {
       state.isLoading = false;
       state.isAuthenticated = true;
       state.userData = action.payload;
       state.hasFetchedUser = true;
-     
     });
 
     builder.addCase(fetchCurrentUser.rejected, (state, _) => {
-    state.isLoading = false;
-    state.isError = true;
-    state.isAuthenticated = false;
-    state.hasFetchedUser = true;
-    
-});
-
+      state.isLoading = false;
+      state.isError = true;
+      state.isAuthenticated = false;
+      state.hasFetchedUser = true;
+    });
   },
 });
 

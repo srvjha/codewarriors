@@ -42,7 +42,7 @@ const ProfilePage = () => {
       medProblems: 0,
       hardProblems: 0,
       solvedProblems: 0,
-    }
+    },
   );
 
   progressData.solvedProblems =
@@ -61,7 +61,7 @@ const ProfilePage = () => {
         setAllSubmissions(res.data.data);
 
         const data = res.data.data.filter(
-          (submission: Submission) => submission.status === "Accepted"
+          (submission: Submission) => submission.status === "Accepted",
         );
 
         const latestMap = new Map();
@@ -77,7 +77,7 @@ const ProfilePage = () => {
         }
         const uniqueLatestSubmissions = Array.from(latestMap.values()).sort(
           (a: any, b: any) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
 
         setSubmissions(uniqueLatestSubmissions.slice(0, 10));
@@ -145,13 +145,14 @@ const ProfilePage = () => {
               </div>
               <p className="mt-1 text-gray-400 text-sm">Days in a row</p>
 
-         
               <div className="flex gap-1 mt-4">
                 {[...Array(7)].map((_, i) => (
                   <div
                     key={i}
                     className={`w-4 h-4 rounded ${
-                      i < (userData?.dailyProblemStreak ?? 0) % 7 ? "bg-green-400" : "bg-neutral-700"
+                      i < (userData?.dailyProblemStreak ?? 0) % 7
+                        ? "bg-green-400"
+                        : "bg-neutral-700"
                     }`}
                   />
                 ))}

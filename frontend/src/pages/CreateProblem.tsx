@@ -100,7 +100,7 @@ const CreateProblemForm = () => {
         },
         {
           withCredentials: true,
-        }
+        },
       );
       if (response.status === 200) {
         ToastSuccess(response.data.message);
@@ -188,11 +188,10 @@ const CreateProblemForm = () => {
                 <CheckCircle2 className="w-5 h-5" /> Examples
               </h3>
               <Button
-               variant="secondary"
+                variant="secondary"
                 onClick={() =>
                   appendExample({ input: "", output: "", explanation: "" })
                 }
-               
               >
                 <Plus className="w-4 h-4" /> Add Examples
               </Button>
@@ -236,7 +235,6 @@ const CreateProblemForm = () => {
               <Button
                 variant="secondary"
                 onClick={() => appendTestCase({ input: "", output: "" })}
-                
               >
                 <Plus className="w-4 h-4" /> Add Test Case
               </Button>
@@ -317,7 +315,7 @@ const CreateProblemForm = () => {
                         onChange={(value) =>
                           setValue(
                             `languages.${lang}.referenceSolution`,
-                            value || ""
+                            value || "",
                           )
                         }
                       />
@@ -328,7 +326,7 @@ const CreateProblemForm = () => {
                   </div>
                 )}
               </div>
-            )
+            ),
           )}
 
           <div className="space-y-6">

@@ -44,7 +44,7 @@ const DiscussPage = () => {
   const { userData } = useSelector((state: RootState) => state.auth);
   const [originalPosts, setOriginalPosts] = useState<Post[]>([]);
   const [activeFilter, setActiveFilter] = useState<null | "mv" | "lt">(null);
-   const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const formatTime = (date: string) => {
     const postCreatedTime = new Date(date);
@@ -94,8 +94,8 @@ const DiscussPage = () => {
                     { userId: userData.id },
                   ],
                 }
-              : post
-          )
+              : post,
+          ),
         );
       } else {
         setPosts((prev) =>
@@ -105,16 +105,16 @@ const DiscussPage = () => {
                   ...post,
                   upvotes: post.upvotes - 1,
                   DiscussionUpvote: post.DiscussionUpvote.filter(
-                    (upvote) => upvote.userId !== userData?.id
+                    (upvote) => upvote.userId !== userData?.id,
                   ),
                 }
-              : post
-          )
+              : post,
+          ),
         );
       }
     } catch (error: any) {
       ToastError(error?.response?.data?.error || "Something went wrong");
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -157,7 +157,7 @@ const DiscussPage = () => {
           : [...originalPosts].sort(
               (a, b) =>
                 new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
+                new Date(a.createdAt).getTime(),
             );
       setPosts(sorted);
     }
@@ -179,18 +179,18 @@ const DiscussPage = () => {
   return (
     <>
       <Toast />
-       {loading && (
-              <div
-                style={{
-                  height: "100vh",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <ClipLoader size={50} color="#4F46E5" />
-              </div>
-            )}
+      {loading && (
+        <div
+          style={{
+            height: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ClipLoader size={50} color="#4F46E5" />
+        </div>
+      )}
       <AlertDialog open={deleteDialogOpen} onOpenChange={handleDialogClose}>
         <AlertDialogContent className="bg-neutral-900 border-none text-neutral-100">
           <AlertDialogHeader>

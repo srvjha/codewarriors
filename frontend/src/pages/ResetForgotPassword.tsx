@@ -27,7 +27,7 @@ const ResetForgotPassword = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useParams();
-    const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data: ResetForgotPasswordFormValues) => {
     // console.log("data: ",data)

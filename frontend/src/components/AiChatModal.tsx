@@ -36,7 +36,7 @@ const AiChatModal = ({
   interface HandleSendMessageEvent extends React.FormEvent<HTMLFormElement> {}
 
   const handleSendMessage = async (
-    e: HandleSendMessageEvent
+    e: HandleSendMessageEvent,
   ): Promise<void> => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -52,7 +52,7 @@ const AiChatModal = ({
         {
           context: context,
           message: input,
-        }
+        },
       );
       // console.log("response: ", response);
 

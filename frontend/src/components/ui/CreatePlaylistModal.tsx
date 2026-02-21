@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/Input";
-import { Textarea } from "@/components/ui/textarea"; 
+import { Textarea } from "@/components/ui/textarea";
 import { X, Plus, Edit } from "lucide-react";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 import API from "@/utils/AxiosInstance";
@@ -14,18 +14,19 @@ interface CreatePlaylistModalProps {
   isEditing?: boolean;
 }
 
-const CreatePlaylistModal = ({ 
-  onClose, 
-  defaultName = "", 
-  defaultDescription = "", 
+const CreatePlaylistModal = ({
+  onClose,
+  defaultName = "",
+  defaultDescription = "",
   defaultVisibility = "private",
   playlistId = null,
-  isEditing = false
+  isEditing = false,
 }: CreatePlaylistModalProps) => {
   const [name, setName] = useState(defaultName);
   const [description, setDescription] = useState(defaultDescription);
-  const [visibility, setVisibility] = useState<"public" | "private">(defaultVisibility);
-
+  const [visibility, setVisibility] = useState<"public" | "private">(
+    defaultVisibility,
+  );
 
   useEffect(() => {
     setName(defaultName);
@@ -38,7 +39,7 @@ const CreatePlaylistModal = ({
 
     try {
       let res;
-      
+
       if (isEditing && playlistId) {
         // Update existing playlist
         res = await API.put(
@@ -47,9 +48,9 @@ const CreatePlaylistModal = ({
             name,
             description,
             visibility: visibility === "public" ? true : false,
-            type: visibility === "public" ? "public" : "private"
+            type: visibility === "public" ? "public" : "private",
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
       } else {
         // Create new playlist
@@ -59,17 +60,17 @@ const CreatePlaylistModal = ({
             name,
             description,
             visibilty: visibility === "public" ? true : false,
-            type: visibility === "public" ? "public" : "private"
+            type: visibility === "public" ? "public" : "private",
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
       }
 
       if (res.data.success) {
         ToastSuccess(
-          isEditing 
-            ? "Playlist updated successfully!" 
-            : "Playlist created successfully!"
+          isEditing
+            ? "Playlist updated successfully!"
+            : "Playlist created successfully!",
         );
         setName("");
         setDescription("");
@@ -78,8 +79,8 @@ const CreatePlaylistModal = ({
       }
     } catch (err: any) {
       ToastError(
-        err.response?.data?.error || 
-        `Failed to ${isEditing ? 'update' : 'create'} playlist`
+        err.response?.data?.error ||
+          `Failed to ${isEditing ? "update" : "create"} playlist`,
       );
     }
   };

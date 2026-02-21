@@ -1,5 +1,5 @@
-import Lottie from 'react-lottie';
-import animationData from '../../../dashboard.json';
+import Lottie from "react-lottie";
+import animationData from "../../../dashboard.json";
 
 const FeatureDash = () => {
   const defaultOptions = {
@@ -7,7 +7,7 @@ const FeatureDash = () => {
     autoplay: true,
     animationData: animationData,
     rendererSettings: {
-      preserveAspectRatio: 'xMidYMid meet',
+      preserveAspectRatio: "xMidYMid meet",
     },
   };
 
@@ -15,8 +15,8 @@ const FeatureDash = () => {
     <div className="w-full overflow-hidden  ">
       <Lottie
         options={defaultOptions}
-        height={'100%'}
-        width={'100%'}
+        height={"100%"}
+        width={"100%"}
         isClickToPauseDisabled
       />
     </div>

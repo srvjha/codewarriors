@@ -29,7 +29,11 @@ import { Bar, Doughnut } from "react-chartjs-2";
 import API from "@/utils/AxiosInstance";
 import type { UserData } from "@/redux/slices/auth/authTypes";
 import { Link } from "react-router-dom";
-import { Tooltip as UITooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip as UITooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 ChartJS.register(
   CategoryScale,
@@ -40,7 +44,7 @@ ChartJS.register(
   Legend,
   ArcElement,
   LineElement,
-  PointElement
+  PointElement,
 );
 
 const Dashboard = () => {
@@ -117,7 +121,7 @@ const Dashboard = () => {
   const verifiedUsers = users.filter((user) => user.isEmailVerified).length;
   const unverifiedUsers = users.length - verifiedUsers;
   const activeUsers = users.filter(
-    (user) => user.dailyProblemStreak > 0
+    (user) => user.dailyProblemStreak > 0,
   ).length;
 
   const userVerificationData = {
@@ -165,13 +169,13 @@ const Dashboard = () => {
         data: [
           users.filter((u) => u.dailyProblemStreak === 0).length,
           users.filter(
-            (u) => u.dailyProblemStreak >= 1 && u.dailyProblemStreak <= 5
+            (u) => u.dailyProblemStreak >= 1 && u.dailyProblemStreak <= 5,
           ).length,
           users.filter(
-            (u) => u.dailyProblemStreak >= 6 && u.dailyProblemStreak <= 15
+            (u) => u.dailyProblemStreak >= 6 && u.dailyProblemStreak <= 15,
           ).length,
           users.filter(
-            (u) => u.dailyProblemStreak >= 16 && u.dailyProblemStreak <= 30
+            (u) => u.dailyProblemStreak >= 16 && u.dailyProblemStreak <= 30,
           ).length,
           users.filter((u) => u.dailyProblemStreak > 30).length,
         ],
