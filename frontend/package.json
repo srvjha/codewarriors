@@ -48,6 +48,7 @@
     "lucide-react": "^0.509.0",
     "marked": "^15.0.12",
     "monaco-editor": "^0.52.2",
+    "motion": "^12.34.3",
     "randomcolor": "^0.6.2",
     "react": "^19.2.3",
     "react-calendar-heatmap": "^1.10.0",

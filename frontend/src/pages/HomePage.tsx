@@ -12,15 +12,20 @@ import {
 import faqs from "../constants/faqs.json";
 import CoderDesc from "@/components/ui/CoderDesc";
 import Features from "@/components/ui/Features";
+import { Button as MovingBorderButton } from "@/components/ui/moving-border";
 
 const HomePage = () => {
   return (
     <div className="relative flex flex-col min-h-screen  text-white overflow-hidden">
       <div className="relative z-10   px-6 py-20 md:py-32 min-h-screen flex-row items-center justify-center">
         <div className=" flex justify-center items-center -mt-10">
-          <div className="w-full max-w-fit mx-auto px-4 sm:px-6 py-2 text-xs md:text-sm font-semibold rounded-full text-white bg-gradient-to-r from-neutral-600 via-neutral-800 to-neutral-900 shadow-md ring-1 ring-white/10 backdrop-blur-sm text-center">
-            ✨ Join CodeWarriors built for real-world problem solvers
-          </div>
+          <MovingBorderButton
+            borderRadius="1.75rem"
+            containerClassName="w-full h-10 max-w-fit"
+            className=" px-4 text-xs md:text-sm font-medium text-white bg-neutral-900"
+          >
+            CodeWarriors built for real-world problem solvers
+          </MovingBorderButton>
         </div>
         <div className="max-w-5xl mx-auto mt-5 flex flex-col items-center text-center gap-12">
           <motion.div
