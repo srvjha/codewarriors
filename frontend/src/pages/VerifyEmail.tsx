@@ -14,11 +14,10 @@ const VerifyEmail = () => {
   const [message, setMessage] = useState("Verifying...");
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const {userData}  = useSelector((state:RootState)=>state.auth)
+  const { userData } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
-    API
-      .get(`/auth/verify/email/${token}`)
+    API.get(`/auth/verify/email/${token}`)
       .then((res) => {
         // console.log(res);
         setMessage(`✅ ${res.data.message}`);
@@ -26,7 +25,7 @@ const VerifyEmail = () => {
         setIsLoading(false);
         setTimeout(() => navigate("/"), 3000);
       })
-      .catch((error:any) => {
+      .catch((error: any) => {
         setMessage(`❌ ${error.response.data.error} `);
         setIsSuccess(false);
         setIsLoading(false);
@@ -37,74 +36,79 @@ const VerifyEmail = () => {
     <div className="w-8 h-8 border-2 border-gray-600 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
   );
 
-  const handleRequestVerificationLink = async()=>{
+  const handleRequestVerificationLink = async () => {
     try {
-      const res = await API.post("/auth/resend/verify/email",{
-        email:userData?.email
-      },{withCredentials:true})
+      const res = await API.post(
+        "/auth/resend/verify/email",
+        {
+          email: userData?.email,
+        },
+        { withCredentials: true },
+      );
 
-      if(res.data.success){
-        ToastSuccess(res.data.message)
+      if (res.data.success) {
+        ToastSuccess(res.data.message);
       }
-    } catch (error:any) {
-      ToastError(error.response.data.error)
+    } catch (error: any) {
+      ToastError(error.response.data.error);
     }
-  }
+  };
 
   return (
     <>
-    <Toast/>
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
-      <Card className="w-full max-w-md bg-zinc-900 border border-neutral-800  shadow-xl shadow-neutral-800">
-        <CardHeader className="text-center pb-6 pt-8">
-          <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-700">
-            <Mail className="w-8 h-8 text-blue-400" />
-          </div>
-          <CardTitle className="text-xl font-semibold text-white ">
-            Email Verification
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent className="flex flex-col items-center gap-6 pb-8">
-          {isLoading && (
-            <div className="flex flex-col items-center gap-4">
-              <LoadingSpinner />
-              <p className="text-gray-400 text-sm">Verifying your email...</p>
+      <Toast />
+      <div className="min-h-screen bg-black flex items-center justify-center px-4">
+        <Card className="w-full max-w-md bg-zinc-900 border border-neutral-800  shadow-xl shadow-neutral-800">
+          <CardHeader className="text-center pb-6 pt-8">
+            <div className="w-16 h-16 bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-700">
+              <Mail className="w-8 h-8 text-blue-400" />
             </div>
-          )}
+            <CardTitle className="text-xl font-semibold text-white ">
+              Email Verification
+            </CardTitle>
+          </CardHeader>
 
-          {!isLoading && (
-            <>
-              
-              
-              <h3 className={`text-lg font-medium text-center ${
-                isSuccess ? "text-green-400" : "text-red-400"
-              }`}>
-                {message}
-              </h3>
+          <CardContent className="flex flex-col items-center gap-6 pb-8">
+            {isLoading && (
+              <div className="flex flex-col items-center gap-4">
+                <LoadingSpinner />
+                <p className="text-gray-400 text-sm">Verifying your email...</p>
+              </div>
+            )}
 
-              {isSuccess ? (
-                <p className="text-sm text-gray-400 text-center">
-                  Redirecting to home...
-                </p>
-              ) : (
-                <div className="flex gap-2">
-                <Button 
-                  onClick={() => navigate("/")}
-                  className=" text-white px-6 py-2 rounded-lg transition-colors duration-200"
+            {!isLoading && (
+              <>
+                <h3
+                  className={`text-lg font-medium text-center ${
+                    isSuccess ? "text-green-400" : "text-red-400"
+                  }`}
                 >
-                  Go to Home
-                </Button>
+                  {message}
+                </h3>
 
-                <Button onClick={handleRequestVerificationLink}>Request Verification Link</Button>
-               </div>
-                
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+                {isSuccess ? (
+                  <p className="text-sm text-gray-400 text-center">
+                    Redirecting to home...
+                  </p>
+                ) : (
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => navigate("/")}
+                      className=" text-white px-6 py-2 rounded-lg transition-colors duration-200"
+                    >
+                      Go to Home
+                    </Button>
+
+                    <Button onClick={handleRequestVerificationLink}>
+                      Request Verification Link
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </>
   );
 };

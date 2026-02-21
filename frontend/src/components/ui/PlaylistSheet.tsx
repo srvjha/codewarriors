@@ -28,19 +28,19 @@ const PlaylistSheet = ({
       if (res.data.success) {
         const playlistData = res.data.data;
         const favouriteSection = playlistData.filter(
-          (data: Playlist) => (data.name !== "Beginner's Foundation" 
-          && data.name !== "Intermediate Mastery"
-          && data.name !== "Advanced Conquest"
-          && data.name !== "Google Interview Questions"
-          && data.name !== "Amazon Interview Questions"
-          && data.name !== "Microsoft Interview Questions")
+          (data: Playlist) =>
+            data.name !== "Beginner's Foundation" &&
+            data.name !== "Intermediate Mastery" &&
+            data.name !== "Advanced Conquest" &&
+            data.name !== "Google Interview Questions" &&
+            data.name !== "Amazon Interview Questions" &&
+            data.name !== "Microsoft Interview Questions",
         );
         if (tab === "public") {
           setPlaylists(favouriteSection);
+        } else {
+          setPlaylists(playlistData);
         }
-       else{
-         setPlaylists(playlistData);
-       }
       }
     } catch (err) {
       ToastError("Failed to fetch playlists");
@@ -56,7 +56,7 @@ const PlaylistSheet = ({
       const res = await API.post(
         `/playlist/${playlistId}/problem/${problemId}/add`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       ToastSuccess(res.data.message);
       setTimeout(() => onClose(), 1500);
@@ -69,7 +69,7 @@ const PlaylistSheet = ({
     try {
       const res = await API.delete(
         `/playlist/${playlistId}/problem/${problemId}/remove`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       ToastSuccess(res.data.message);
       setTimeout(() => onClose(), 1500);
@@ -88,7 +88,7 @@ const PlaylistSheet = ({
           description,
           visibilty: visibility === "public" ? true : false,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       ToastSuccess(res.data.message);
       setPlaylists((prev) => [...prev, res.data.data]);
@@ -121,7 +121,7 @@ const PlaylistSheet = ({
                 "px-3 py-1 rounded-full text-sm font-medium",
                 tab === "public"
                   ? "bg-white text-black"
-                  : "bg-zinc-800 text-white"
+                  : "bg-zinc-800 text-white",
               )}
             >
               Public
@@ -132,7 +132,7 @@ const PlaylistSheet = ({
                 "px-3 py-1 rounded-full text-sm font-medium",
                 tab === "private"
                   ? "bg-white text-black"
-                  : "bg-zinc-800 text-white"
+                  : "bg-zinc-800 text-white",
               )}
             >
               Private

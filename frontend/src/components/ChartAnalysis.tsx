@@ -1,5 +1,12 @@
 import { Bar } from "react-chartjs-2";
-import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
 import type { Submission } from "@/types/submit/SubmissionTypes";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
@@ -17,7 +24,6 @@ const ChartAnalysis = ({ submissions }: Props) => {
     });
   });
 
-
   const labels = Object.keys(tagCountMap);
   const dataCounts = Object.values(tagCountMap);
 
@@ -27,7 +33,15 @@ const ChartAnalysis = ({ submissions }: Props) => {
       {
         label: "Tag Frequency",
         data: dataCounts,
-        backgroundColor: ["#00bfa6", "#f9a825", "#c62828", "#2196f3", "#9c27b0", "#ff9800", "#607d8b"],
+        backgroundColor: [
+          "#00bfa6",
+          "#f9a825",
+          "#c62828",
+          "#2196f3",
+          "#9c27b0",
+          "#ff9800",
+          "#607d8b",
+        ],
         borderRadius: 8,
       },
     ],
@@ -39,7 +53,8 @@ const ChartAnalysis = ({ submissions }: Props) => {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: (context: any) => `${context.label}: ${context.parsed.y} submission(s)`,
+          label: (context: any) =>
+            `${context.label}: ${context.parsed.y} submission(s)`,
         },
       },
     },
@@ -57,11 +72,10 @@ const ChartAnalysis = ({ submissions }: Props) => {
   };
 
   return (
- <div className="bg-transparent border border-neutral-800 rounded-xl px-6 py-8 drop-shadow-lg lg:col-span-1 sm:col-span-1 col-span-1">
-  <h2 className="text-xl font-semibold mb-4 text-white">Skill Analysis</h2>
-  <Bar data={chartData} options={options} />
-</div>
-
+    <div className="bg-transparent border border-neutral-800 rounded-xl px-6 py-8 drop-shadow-lg lg:col-span-1 sm:col-span-1 col-span-1">
+      <h2 className="text-xl font-semibold mb-4 text-white">Skill Analysis</h2>
+      <Bar data={chartData} options={options} />
+    </div>
   );
 };
 

@@ -9,13 +9,13 @@ import API from "@/utils/AxiosInstance";
 import { Link, useParams } from "react-router-dom";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
-import { ResetPasswordSchema, type ResetPasswordFormValues } from "@/utils/ZodResolver";
-
-
+import {
+  ResetPasswordSchema,
+  type ResetPasswordFormValues,
+} from "@/utils/ZodResolver";
 
 const ResetPasswordPage = () => {
-
-    const {token} = useParams()
+  const { token } = useParams();
   const {
     register,
     handleSubmit,
@@ -34,7 +34,7 @@ const ResetPasswordPage = () => {
       if (res.data.success) {
         ToastSuccess(res.data.message);
       }
-      reset()
+      reset();
     } catch (err: any) {
       ToastError(err?.response?.data?.error || "Failed to send reset link");
     } finally {

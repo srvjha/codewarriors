@@ -6,9 +6,9 @@ import { ClipLoader } from "react-spinners";
 
 export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { isAuthenticated, isLoading, hasFetchedUser } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
- const location = useLocation()
+  const location = useLocation();
   if (!hasFetchedUser || isLoading) {
     return (
       <div
@@ -24,6 +24,9 @@ export const PrivateRoute = ({ children }: { children: JSX.Element }) => {
     );
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" state={{ from: location }} replace />;
+  return isAuthenticated ? (
+    children
+  ) : (
+    <Navigate to="/login" state={{ from: location }} replace />
+  );
 };
-

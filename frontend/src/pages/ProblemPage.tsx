@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams , useNavigate} from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import {
   BookOpen,
   ChevronDown,
@@ -64,11 +64,12 @@ import AiChatModal from "@/components/AiChatModal";
 import ComplexityModal from "@/components/ComplexityModal";
 import ViewCode from "@/components/ui/ViewCode";
 import { Toast, ToastError } from "@/utils/ToastContainers";
+import { getLogo } from "@/utils/CompanyLogos";
 const ProblemPage = () => {
   const params = useParams();
-  const location =  useLocation();
-  console.log({location});
-  const { problemId,contestId } = params;
+  const location = useLocation();
+  console.log({ location });
+  const { problemId, contestId } = params;
   const [problem, setProblem] = useState<Problem | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedLang, setSelectedLang] = useState<
@@ -92,7 +93,7 @@ const ProblemPage = () => {
   const [viewCode, setViewCode] = useState("");
   const [aiChatOpen, setAiChatOpen] = useState(false);
   const [complexity, setShowComplexity] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -148,22 +149,21 @@ const ProblemPage = () => {
 
   const selectedExample = problem.examples;
 
-   const fetchContest = async () => {
-        try {
-          const res = await API.get(`/contests/${contestId}`);
-          if (!res.data.success) {
-            throw new Error("Failed to fetch contest details");
-           
-          }
-         return res.data.data;
-        } catch (err:any) {
-          if (err.response && err.response.status === 404) {
-            ToastError("Contest not found");
-          } else {
-            ToastError("Failed to fetch contest details");
-          }
-        }
-      };
+  const fetchContest = async () => {
+    try {
+      const res = await API.get(`/contests/${contestId}`);
+      if (!res.data.success) {
+        throw new Error("Failed to fetch contest details");
+      }
+      return res.data.data;
+    } catch (err: any) {
+      if (err.response && err.response.status === 404) {
+        ToastError("Contest not found");
+      } else {
+        ToastError("Failed to fetch contest details");
+      }
+    }
+  };
 
   const handleSubmitCode = async () => {
     setIsSubmitting(true);
@@ -182,47 +182,53 @@ const ProblemPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (res.data.success) {
         // console.log("Execution result:", res.data.data);
-        if(location.pathname.includes("contest")) {
+        if (location.pathname.includes("contest")) {
           const contests = await fetchContest();
-          const score = contests.problems.reduce((acc:number,problem:any)=>{
-            return problem.problemId===problemId?acc+problem.points:acc;
-           },0)
-         const scoreUpdate =  await API.post(`/contests/add/score`,{
+          const score = contests.problems.reduce(
+            (acc: number, problem: any) => {
+              return problem.problemId === problemId
+                ? acc + problem.points
+                : acc;
+            },
+            0,
+          );
+          const scoreUpdate = await API.post(`/contests/add/score`, {
             contestId,
-           // score: contests.problems.map((problem:any)=>problem.problemId===problemId?problem.points:0),
-           score
-          })
-          
-          if(!scoreUpdate.data.success) {
+            // score: contests.problems.map((problem:any)=>problem.problemId===problemId?problem.points:0),
+            score,
+          });
+
+          if (!scoreUpdate.data.success) {
             throw new Error(scoreUpdate.data.error || "Failed to update score");
           }
           // now will create a contest submission
-          const contestSubmission = await API.post(`/contests/submission`,{
+          const contestSubmission = await API.post(`/contests/submission`, {
             contestId,
             userId: userData?.id,
             problemId,
-            submissionId:res.data.data.id,
-            score
+            submissionId: res.data.data.id,
+            score,
           });
-          if(!contestSubmission.data.success) {
-            throw new Error(contestSubmission.data.error || "Failed to create contest submission");
+          if (!contestSubmission.data.success) {
+            throw new Error(
+              contestSubmission.data.error ||
+                "Failed to create contest submission",
+            );
           }
-          setTimeout(()=>navigate(`/contest/${contestId}`),2000)
-          
+          setTimeout(() => navigate(`/contest/${contestId}`), 2000);
         }
         setResults(res.data.data);
         setActiveTab("submit");
-        
       }
     } catch (error: any) {
-      console.log({error})
+      console.log({ error });
       ToastError(
-        error.response.data.error || "An error occurred during execution"
+        error.response.data.error || "An error occurred during execution",
       );
       console.error("Error executing code:", error);
 
@@ -253,7 +259,7 @@ const ProblemPage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (res.data.success) {
@@ -262,7 +268,7 @@ const ProblemPage = () => {
       }
     } catch (error: any) {
       ToastError(
-        error.response.data.error || "An error occurred during execution"
+        error.response.data.error || "An error occurred during execution",
       );
       console.error("Error executing code:", error);
       setResults({
@@ -288,7 +294,7 @@ const ProblemPage = () => {
       if (res.data.success) {
         const resData = res.data.data.sort(
           (a: { createdAt: string }, b: { createdAt: string }) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
         setSubmissions(resData);
       }
@@ -309,7 +315,7 @@ const ProblemPage = () => {
             key={idx}
           >
             <img
-              src={`https://logo.clearbit.com/${company.toLowerCase()}.com`}
+              src={getLogo(company.toLowerCase())}
               alt="companylogo"
               className="w-4 h-4 rounded-lg"
             />
@@ -686,7 +692,7 @@ const ProblemPage = () => {
                                 {(() => {
                                   const memStr = String(sub.memory);
                                   const memNum = parseFloat(
-                                    memStr.replace(/[^0-9.]/g, "")
+                                    memStr.replace(/[^0-9.]/g, ""),
                                   );
                                   return !isNaN(memNum)
                                     ? (memNum / 1000).toFixed(2) + " MB"
@@ -703,7 +709,7 @@ const ProblemPage = () => {
                                 <Eye size={18} />
                               </td>
                             </tr>
-                          )
+                          ),
                         )}
                       </tbody>
                     </table>
@@ -854,7 +860,7 @@ const ProblemPage = () => {
                         key={lang}
                         onSelect={() =>
                           setSelectedLang(
-                            lang as "JAVASCRIPT" | "PYTHON" | "JAVA" | "CPP"
+                            lang as "JAVASCRIPT" | "PYTHON" | "JAVA" | "CPP",
                           )
                         }
                         className="cursor-pointer hover:bg-[#555] px-2 py-1 rounded"
@@ -1019,7 +1025,7 @@ const ProblemPage = () => {
                                   .map(
                                     (
                                       result: TestCaseResultType,
-                                      index: number
+                                      index: number,
                                     ) => (
                                       <tr
                                         key={index}
@@ -1054,7 +1060,7 @@ const ProblemPage = () => {
                                           {result.memory}
                                         </td>
                                       </tr>
-                                    )
+                                    ),
                                   )}
                               </tbody>
                             </table>

@@ -9,9 +9,10 @@ import API from "@/utils/AxiosInstance";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/button";
-import { ForgotPasswordSchema, type ForgotPasswordFormValues } from "@/utils/ZodResolver";
-
-
+import {
+  ForgotPasswordSchema,
+  type ForgotPasswordFormValues,
+} from "@/utils/ZodResolver";
 
 const ForgotPasswordPage = () => {
   const {
@@ -32,7 +33,7 @@ const ForgotPasswordPage = () => {
       if (res.data.success) {
         ToastSuccess(res.data.message);
       }
-      reset()
+      reset();
     } catch (err: any) {
       ToastError(err?.response?.data?.error || "Failed to send reset link");
     } finally {
@@ -71,7 +72,11 @@ const ForgotPasswordPage = () => {
               className="w-full text-base bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 text-white py-3 rounded-lg font-medium transition"
               disabled={isLoading}
             >
-              {isLoading ? <BeatLoader color="white" size={10} /> : "Send Reset Link"}
+              {isLoading ? (
+                <BeatLoader color="white" size={10} />
+              ) : (
+                "Send Reset Link"
+              )}
             </Button>
           </form>
 

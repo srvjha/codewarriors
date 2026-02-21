@@ -2,7 +2,7 @@ type Timer = ReturnType<typeof setTimeout> | undefined;
 
 export const debounce = <T extends (...args: any[]) => any>(
   cb: T,
-  delay: number
+  delay: number,
 ) => {
   let timerId: Timer;
   return function (this: ThisParameterType<T>, ...args: Parameters<T>) {

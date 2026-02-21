@@ -8,7 +8,11 @@ interface MyEditorProps {
   onCodeChange?: (code: string) => void;
 }
 
-const MyEditor: React.FC<MyEditorProps> = ({ codeSnippet,language,onCodeChange }) => {
+const MyEditor: React.FC<MyEditorProps> = ({
+  codeSnippet,
+  language,
+  onCodeChange,
+}) => {
   const [code, setCode] = useState(codeSnippet);
   const [selectedLanguage, setSelectedLanguage] = useState(language);
 
@@ -37,18 +41,18 @@ const MyEditor: React.FC<MyEditorProps> = ({ codeSnippet,language,onCodeChange }
     });
   };
 
-  const handleEditorChange = (value?:string) => {
+  const handleEditorChange = (value?: string) => {
     const updatedValue = value || "";
     setCode(updatedValue);
-    if(onCodeChange){
+    if (onCodeChange) {
       onCodeChange(updatedValue);
     }
-  }
+  };
 
   return (
     <Editor
       height="100%"
-      language={selectedLanguage.toLowerCase()} 
+      language={selectedLanguage.toLowerCase()}
       value={code}
       onChange={handleEditorChange}
       theme="chaicode"

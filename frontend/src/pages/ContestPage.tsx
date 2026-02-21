@@ -40,10 +40,8 @@ export default function ContestListPage() {
   };
 
   useEffect(() => {
-
     fetchContests();
     fetchServerTime();
-
   }, []);
 
   const statusColors = {

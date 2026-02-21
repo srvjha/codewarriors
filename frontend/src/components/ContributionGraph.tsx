@@ -2,23 +2,20 @@ import CalendarHeatmap from "react-calendar-heatmap";
 import "react-calendar-heatmap/dist/styles.css";
 import { Tooltip as ReactTooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
-import type {
-  Submission
-} from "@/types/submit/SubmissionTypes";
-
+import type { Submission } from "@/types/submit/SubmissionTypes";
 
 type SubmissionProps = {
-  submissions:Submission[]
-}
+  submissions: Submission[];
+};
 
-const ContributionCalendar = ({ submissions }:SubmissionProps) => {
+const ContributionCalendar = ({ submissions }: SubmissionProps) => {
   const dateMap = submissions.reduce(
     (acc: { [key: string]: number }, submission: Submission) => {
       const date = new Date(submission?.createdAt).toLocaleDateString();
       acc[date] = (acc[date] || 0) + 1;
       return acc;
     },
-    {}
+    {},
   );
 
   const heatmapData = Object.entries(dateMap).map(([date, count]) => ({
@@ -28,7 +25,7 @@ const ContributionCalendar = ({ submissions }:SubmissionProps) => {
 
   const endDate = new Date();
   const rawStartDate = new Date(
-    new Date().setFullYear(endDate.getFullYear() - 1)
+    new Date().setFullYear(endDate.getFullYear() - 1),
   );
   const startDate = new Date(rawStartDate);
   startDate.setDate(startDate.getDate() + ((6 - startDate.getDay()) % 7));

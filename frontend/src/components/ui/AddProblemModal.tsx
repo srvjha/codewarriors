@@ -67,11 +67,11 @@ const AddProblemsModal: React.FC<AddProblemsModalProps> = ({
       (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value.toLowerCase();
         const filtered = problems.filter((problem) =>
-          problem.title.toLowerCase().includes(query)
+          problem.title.toLowerCase().includes(query),
         );
         setFilteredProblems(filtered);
       },
-      1000
+      1000,
     );
   }, [problems]);
 
@@ -80,7 +80,7 @@ const AddProblemsModal: React.FC<AddProblemsModalProps> = ({
       const res = await API.post(
         `/playlist/${playlistId}/problem/${problemId}/add`,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       // console.log("res: ", res);
       if (res.status) {
@@ -109,7 +109,7 @@ const AddProblemsModal: React.FC<AddProblemsModalProps> = ({
     try {
       const res = await API.delete(
         `/playlist/${playlistId}/problem/${problemId}/remove`,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       if (res.status) {
         setPlaylistProblems((prev) =>
@@ -117,10 +117,10 @@ const AddProblemsModal: React.FC<AddProblemsModalProps> = ({
             ? {
                 ...prev,
                 problems: prev.problems.filter(
-                  (p) => p.problem.id !== problemId
+                  (p) => p.problem.id !== problemId,
                 ),
               }
-            : prev
+            : prev,
         );
         ToastSuccess("Problem removed from playlist");
       }

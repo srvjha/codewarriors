@@ -11,13 +11,12 @@ import { useSelector } from "react-redux";
 import { marked } from "marked";
 import API from "@/utils/AxiosInstance";
 import { useNavigate, useParams } from "react-router-dom";
-import TurndownService from 'turndown';
+import TurndownService from "turndown";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 
 const DiscussUpdatePage = () => {
   const { userData } = useSelector((state: RootState) => state.auth);
-  const {postid} = useParams()
+  const { postid } = useParams();
   const {
     register,
     reset,
@@ -29,16 +28,15 @@ const DiscussUpdatePage = () => {
   const navigate = useNavigate();
   const turndownService = new TurndownService();
 
-  useEffect(()=>{
-    const getPost = async()=>{
-        const res = await API.get(`/discuss/post/${postid}`);
-        // console.log("Res: ",res)
-        setValue("title", res.data.data.title);
-        setContent(turndownService.turndown(res.data.data.description));
-        }
-        getPost();
-    
-  },[])
+  useEffect(() => {
+    const getPost = async () => {
+      const res = await API.get(`/discuss/post/${postid}`);
+      // console.log("Res: ",res)
+      setValue("title", res.data.data.title);
+      setContent(turndownService.turndown(res.data.data.description));
+    };
+    getPost();
+  }, []);
 
   const handleContentChange = (value?: string) => {
     setContent(value || "");
@@ -60,20 +58,19 @@ const DiscussUpdatePage = () => {
     try {
       const res = await API.post(
         `/discuss/update/post/${postid}`,
-        { title:payload.title,description:payload.contentHtml},
-        { withCredentials: true }
+        { title: payload.title, description: payload.contentHtml },
+        { withCredentials: true },
       );
       // console.log("Res:  ",res)
       if (res.data.success) {
         // console.log("post: ",res.data)
         ToastSuccess(res.data.message);
-        reset()
-        handleContentChange("")
-       setTimeout(()=> navigate("/discuss"),2000)
+        reset();
+        handleContentChange("");
+        setTimeout(() => navigate("/discuss"), 2000);
       }
-    } catch (error:any) {
-       ToastError(error?.response.data.error)
-       
+    } catch (error: any) {
+      ToastError(error?.response.data.error);
     }
   };
   // console.log("content: ",content)
@@ -106,10 +103,15 @@ const DiscussUpdatePage = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <Button  className="text-sm px-4 py-2 bg-neutral-800 hover:bg-neutral-700 cursor-pointer" onClick={()=>navigate("/discuss")}>
+              <Button
+                className="text-sm px-4 py-2 bg-neutral-800 hover:bg-neutral-700 cursor-pointer"
+                onClick={() => navigate("/discuss")}
+              >
                 Cancel
               </Button>
-              <Button className="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 cursor-pointer">Update</Button>
+              <Button className="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 cursor-pointer">
+                Update
+              </Button>
             </div>
           </div>
 

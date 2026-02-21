@@ -3,10 +3,7 @@ import { X, Eye, EyeOff } from "lucide-react";
 import { Input } from "./Input";
 import { Button } from "./button";
 import { useForm } from "react-hook-form";
-import {
-  PasswordSchema,
-  type PasswordFormValues,
-} from "@/utils/ZodResolver";
+import { PasswordSchema, type PasswordFormValues } from "@/utils/ZodResolver";
 import { BeatLoader } from "react-spinners";
 import { useState } from "react";
 import API from "@/utils/AxiosInstance";
@@ -45,7 +42,7 @@ const PasswordChangeModal = ({ onClose }: { onClose: () => void }) => {
       const res = await API.post(
         "auth/password/change",
         { oldPassword, newPassword },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (res.data.success) {
@@ -134,7 +131,11 @@ const PasswordChangeModal = ({ onClose }: { onClose: () => void }) => {
                 className="absolute top-2.5 right-3 text-zinc-400 hover:text-white"
                 onClick={() => toggleVisibility("confirm")}
               >
-                {showPassword.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword.confirm ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
               </button>
               {errors.confirmNewPassword && (
                 <p className="text-red-500 text-sm mt-1">

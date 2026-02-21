@@ -39,7 +39,7 @@ const ProgressChart = ({ progressData }: P) => {
       totalMedProblems: 0,
       totalHardProblems: 0,
       totalProblems: 0,
-    }
+    },
   );
 
   problemsData.totalProblems =

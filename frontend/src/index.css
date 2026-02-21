@@ -1,8 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
-
 
 body {
   background: linear-gradient(to bottom right, #000000, #18181b);
@@ -149,7 +148,6 @@ body {
   /* IE 10+ */
 }
 
-
 @keyframes float {
   0% {
     transform: translateY(0px) scale(1);
@@ -166,7 +164,6 @@ body {
     opacity: 0.08;
   }
 }
-
 
 .react-calendar-heatmap .color-scale-1 {
   fill: #d6e685;
@@ -200,7 +197,6 @@ body {
   font-size: 10px !important;
 }
 
-
 .glow-grid-bg {
   position: absolute;
   inset: 0;
@@ -210,7 +206,6 @@ body {
     linear-gradient(to bottom, rgba(60, 88, 131, 0.08) 1px, transparent 2px);
   background-size: 60px 60px;
 }
-
 
 @keyframes matrix-fall {
   to {
@@ -239,7 +234,6 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-
 /* Hide scrollbar for Chrome, Safari and Opera */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
@@ -251,9 +245,7 @@ body {
   /* IE and Edge */
   scrollbar-width: none;
   /* Firefox */
-
 }
-
 
 /* Override uiw editor dark theme to match Tailwind's neutral-900 */
 .w-md-editor {
@@ -270,7 +262,6 @@ body {
 
 .w-md-editor-content {
   background-color: #171717 !important;
-
 }
 
 .w-md-editor-content .w-md-editor-input {
@@ -281,9 +272,6 @@ body {
 .wmde-markdown {
   background-color: transparent !important;
 }
-
-
-
 
 .w-md-editor-preview {
   background-color: #171717 !important;

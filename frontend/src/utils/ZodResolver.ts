@@ -1,4 +1,3 @@
-
 import type { CreateProblemFormValues } from "@/types/createProblem/createProblemTypes";
 import { z } from "zod";
 import type { Resolver } from "react-hook-form";
@@ -20,7 +19,6 @@ export const LoginSchema = z.object({
 
 export type LoginFormValues = z.infer<typeof LoginSchema>;
 
-
 export const PasswordSchema = z.object({
   oldPassword: z.string().nonempty("Old Password is required."),
   newPassword: z.string().nonempty("New Password is required."),
@@ -32,13 +30,13 @@ export type PasswordFormValues = z.infer<typeof PasswordSchema>;
 export const DiscussSchema = z.object({
   title: z.string().nonempty("Title is required."),
   content: z.string().nonempty("Content is required."),
-   topics: z.array(z.string()).optional(),
+  topics: z.array(z.string()).optional(),
 });
 
 export type DiscussFormValues = z.infer<typeof DiscussSchema>;
 
 export const CreateProblemSchema: Resolver<CreateProblemFormValues> = async (
-  values
+  values,
 ) => {
   const errors: Record<string, any> = {};
 
@@ -104,7 +102,6 @@ export const CreateProblemSchema: Resolver<CreateProblemFormValues> = async (
   };
 };
 
-
 export const ForgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email"),
 });
@@ -115,12 +112,12 @@ export const ResetForgotPasswordSchema = z.object({
   password: z.string().nonempty("Password is required"),
 });
 
-export type ResetForgotPasswordFormValues = z.infer<typeof ResetForgotPasswordSchema>;
-
+export type ResetForgotPasswordFormValues = z.infer<
+  typeof ResetForgotPasswordSchema
+>;
 
 export const ResetPasswordSchema = z.object({
   password: z.string().nonempty("Password Required!"),
 });
 
 export type ResetPasswordFormValues = z.infer<typeof ResetPasswordSchema>;
-

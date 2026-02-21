@@ -19,7 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 export const Header = ({ children }: React.PropsWithChildren) => {
   const dispatch = useDispatch<AppDispatch>();
   const { userData, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth
+    (state: RootState) => state.auth,
   );
 
   if (!userData && isAuthenticated) {
@@ -42,13 +42,15 @@ export const Header = ({ children }: React.PropsWithChildren) => {
       ToastSuccess(result);
     } catch (error: any) {
       ToastError(
-        error || error?.response?.data?.message || "Something went wrong"
+        error || error?.response?.data?.message || "Something went wrong",
       );
     }
   };
   return (
     <>
-     <nav className="text-white flex flex-row justify-between px-4 md:px-8 py-4 h-14 border-b border-neutral-800 sticky top-0 z-50 backdrop-blur-md bg-black/70">  <div className="flex flex-row gap-5 items-center">
+      <nav className="text-white flex flex-row justify-between px-4 md:px-8 py-4 h-14 border-b border-neutral-800 sticky top-0 z-50 backdrop-blur-md bg-black/70">
+        {" "}
+        <div className="flex flex-row gap-5 items-center">
           <Link to="/">
             <svg
               width="200"
@@ -104,11 +106,17 @@ export const Header = ({ children }: React.PropsWithChildren) => {
               Discuss
             </Link>
 
-            <Link to="/my-list" className="hover:text-blue-400 transition-colors">
+            <Link
+              to="/my-list"
+              className="hover:text-blue-400 transition-colors"
+            >
               Sheets
             </Link>
 
-            <Link to="/contest" className="hover:text-blue-400 transition-colors">
+            <Link
+              to="/contest"
+              className="hover:text-blue-400 transition-colors"
+            >
               Contests
             </Link>
 
@@ -121,36 +129,35 @@ export const Header = ({ children }: React.PropsWithChildren) => {
           </div>
         </div>
         {children && <div className="mr-36 -mt-2">{children}</div>}
-
-        <div  className="flex flex-row items-center gap-5 mr-3">
-           <Link to="/profile" className="flex flex-row items-center gap-5">
-          {userData && userData?.dailyProblemStreak > 0 ? (
-            <div className="flex gap-1">
-              <TbFlameFilled
-                className="text-blue-400 mt-1"
-                size={18}
-                data-tip="daily streak"
-              />
-              <span>{userData?.dailyProblemStreak}</span>
-            </div>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex gap-1 items-center">
-                  <TbFlame className="text-white mt-1" size={18} />
-                  <span>{userData?.dailyProblemStreak}</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="bg-neutral-800 px-2.5 text-sm  py-2 mt-1 text-white leading-tight whitespace-nowrap">
-                Solve one problem daily to refresh the streak
-              </TooltipContent>
-            </Tooltip>
-          )}
+        <div className="flex flex-row items-center gap-5 mr-3">
+          <Link to="/profile" className="flex flex-row items-center gap-5">
+            {userData && userData?.dailyProblemStreak > 0 ? (
+              <div className="flex gap-1">
+                <TbFlameFilled
+                  className="text-blue-400 mt-1"
+                  size={18}
+                  data-tip="daily streak"
+                />
+                <span>{userData?.dailyProblemStreak}</span>
+              </div>
+            ) : (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex gap-1 items-center">
+                    <TbFlame className="text-white mt-1" size={18} />
+                    <span>{userData?.dailyProblemStreak}</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="bg-neutral-800 px-2.5 text-sm  py-2 mt-1 text-white leading-tight whitespace-nowrap">
+                  Solve one problem daily to refresh the streak
+                </TooltipContent>
+              </Tooltip>
+            )}
           </Link>
 
-            <Link to="/about" className="hover:text-blue-400 transition-colors">
-              About
-            </Link>
+          <Link to="/about" className="hover:text-blue-400 transition-colors">
+            About
+          </Link>
 
           {userData?.role === "ADMIN" && (
             <Link

@@ -1,5 +1,5 @@
-import Lottie from 'react-lottie';
-import animationData from '../../../coder.json';
+import Lottie from "react-lottie";
+import animationData from "../../../coder.json";
 
 const CoderDesc = () => {
   const defaultOptions = {
@@ -7,7 +7,7 @@ const CoderDesc = () => {
     autoplay: true,
     animationData: animationData,
     rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
+      preserveAspectRatio: "xMidYMid slice",
     },
   };
 

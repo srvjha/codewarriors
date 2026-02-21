@@ -44,7 +44,7 @@ export type PostComment = {
       avatar: string;
     };
   }[];
-   DiscussionUpvote: {
+  DiscussionUpvote: {
     userId: string;
   }[];
 };
@@ -65,7 +65,7 @@ export type Comment = {
     fullName: string;
     avatar: string;
   };
-  CommentUpvote:{
-    userId:string;
-  }[]
+  CommentUpvote: {
+    userId: string;
+  }[];
 };

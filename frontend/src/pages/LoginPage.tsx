@@ -71,7 +71,7 @@ const LoginPage = () => {
       }, 3000);
     } catch (error: any) {
       ToastError(
-        error || error?.response?.data?.message || "Something went wrong"
+        error || error?.response?.data?.message || "Something went wrong",
       );
     } finally {
       setIsLoading(false);
@@ -241,7 +241,6 @@ const LoginPage = () => {
                 </form>
               </CardContent>
 
-              
               <div className="flex items-center justify-center my-4">
                 <div className="flex-grow h-px bg-gray-600"></div>
                 <span className="px-4 text-sm text-gray-400">OR</span>
@@ -250,14 +249,14 @@ const LoginPage = () => {
 
               <div className="w-full flex justify-center mt-4">
                 <GoogleLogin
-                theme="filled_blue"
+                  theme="filled_blue"
                   onSuccess={async (credentialResponse) => {
                     try {
                       if (credentialResponse.credential) {
                         const res = await dispatch(
                           googleAuthLoginUser({
                             credential: credentialResponse.credential,
-                          })
+                          }),
                         ).unwrap();
                         ToastSuccess(res.message);
 
