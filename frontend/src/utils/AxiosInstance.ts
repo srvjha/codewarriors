@@ -1,8 +1,10 @@
 import axios from "axios";
-let serverURL = import.meta.env.VITE_DEV_ENV;
+import env from "../config/env";
+
+let serverURL = env.VITE_DEV_ENV;
 
 if (import.meta.env.PROD) {
-  serverURL = import.meta.env.VITE_PROD_ENV;
+  serverURL = env.VITE_PROD_ENV;
 }
 
 const API = axios.create({
@@ -54,7 +56,7 @@ API.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default API;

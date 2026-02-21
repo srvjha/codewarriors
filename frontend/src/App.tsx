@@ -29,16 +29,17 @@ import SheetPage from "./pages/SheetPage";
 import ContestPage from "./pages/ContestPage";
 import ContestDetailPage from "./pages/ContestDetailPage";
 
+const excludedPaths = ["/login", "/register"];
+
 const App = () => {
   const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
-  const excludedPaths = ["/login", "/register"];
 
   useEffect(() => {
     if (!excludedPaths.includes(location.pathname)) {
       dispatch(fetchCurrentUser());
     }
-  }, [location.pathname]);
+  }, [location.pathname, dispatch]);
 
   return (
     <Routes>
@@ -106,14 +107,7 @@ const App = () => {
           }
         />
 
-        <Route
-          path="/my-list"
-          element={
-            
-              <PlaylistPage />
-          
-          }
-        />
+        <Route path="/my-list" element={<PlaylistPage />} />
 
         <Route
           path="/create/problem"

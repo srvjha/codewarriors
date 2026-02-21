@@ -37,6 +37,7 @@ import PlaylistSheet from "@/components/ui/PlaylistSheet";
 import type { Problem } from "@/types/problem/problemTypes";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ClipLoader } from "react-spinners";
+import { getLogo } from "@/utils/CompanyLogos";
 
 const problemsPerPage = 10;
 
@@ -105,13 +106,13 @@ const ProblemsetPage = () => {
   }, []);
 
   const uniqueCompanies = Array.from(
-    new Set(tags.flatMap((tag) => tag.companies))
+    new Set(tags.flatMap((tag) => tag.companies)),
   );
 
   const fetchMoreData = () => {
     const next = filteredProblems.slice(
       visibleProblems.length,
-      visibleProblems.length + problemsPerPage
+      visibleProblems.length + problemsPerPage,
     );
 
     setVisibleProblems((prev) => [...prev, ...next]);
@@ -136,13 +137,13 @@ const ProblemsetPage = () => {
       (event: React.ChangeEvent<HTMLInputElement>) => {
         const query = event.target.value.toLowerCase();
         const filtered = allProblems.filter((problem) =>
-          problem.title.toLowerCase().includes(query)
+          problem.title.toLowerCase().includes(query),
         );
         setFilteredProblems(filtered);
         setVisibleProblems(filtered.slice(0, problemsPerPage));
         setHasMore(filtered.length > problemsPerPage);
       },
-      1000
+      1000,
     );
   }, [allProblems]);
 
@@ -168,7 +169,7 @@ const ProblemsetPage = () => {
       sortedProblems.sort(
         (a, b) =>
           reordered.indexOf(a.difficulty.toUpperCase()) -
-          reordered.indexOf(b.difficulty.toUpperCase())
+          reordered.indexOf(b.difficulty.toUpperCase()),
       );
 
       setActive(false);
@@ -186,7 +187,7 @@ const ProblemsetPage = () => {
     let tagBasedData = allProblems;
     if (tag !== "All Topics") {
       tagBasedData = allProblems.filter((problem) =>
-        problem.tags.includes(tag)
+        problem.tags.includes(tag),
       );
     }
 
@@ -216,24 +217,24 @@ const ProblemsetPage = () => {
 
     if (filter.companyTags.length > 0) {
       const getProblemName = tags.filter((tag) =>
-        filter.companyTags.some((company) => tag.companies.includes(company))
+        filter.companyTags.some((company) => tag.companies.includes(company)),
       );
       // console.log({ getProblemName });
       filtered = filtered.filter((problem) =>
-        getProblemName.some((tag) => problem.title.includes(tag.problem))
+        getProblemName.some((tag) => problem.title.includes(tag.problem)),
       );
     }
 
     if (filter.execType.length > 0) {
       filtered = filtered.filter((problem) =>
-        filter.execType.includes(problem.isSolved ? "Solved" : "Unsolved")
+        filter.execType.includes(problem.isSolved ? "Solved" : "Unsolved"),
       );
     }
 
     if (filter.difficulty.length > 0) {
-      let levels = filter.difficulty.map((level) => level.toLowerCase());
+      const levels = filter.difficulty.map((level) => level.toLowerCase());
       filtered = filtered.filter((problem) =>
-        levels.includes(problem.difficulty.toLowerCase())
+        levels.includes(problem.difficulty.toLowerCase()),
       );
     }
 
@@ -268,7 +269,7 @@ const ProblemsetPage = () => {
                   className="text-[17px] text-zinc-300 flex items-center gap-1"
                 >
                   <img
-                    src={`https://logo.clearbit.com/${company.toLowerCase()}.com`}
+                    src={getLogo(company)}
                     className="w-4 h-4 rounded"
                     alt="logo"
                   />
@@ -309,7 +310,7 @@ const ProblemsetPage = () => {
                     className="text-base text-zinc-300 flex items-center gap-1"
                   >
                     <img
-                      src={`https://logo.clearbit.com/${company.toLowerCase()}.com`}
+                      src={getLogo(company)}
                       className="w-4 h-4 rounded"
                       alt="logo"
                     />
@@ -542,7 +543,7 @@ const ProblemsetPage = () => {
 
               {visibleProblems.map((problem, index) => {
                 const isInPlaylist = problem.ProblemInPlaylist.some(
-                  (prob) => prob.problemId === problem.id
+                  (prob) => prob.problemId === problem.id,
                 );
 
                 return (

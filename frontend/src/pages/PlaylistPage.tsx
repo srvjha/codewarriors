@@ -37,11 +37,12 @@ import { debounce } from "@/utils/debounce";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { ClipLoader } from "react-spinners";
+import { getLogo } from "@/utils/CompanyLogos";
 
 const PlaylistPage = () => {
   const [privatePlaylists, setPrivatePlaylists] = useState<Playlist[]>([]);
   const [publicPlaylists, setPublicPlaylists] = useState<Playlist[]>([]);
-  const[loading,setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [recommended, setRecommend] = useState<Playlist[]>([]);
@@ -66,7 +67,7 @@ const PlaylistPage = () => {
       setPrivatePlaylists(response.data.data || []);
     } catch (err) {
       console.error("Failed to fetch playlists", err);
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -78,18 +79,18 @@ const PlaylistPage = () => {
       });
       // for favourite
       const data = response.data.data.filter(
-        (d: Playlist) => d.type === "public"
+        (d: Playlist) => d.type === "public",
       );
       console.log({ public: data });
       const companyBasedSheets = response.data.data.filter(
-        (d: Playlist) => d.type === "company"
+        (d: Playlist) => d.type === "company",
       );
       setPublicPlaylists(data || []);
       setRecommend(response.data.data || []);
       setCompanyBased(companyBasedSheets);
     } catch (err) {
       console.error("Failed to fetch playlists", err);
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -119,7 +120,7 @@ const PlaylistPage = () => {
       (playlist) =>
         playlist.name === "Beginner's Foundation" ||
         playlist.name === "Intermediate Mastery" ||
-        playlist.name === "Advanced Conquest"
+        playlist.name === "Advanced Conquest",
     );
 
     const styleOptions = [
@@ -212,7 +213,7 @@ const PlaylistPage = () => {
                 (playlist.name.toLowerCase().includes("hard") &&
                   (keyword === "hard" || keyword === "advanced")) ||
                 (keyword === "beginner" &&
-                  playlist.name.toLowerCase().includes("easy")))
+                  playlist.name.toLowerCase().includes("easy"))),
           );
 
           return (
@@ -237,7 +238,7 @@ const PlaylistPage = () => {
           const matchesCompany = companyNames.some(
             (company) =>
               query.includes(company) &&
-              playlist.name.toLowerCase().includes(company)
+              playlist.name.toLowerCase().includes(company),
           );
 
           return (
@@ -256,13 +257,13 @@ const PlaylistPage = () => {
         setRecommend(filteredRecommended);
         setCompanyBased(filteredCompanyBased);
       },
-      1000
+      1000,
     );
   }, [privatePlaylists, publicPlaylists, recommended, companyBased]);
 
   const handleEditPlaylist = (id: string) => {
     const playlistToEdit = [...publicPlaylists, ...privatePlaylists].find(
-      (playlist) => playlist.id === id
+      (playlist) => playlist.id === id,
     );
 
     if (playlistToEdit) {
@@ -408,7 +409,7 @@ const PlaylistPage = () => {
                                 new Date(playlist.updatedAt),
                                 {
                                   addSuffix: true,
-                                }
+                                },
                               )
                             : "N/A"}
                         </span>
@@ -420,7 +421,7 @@ const PlaylistPage = () => {
                           onClick={() =>
                             handleAddProblemToPlaylist(
                               playlist.name,
-                              playlist.id
+                              playlist.id,
                             )
                           }
                         >
@@ -640,9 +641,7 @@ const PlaylistPage = () => {
                   <CardHeader className="pb-4">
                     <div className="flex mb-4">
                       <img
-                        src={`https://logo.clearbit.com/${company.name
-                          .split(" ")[0]
-                          .toLowerCase()}.com`}
+                        src={getLogo(company.name.split(" ")[0].toLowerCase())}
                         className="w-7 h-7 object-contain mt-2"
                         alt="logo"
                       />
