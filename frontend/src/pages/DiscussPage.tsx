@@ -35,6 +35,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import type { Post } from "@/types/discuss/post";
 import { ClipLoader } from "react-spinners";
+import { formatTime } from "@/utils";
 
 const DiscussPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -45,24 +46,6 @@ const DiscussPage = () => {
   const [originalPosts, setOriginalPosts] = useState<Post[]>([]);
   const [activeFilter, setActiveFilter] = useState<null | "mv" | "lt">(null);
   const [loading, setLoading] = useState(true);
-
-  const formatTime = (date: string) => {
-    const postCreatedTime = new Date(date);
-    const currentTime = new Date();
-    const diffMs = currentTime.getTime() - postCreatedTime.getTime();
-
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays >= 1) {
-      return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
-    } else if (diffHours >= 1) {
-      return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
-    } else {
-      return `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""} ago`;
-    }
-  };
 
   useEffect(() => {
     const fetchAllPost = async () => {
