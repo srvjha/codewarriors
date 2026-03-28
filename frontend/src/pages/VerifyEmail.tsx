@@ -8,6 +8,10 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/store";
 import { Toast, ToastError, ToastSuccess } from "@/utils/ToastContainers";
 
+const LoadingSpinner = () => (
+  <div className="w-8 h-8 border-2 border-gray-600 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
+);
+
 const VerifyEmail = () => {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -31,10 +35,6 @@ const VerifyEmail = () => {
         setIsLoading(false);
       });
   }, [token, navigate]);
-
-  const LoadingSpinner = () => (
-    <div className="w-8 h-8 border-2 border-gray-600 border-t-blue-500 rounded-full animate-spin mx-auto"></div>
-  );
 
   const handleRequestVerificationLink = async () => {
     try {

@@ -20,6 +20,35 @@ const Spinner: FC<SpinnerProps> = ({
   variant = "bounce",
   text = "Loading...",
 }) => {
+  const [displayText, setDisplayText] = useState("");
+  const [showCursor, setShowCursor] = useState(true);
+  const [textIndex, setTextIndex] = useState(0);
+
+  useEffect(() => {
+    if (variant !== "terminal") return;
+    if (textIndex < text.length) {
+      const timer = setTimeout(() => {
+        setDisplayText((prev) => prev + text[textIndex]);
+        setTextIndex((prev) => prev + 1);
+      }, 150);
+      return () => clearTimeout(timer);
+    } else {
+      const resetTimer = setTimeout(() => {
+        setDisplayText("");
+        setTextIndex(0);
+      }, 1000);
+      return () => clearTimeout(resetTimer);
+    }
+  }, [textIndex, text, variant]);
+
+  useEffect(() => {
+    if (variant !== "terminal") return;
+    const blinkTimer = setInterval(() => {
+      setShowCursor((prev) => !prev);
+    }, 500);
+    return () => clearInterval(blinkTimer);
+  }, [variant]);
+
   // dots
   if (variant === "bounce") {
     return (
@@ -77,33 +106,6 @@ const Spinner: FC<SpinnerProps> = ({
 
   // terminal
   if (variant === "terminal") {
-    const [displayText, setDisplayText] = useState("");
-    const [showCursor, setShowCursor] = useState(true);
-    const [textIndex, setTextIndex] = useState(0);
-
-    useEffect(() => {
-      if (textIndex < text.length) {
-        const timer = setTimeout(() => {
-          setDisplayText((prev) => prev + text[textIndex]);
-          setTextIndex((prev) => prev + 1);
-        }, 150);
-        return () => clearTimeout(timer);
-      } else {
-        const resetTimer = setTimeout(() => {
-          setDisplayText("");
-          setTextIndex(0);
-        }, 1000);
-        return () => clearTimeout(resetTimer);
-      }
-    }, [textIndex, text]);
-
-    useEffect(() => {
-      const blinkTimer = setInterval(() => {
-        setShowCursor((prev) => !prev);
-      }, 500);
-      return () => clearInterval(blinkTimer);
-    }, []);
-
     return (
       <div
         className={cn(
