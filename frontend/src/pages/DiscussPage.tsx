@@ -369,9 +369,8 @@ const DiscussPage = () => {
                 <div key={idx} className="mb-4">
                   <p className="text-zinc-400 font-medium mb-1">#{tag}</p>
                   {posts.map((post) => (
-                    <Link to={`/discuss/${post.id}`}>
+                    <Link key={post.id} to={`/discuss/${post.id}`}>
                       <p
-                        key={post.id}
                         className="text-zinc-200 text-sm hover:underline cursor-pointer truncate"
                       >
                         {post.title}

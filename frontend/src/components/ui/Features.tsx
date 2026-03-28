@@ -90,6 +90,7 @@ const Features = () => {
         <div className="mt-2 z-50 relative h-[310px]">
           <img
             src="./editr.png"
+            alt=""
             className="cursor-pointer rounded-xl w-full h-[340px]  shadow-xs shadow-neutral-100"
           />
         </div>
